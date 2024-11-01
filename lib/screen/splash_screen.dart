@@ -5,7 +5,7 @@ import 'package:healthify/widget/healthify_text.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
-// memanggil splash 
+// memanggil splash
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 Text(
                   'Your Path to Holistic Wellness Starts Here.',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: const Color.fromRGBO(146, 36, 19, 1),
                   ),
