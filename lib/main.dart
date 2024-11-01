@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screen/splash_screen.dart';
+import 'package:healthify/screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());

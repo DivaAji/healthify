@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screen/welcome_screen.dart';
-import 'package:healthify/widget/healthify_text.dart';
+import 'package:healthify/screens/welcome_screen.dart';
+import 'package:healthify/widgets/healthify_text.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

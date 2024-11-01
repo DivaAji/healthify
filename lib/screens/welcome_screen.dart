@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screen/login_screen.dart';
-import 'package:healthify/widget/healthify_text.dart';
+import 'package:healthify/screens/login_screen.dart';
+import 'package:healthify/widgets/healthify_text.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
