@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class HealthifyText extends StatelessWidget {
-  const HealthifyText({Key? key}) : super(key: key);
+  final double fontSize; // Ubah menjadi double untuk ukuran font
+
+  const HealthifyText({Key? key, this.fontSize = 48}) : super(key: key); // Gunakan default value
 
   @override
   Widget build(BuildContext context) {
@@ -9,7 +11,7 @@ class HealthifyText extends StatelessWidget {
       text: TextSpan(
         style: TextStyle(
           fontFamily: 'Galatea',
-          fontSize: 48,
+          fontSize: fontSize, // Gunakan parameter fontSize
           fontWeight: FontWeight.w700,
           height: 1.25,
           shadows: [

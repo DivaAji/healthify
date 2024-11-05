@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/login_screen.dart';
 import 'package:healthify/widgets/healthify_text.dart';
+import 'package:healthify/widgets/button.dart'; // Impor kelas CustomButton
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -8,44 +9,50 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Stack(
-            children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Image.asset(
-                  'assets/images/shape.png',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
+      body: SingleChildScrollView(
+        // Untuk membuat layar bisa di-scroll jika konten terlalu panjang
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Image.asset(
+                    'assets/images/shape.png',
+                    fit: BoxFit.cover,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height *
+                        0.5, // Sesuaikan tinggi untuk proporsi yang baik
+                  ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: Image.asset(
-                  'assets/images/welcome.png',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Image.asset(
+                    'assets/images/welcome.png',
+                    fit: BoxFit.cover,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height *
+                        0.4, // Sesuaikan tinggi
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 60),
-          Text(
-            'Welcome to',
-            style: TextStyle(
-              fontFamily: 'Galatea',
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: const Color.fromRGBO(33, 50, 75, 1),
+              ],
             ),
-          ),
-          const SizedBox(height: 1),
-          const HealthifyText(),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Container(
+            const SizedBox(height: 85),
+            Text(
+              'Welcome to',
+              style: TextStyle(
+                fontFamily: 'Galatea',
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: const Color.fromRGBO(33, 50, 75, 1),
+              ),
+            ),
+            const SizedBox(height: 1),
+            const HealthifyText(),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Text(
                 'Temukan program yang tepat untuk perjalanan kesehatan anda, kapan pun dan di mana pun.',
                 style: TextStyle(
@@ -56,33 +63,19 @@ class WelcomeScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-          ),
-          const SizedBox(height: 40),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(17),
-              ),
-              backgroundColor: const Color.fromRGBO(0, 139, 144, 1),
+            const SizedBox(height: 40),
+            CustomButton(
+              text: 'Get Started >>', // Ganti teks di sini
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
             ),
-            child: Text(
-              'Get Started >>',
-              style: TextStyle(
-                fontFamily: 'Galatea',
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
