@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/image_picker_screen.dart';
 import 'package:healthify/widgets/camera.dart';
 
 class FaceScan extends StatelessWidget {
@@ -25,34 +26,46 @@ class FaceScan extends StatelessWidget {
                     right:
                         screenWidth * 0.08, // Padding kanan 8% dari lebar layar
                   ),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.03,
-                      vertical: screenHeight * 0.01,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color.fromRGBO(214, 222, 222, 1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Unggah',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(0, 139, 144, 1),
-                            fontSize:
-                                screenWidth * 0.04, // Ukuran teks responsif
+                  child: InkWell(
+                    onTap: () {
+                      // Navigasi ke screen image picker
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImagePickerScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.03,
+                        vertical: screenHeight * 0.01,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(214, 222, 222, 1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Unggah',
+                            style: TextStyle(
+                              color: const Color.fromRGBO(0, 139, 144, 1),
+                              fontSize:
+                                  screenWidth * 0.04, // Ukuran teks responsif
+                            ),
                           ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02), // Jarak responsif
-                        Image.asset(
-                          'assets/icons/upload.png',
-                          width: screenWidth * 0.05,
-                          height: screenWidth * 0.05,
-                          fit: BoxFit.cover,
-                        ),
-                      ],
+                          SizedBox(
+                              width: screenWidth * 0.02), // Jarak responsif
+                          Image.asset(
+                            'assets/icons/upload.png',
+                            width: screenWidth * 0.05,
+                            height: screenWidth * 0.05,
+                            fit: BoxFit.cover,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -82,7 +95,7 @@ class FaceScan extends StatelessWidget {
           SizedBox(height: screenHeight * 0.01),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+              padding: EdgeInsets.only(bottom: screenHeight * 0.005),
               child: GestureDetector(
                 onTap: () {
                   _takePicture();
