@@ -75,7 +75,7 @@ class DataUserForm extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const FaceScan(),
+                                builder: (context) => FaceScan(),
                               ),
                             );
                           },
