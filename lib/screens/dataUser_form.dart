@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/dataUser_form.dart';
+import 'package:healthify/screens/faceScan_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/text_field.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class DataUserForm extends StatelessWidget {
+  const DataUserForm({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class RegisterScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Daftar Akun',
+                          'Lengkapi Data Diri',
                           style: TextStyle(
                             fontFamily: 'Galatea',
                             fontSize: 24,
@@ -48,7 +48,7 @@ class RegisterScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 13),
                         const Text(
-                          'Bergabunglah dengan kami dalam perjalanan kebugaran Anda!',
+                          'Lengkapi data berikut dan bantu kami menyesuaikan program anda!',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -58,17 +58,15 @@ class RegisterScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
-                          labelText: 'Username',
+                          labelText: 'Jenis Kelamin',
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
-                          labelText: 'Password',
-                          obscureText: true,
+                          labelText: 'Berat Badan',
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
-                          labelText: 'Konfirmasi Password',
-                          obscureText: true,
+                          labelText: 'Tinggi Badan',
                         ),
                         const SizedBox(height: 20),
                         CustomButton(
@@ -77,7 +75,7 @@ class RegisterScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const DataUserForm(),
+                                builder: (context) => const FaceScan(),
                               ),
                             );
                           },
