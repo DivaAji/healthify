@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/profile_screen.dart';
+import 'package:healthify/screens/program/kelenturan_screen.dart';
+import 'package:healthify/screens/program/kelincahan_screen.dart';
+import 'package:healthify/screens/program/keseimbangan_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,12 +12,23 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('PROGRAM'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
               'Sedang Berlangsung',
               style: TextStyle(
@@ -32,8 +47,8 @@ class HomeScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
               'Pilihan Program',
               style: TextStyle(
@@ -49,17 +64,17 @@ class HomeScreen extends StatelessWidget {
                 ProgramCard(
                   title: 'Kelincahan',
                   imageUrl: 'assets/images/login_background.jpg', // Ganti dengan path banner kelincahan
-                  nextPage: NextScreen(title: 'Kelincahan'),
+                  nextPage: KelincahanScreen(title: 'Kelincahan'),
                 ),
                 ProgramCard(
                   title: 'Keseimbangan',
                   imageUrl: 'assets/images/login_background.jpg', // Ganti dengan path banner keseimbangan
-                  nextPage: NextScreen(title: 'Keseimbangan'),
+                  nextPage: KeseimbanganScreen(title: 'Keseimbangan'),
                 ),
                 ProgramCard(
                   title: 'Kelenturan',
                   imageUrl: 'assets/images/login_background.jpg', // Ganti dengan path banner kelenturan
-                  nextPage: NextScreen(title: 'Kelenturan'),
+                  nextPage: KelenturanScreen(title: 'Kelenturan'),
                 ),
               ],
             ),
@@ -113,23 +128,3 @@ class ProgramCard extends StatelessWidget {
   }
 }
 
-class NextScreen extends StatelessWidget {
-  final String title;
-
-  const NextScreen({Key? key, required this.title}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: Text(
-          'Selamat datang di $title',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-    );
-  }
-}
