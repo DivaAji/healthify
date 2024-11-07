@@ -14,6 +14,7 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          // Background image
           SizedBox.expand(
             child: Image.asset(
               'assets/images/login_background.jpg',
@@ -21,17 +22,17 @@ class LoginScreen extends StatelessWidget {
               height: MediaQuery.of(context).size.height, // Sesuaikan tinggi
             ),
           ),
+          // Centering the content with a scrollable card
           Center(
             child: SingleChildScrollView(
-              // Tambahkan SingleChildScrollView agar layar dapat di-scroll
+              padding: EdgeInsets.symmetric(horizontal: 20), // Padding untuk seluruh tampilan
               child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 250), // Menurunkan card dari tengah
+                padding: const EdgeInsets.only(top: 150), // Menurunkan card agar lebih rendah
                 child: MyCard(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min, // Sesuaikan ukuran card
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const HealthifyText(fontSize: 24),
                         const SizedBox(height: 10),
@@ -44,12 +45,12 @@ class LoginScreen extends StatelessWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 15),
-                        CustomTextField(
+                        const SizedBox(height: 20),
+                        const CustomTextField(
                           labelText: 'Username',
                         ),
                         const SizedBox(height: 15),
-                        CustomTextField(
+                        const CustomTextField(
                           labelText: 'Password',
                           obscureText: true,
                         ),
@@ -64,11 +65,10 @@ class LoginScreen extends StatelessWidget {
                               ),
                             );
                           },
-                          horizontalPadding:
-                              50.0, // Mengatur padding horizontal
+                          horizontalPadding: 50.0, // Mengatur padding horizontal
                           verticalPadding: 10.0, // Mengatur padding vertical
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 20),
                         const Text(
                           'Belum punya akun?',
                           style: TextStyle(

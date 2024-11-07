@@ -9,30 +9,43 @@ class MyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius:
-          BorderRadius.all(Radius.circular(20)), // Menambahkan border radius
+      borderRadius: BorderRadius.all(Radius.circular(20)), // Menambahkan border radius
       child: BackdropFilter(
-        filter: ImageFilter.blur(
-            sigmaX: 10.0, sigmaY: 10.0), // Mengurangi sedikit tingkat blur
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Mengurangi sedikit tingkat blur
         child: Container(
           width: 300, // Lebar card
           height: 400, // Tinggi card
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7), // Warna putih lebih terang
+            color: Colors.white.withOpacity(0), // Warna putih lebih transparan untuk efek kaca
             border: Border.all(
-              color: Colors.white.withOpacity(0.9), // Border lebih solid
+              color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.3), // Border lebih tipis dengan transparansi
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black
-                    .withOpacity(0.1), // Warna bayangan lebih lembut
-                blurRadius: 8, // Radius blur bayangan
+                color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.2), // Bayangan yang lebih halus
+                blurRadius: 10, // Radius blur bayangan untuk efek lebih lembut
                 offset: Offset(0, 4), // Posisi bayangan
               ),
             ],
           ),
-          child: child, // Gunakan child di sini
+          child: Stack( // Menambahkan Stack untuk menambahkan stroke
+            children: [
+              // Layer putih untuk stroke
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.7), // Warna stroke putih
+                      width: 1, // Lebar stroke putih
+                    ),
+                    borderRadius: BorderRadius.circular(20), // Border radius yang sama
+                  ),
+                ),
+              ),
+              child, // Konten asli di dalam card
+            ],
+          ),
         ),
       ),
     );

@@ -22,8 +22,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void initState() {
     super.initState();
-    _isObscured =
-        widget.obscureText; // Mulai dengan status sesuai nilai `obscureText`
+    _isObscured = widget.obscureText; // Mulai dengan status sesuai nilai `obscureText`
   }
 
   void _toggleObscureText() {
@@ -36,19 +35,35 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return Container(
       height: widget.height,
+      decoration: BoxDecoration(
+        color: Colors.white, // Warna latar belakang putih
+        borderRadius: BorderRadius.circular(20), // Radius sudut 20
+        border: Border.all(color: const Color(0xFF78B9BA)), // Garis tepi berwarna hitam
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5), // Warna bayangan
+            spreadRadius: 1, // Radius penyebaran bayangan
+            blurRadius: 4, // Blur radius bayangan
+            offset: Offset(0, 4), // Posisi bayangan (x, y)
+          ),
+        ],
+      ),
       child: TextField(
         obscureText: _isObscured,
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
+          border: InputBorder.none, // Menghilangkan border default
           labelText: widget.labelText,
+          labelStyle: TextStyle(color: const Color(0xFF21324B)), // Warna label
           suffixIcon: widget.obscureText
               ? IconButton(
                   icon: Icon(
                     _isObscured ? Icons.visibility_off : Icons.visibility,
+                    color: const Color(0xFF21324B), // Warna ikon
                   ),
                   onPressed: _toggleObscureText,
                 )
               : null, // Hanya tampilkan ikon mata jika `obscureText` true
+          contentPadding: EdgeInsets.symmetric(horizontal: 16), // Padding konten
         ),
       ),
     );
