@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/program/day/day1_screen.dart';
 
 class KelenturanScreen extends StatefulWidget {
   final String title;
@@ -39,6 +40,7 @@ class _KelenturanScreenState extends State<KelenturanScreen> {
             Text(
               'Tingkatkan fleksibilitas dan mobilitas tubuh dengan latihan peregangan yang aman dan efektif. Cocok untuk semua tingkatan, program ini membantu mengurangi kekakuan, meningkatkan postur, serta mencegah cedera. Jadikan kelenturan bagian dari rutinitas sehat Anda!',
               style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 16.0),
 
@@ -59,7 +61,7 @@ class _KelenturanScreenState extends State<KelenturanScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DayDetailScreen(day: index + 1),
+                            builder: (context) => Day1Screen(day: index + 1),
                           ),
                         );
                       }
@@ -73,15 +75,24 @@ class _KelenturanScreenState extends State<KelenturanScreen> {
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          Text(
-                            'Day ${index + 1}',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Day',
+                                style: TextStyle(color: const Color(0xFF21324B), fontSize: 16),
+                              ),
+                              Text(
+                                '${index + 1}',
+                                style: TextStyle(color: const Color(0xFF21324B), fontSize: 30),
+                              ),// Tampilkan teks tambahan jika hari dapat diakses
+                            ],
                           ),
                           if (index > completedDays) // Tampilkan ikon gembok jika hari tidak dapat diakses
                             Center(
                               child: Icon(
                                 Icons.lock,
-                                color: const Color.fromARGB(255, 0, 0, 0),
+                                color: const Color.fromARGB(255, 255, 255, 255),
                                 size: 40, // Ukuran ikon yang lebih besar
                               ),
                             ),
@@ -99,23 +110,3 @@ class _KelenturanScreenState extends State<KelenturanScreen> {
   }
 }
 
-class DayDetailScreen extends StatelessWidget {
-  final int day;
-
-  const DayDetailScreen({Key? key, required this.day}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Day $day'),
-      ),
-      body: Center(
-        child: Text(
-          'Detail untuk Day $day',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-    );
-  }
-}
