@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
-  final double horizontalPadding; // Tambahkan parameter untuk horizontal padding
-  final double verticalPadding;   // Tambahkan parameter untuk vertical padding
+  final double horizontalPadding;
+  final double verticalPadding;
+  final TextStyle? textStyle; // Tambahkan parameter untuk TextStyle
 
   const CustomButton({
     Key? key,
     required this.text,
     required this.onPressed,
-    this.horizontalPadding = 30.0, // Nilai default horizontal padding
-    this.verticalPadding = 15.0,   // Nilai default vertical padding
+    this.horizontalPadding = 30.0,
+    this.verticalPadding = 15.0,
+    this.textStyle, // Tambahkan TextStyle opsional
   }) : super(key: key);
 
   @override
@@ -24,7 +26,7 @@ class CustomButton extends StatelessWidget {
           vertical: verticalPadding,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(17),
+          borderRadius: BorderRadius.circular(20),
         ),
         backgroundColor: const Color.fromRGBO(0, 139, 144, 1),
       ),
@@ -35,7 +37,7 @@ class CustomButton extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
-        ),
+        ).merge(textStyle), // Menggabungkan gaya default dengan textStyle
       ),
     );
   }

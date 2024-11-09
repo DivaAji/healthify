@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   camera: ^0.11.0+2
   image_picker: ^1.1.2
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -67,7 +68,13 @@ flutter:
     - assets/images/login_background.jpg
     - assets/images/ellipse.png
     - assets/images/detect_rectangle.png
+    - assets/images/rectangle.png
+    - assets/images/kelenturan.jpg
     - assets/icons/upload.png
+    - assets/icons/home.png
+    - assets/icons/latihan.png
+    - assets/icons/user.png
+    - assets/icons/history.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/home_screen.dart';
+import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/screens/register_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
@@ -60,7 +60,7 @@ class LoginScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
+                                builder: (context) => const MyNavigationBar(),
                               ),
                             );
                           },
