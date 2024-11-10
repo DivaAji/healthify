@@ -114,13 +114,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         CustomTextField(
                           labelText: 'Username',
                           controller:
-                              usernameController, // Isi controller dengan data
+                              usernameController, suffixIcon: null, // Isi controller dengan data
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Password',
                           obscureText: isObscured, // Use isObscured here
-                          controller: passwordController,
+                          controller: passwordController, suffixIcon: null,
                         ),
                         const SizedBox(height: 10),
 

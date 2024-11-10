@@ -5,26 +5,15 @@ class CustomTextField extends StatefulWidget {
   final bool obscureText;
   final double height;
   final TextInputType keyboardType;
-  final TextEditingController?
-<<<<<<< HEAD
-      controller;
-  final IconButton? suffixIcon; // Pastikan controller dideklarasikan di widget
-=======
-      controller; // Controller dideklarasikan di widget
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
+  final TextEditingController? controller;
 
   const CustomTextField({
     Key? key,
     required this.labelText,
     this.obscureText = false,
     this.height = 50.0,
-<<<<<<< HEAD
-    this.controller, 
-    this.suffixIcon,
-=======
     this.keyboardType = TextInputType.text,
-    this.controller,
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
+    this.controller, required suffixIcon,
   }) : super(key: key);
 
   @override
@@ -42,7 +31,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   void _toggleObscureText() {
     setState(() {
-      _isObscured = !_isObscured; // Toggle status visibilitas password
+      _isObscured = !_isObscured; // Toggle visibility of the text
     });
   }
 
@@ -50,7 +39,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight: widget.height, // Tetapkan batasan tinggi maksimum
+        maxHeight: widget.height,
       ),
       child: Stack(
         children: [
@@ -78,8 +67,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               decoration: InputDecoration(
                 border: InputBorder.none,
                 labelText: widget.labelText,
-                labelStyle:
-                    TextStyle(color: const Color.fromARGB(255, 87, 97, 112)),
+                labelStyle: TextStyle(color: const Color.fromARGB(255, 87, 97, 112)),
                 suffixIcon: widget.obscureText
                     ? IconButton(
                         icon: Icon(

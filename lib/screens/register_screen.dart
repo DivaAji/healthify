@@ -123,41 +123,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
-<<<<<<< HEAD
-                          labelText: 'Username', suffixIcon: null,
-=======
-                          controller: usernameController,
                           labelText: 'Username',
-                          keyboardType: TextInputType.name,
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
+                          keyboardType: TextInputType.name, suffixIcon: null,
+
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: passwordController,
                           labelText: 'Password',
-<<<<<<< HEAD
                           obscureText: true, suffixIcon: null,
-=======
-                          obscureText: true,
                           keyboardType: TextInputType.text,
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: confirmPasswordController,
                           labelText: 'Konfirmasi Password',
-<<<<<<< HEAD
                           obscureText: true, suffixIcon: null,
-=======
-                          obscureText: true,
                           keyboardType: TextInputType.text,
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: emailController,
                           labelText: 'Email',
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.text, suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomDropdownButton(
@@ -174,13 +162,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         CustomTextField(
                           labelText: 'Berat Badan',
                           controller: weightController,
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.number, suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Tinggi Badan',
                           controller: heightController,
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.number, suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomDropdownButton(
@@ -198,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           CustomTextField(
                             labelText: 'Umur',
                             controller: ageController,
-                            keyboardType: TextInputType.number,
+                            keyboardType: TextInputType.number, suffixIcon: null,
                           ),
                         const SizedBox(height: 20),
                         CustomButton(

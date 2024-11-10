@@ -10,7 +10,7 @@ class _CameraWidgetState extends State<CameraWidget> {
   CameraController? _cameraController;
   List<CameraDescription>? cameras;
   int _selectedCameraIndex = 0;
-  bool _isInitializing = true; // State to track initialization
+  bool _isInitializing = true;
 
   @override
   void initState() {
@@ -18,12 +18,10 @@ class _CameraWidgetState extends State<CameraWidget> {
     initCamera();
   }
 
-  // Initialize camera and set to front camera if available
   Future<void> initCamera() async {
     try {
       cameras = await availableCameras();
       if (cameras!.isNotEmpty) {
-        // Find front camera if available
         _selectedCameraIndex = cameras!.indexWhere(
             (camera) => camera.lensDirection == CameraLensDirection.front);
 
@@ -34,23 +32,19 @@ class _CameraWidgetState extends State<CameraWidget> {
 
         await _initializeCamera(_selectedCameraIndex);
       } else {
-        // Handle case where no cameras are available
-        // You might want to show a message to the user
         print('No cameras available');
       }
     } catch (e) {
-      // Handle errors here
       print('Error initializing camera: $e');
     } finally {
       setState(() {
-        _isInitializing = false; // Update the loading state
+        _isInitializing = false;
       });
     }
   }
 
-  // Initialize camera with selected index
   Future<void> _initializeCamera(int cameraIndex) async {
-    _cameraController?.dispose(); // Dispose previous camera controller
+    _cameraController?.dispose();
     _cameraController = CameraController(
       cameras![cameraIndex],
       ResolutionPreset.high,
@@ -60,7 +54,6 @@ class _CameraWidgetState extends State<CameraWidget> {
     setState(() {});
   }
 
-  // Function to toggle camera
   void _toggleCamera() {
     if (cameras!.length < 2) return; // Prevent toggling if there's only one camera
     _selectedCameraIndex = (_selectedCameraIndex + 1) % cameras!.length;
@@ -69,12 +62,7 @@ class _CameraWidgetState extends State<CameraWidget> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     if (_isInitializing) {
-=======
-    if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      // Tampilkan loading spinner saat kamera belum terinisialisasi
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
       return Center(child: CircularProgressIndicator());
     }
 
@@ -99,13 +87,8 @@ class _CameraWidgetState extends State<CameraWidget> {
           child: FloatingActionButton(
             onPressed: _toggleCamera,
             child: Icon(Icons.cameraswitch),
-<<<<<<< HEAD
-            backgroundColor: const Color.fromRGBO(214, 222, 222, 1), // Button background color
-            foregroundColor: const Color.fromRGBO(0, 139, 144, 1), // Icon color
-=======
             backgroundColor: const Color.fromRGBO(214, 222, 222, 1),
             foregroundColor: const Color.fromRGBO(0, 139, 144, 1),
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
           ),
         ),
       ],

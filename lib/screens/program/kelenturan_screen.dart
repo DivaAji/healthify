@@ -29,7 +29,7 @@ class _KelenturanScreenState extends State<KelenturanScreen> {
               height: 200,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/login_background.jpg'), // Ganti dengan path gambar banner
+                  image: AssetImage('assets/images/kelenturan.jpg'), // Ganti dengan path gambar banner
                   fit: BoxFit.cover,
                 ),
               ),

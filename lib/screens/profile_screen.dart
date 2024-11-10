@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/editProfile_screen.dart';
 import 'package:healthify/widgets/button.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -17,20 +18,20 @@ class ProfileScreen extends StatelessWidget {
             // Gambar Profil
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/profile_picture.png'), // Ganti dengan path gambar profil
+              backgroundImage: AssetImage('assets/images/kelenturan.jpg'), // Ganti dengan path gambar profil
             ),
             const SizedBox(height: 16),
 
             // Nama Pengguna
             Text(
-              'Nama Pengguna',
+              'Dappa',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
             // Email Pengguna
             Text(
-              'email@example.com',
+              'Dappa@healthidy.com',
               style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
             const SizedBox(height: 16),
@@ -40,7 +41,10 @@ class ProfileScreen extends StatelessWidget {
               text: 'Edit Profil',
               onPressed: () {
                 // Aksi ketika tombol edit ditekan
-                print('Edit Profile pressed');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                );
               },
             ),
 
@@ -58,7 +62,7 @@ class ProfileScreen extends StatelessWidget {
               child: ListView(
                 children: [
                   _buildInfoItem('Tanggal Lahir', '01 Januari 2000'),
-                  _buildInfoItem('Alamat', 'Jl. Contoh No.123'),
+                  _buildInfoItem('Alamat', 'Jl. Pegangsaan Timur.54'),
                   _buildInfoItem('Nomor Telepon', '+62123456789'),
                 ],
               ),

@@ -50,7 +50,7 @@ class _Latihan1ScreenState extends State<Latihan1Screen> {
             height: 200,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
+                image: AssetImage('assets/images/kelenturan.jpg'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),
@@ -157,7 +157,7 @@ class _HalamanBaruState extends State<HalamanBaru> {
             height: 200,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
+                image: AssetImage('assets/images/kelenturan.jpg'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),

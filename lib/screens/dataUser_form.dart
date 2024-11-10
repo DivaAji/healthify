@@ -73,17 +73,17 @@ class DataUserForm extends StatelessWidget {
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: genderController,
-                          labelText: 'Jenis Kelamin',
+                          labelText: 'Jenis Kelamin', suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: weightController,
-                          labelText: 'Berat Badan',
+                          labelText: 'Berat Badan', suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: heightController,
-                          labelText: 'Tinggi Badan',
+                          labelText: 'Tinggi Badan', suffixIcon: null,
                         ),
                         const SizedBox(height: 20),
                         CustomButton(

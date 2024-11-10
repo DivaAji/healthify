@@ -7,7 +7,7 @@ class FaceScan extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mendapatkan ukuran layar menggunakan MediaQuery
+    // Get screen dimensions using MediaQuery
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -17,7 +17,6 @@ class FaceScan extends StatelessWidget {
           Stack(
             children: [
               CameraWidget(),
-<<<<<<< HEAD
               _buildUploadButton(context, screenWidth, screenHeight),
               _buildDetectionOverlay(screenWidth, screenHeight),
             ],
@@ -29,106 +28,16 @@ class FaceScan extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.only(bottom: screenHeight * 0.005),
               child: Center(
-                child: FloatingActionButton(
-                  onPressed: () {
+                child: GestureDetector(
+                  onTap: () {
                     _takePicture();
                   },
-                  backgroundColor: Colors.white,
                   child: Image.asset(
                     'assets/images/ellipse.png',
-                    width: screenWidth * 0.2, // Lebar responsif
-                    height: screenWidth * 0.2, // Tinggi responsif agar tetap proporsional
+                    width: screenWidth * 0.2, // Responsive width
+                    height: screenWidth * 0.2, // Responsive height to maintain aspect ratio
                     fit: BoxFit.cover,
                   ),
-=======
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: screenHeight *
-                        0.05, // Padding atas 5% dari tinggi layar
-                    right:
-                        screenWidth * 0.05, // Padding kanan 8% dari lebar layar
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      // Navigasi ke screen image picker
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ImagePickerScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.03,
-                        vertical: screenHeight * 0.01,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(214, 222, 222, 1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Unggah',
-                            style: TextStyle(
-                              color: const Color.fromRGBO(0, 139, 144, 1),
-                              fontSize:
-                                  screenWidth * 0.04, 
-                            ),
-                          ),
-                          SizedBox(
-                              width: screenWidth * 0.02), 
-                          Image.asset(
-                            'assets/icons/upload.png',
-                            width: screenWidth * 0.05,
-                            height: screenWidth * 0.05,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: screenWidth * 0.5),
-                  child: Image.asset(
-                    'assets/images/detect_rectangle.png',
-                    width: 300,
-                    // fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Pastikan wajah anda terlihat jelas',
-            style: TextStyle(
-              fontSize: screenWidth * 0.04,
-              fontWeight: FontWeight.w400,
-              color: Color.fromRGBO(33, 50, 75, 1),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 5),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 5),
-              child: GestureDetector(
-                onTap: () {
-                  _takePicture();
-                },
-                child: Image.asset(
-                  'assets/images/ellipse.png',
-                  width: 80,
-                  height: 40,
-                  // fit: BoxFit.cover,
->>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
                 ),
               ),
             ),
@@ -138,18 +47,18 @@ class FaceScan extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk membangun tombol unggah
+  // Function to build the upload button
   Widget _buildUploadButton(BuildContext context, double screenWidth, double screenHeight) {
     return Align(
       alignment: Alignment.topRight,
       child: Padding(
         padding: EdgeInsets.only(
-          top: screenHeight * 0.05, // Padding atas 5% dari tinggi layar
-          right: screenWidth * 0.08, // Padding kanan 8% dari lebar layar
+          top: screenHeight * 0.05, // 5% top padding from screen height
+          right: screenWidth * 0.05, // 5% right padding from screen width
         ),
         child: InkWell(
           onTap: () {
-            // Navigasi ke screen image picker
+            // Navigate to the image picker screen
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -173,10 +82,10 @@ class FaceScan extends StatelessWidget {
                   'Unggah',
                   style: TextStyle(
                     color: const Color.fromRGBO(0, 139, 144, 1),
-                    fontSize: screenWidth * 0.04, // Ukuran teks responsif
+                    fontSize: screenWidth * 0.04, // Responsive text size
                   ),
                 ),
-                SizedBox(width: screenWidth * 0.02), // Jarak responsif
+                SizedBox(width: screenWidth * 0.02), // Responsive spacing
                 Image.asset(
                   'assets/icons/upload.png',
                   width: screenWidth * 0.05,
@@ -191,21 +100,21 @@ class FaceScan extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk membangun overlay deteksi
+  // Function to build the detection overlay
   Widget _buildDetectionOverlay(double screenWidth, double screenHeight) {
     return Center(
       child: Padding(
         padding: EdgeInsets.only(top: screenHeight * 0.3),
         child: Image.asset(
           'assets/images/detect_rectangle.png',
-          width: screenWidth * 0.8, // Lebar gambar responsif
+          width: screenWidth * 0.8, // Responsive image width
           fit: BoxFit.cover,
         ),
       ),
     );
   }
 
-  // Fungsi untuk membangun teks instruksi
+  // Function to build the instruction text
   Widget _buildInstructionText(double screenWidth) {
     return Text(
       'Pastikan wajah anda terlihat jelas',
@@ -218,10 +127,10 @@ class FaceScan extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk mengambil gambar
+  // Function to take a picture
   void _takePicture() {
-    // Implementasikan logika pengambilan gambar menggunakan camera
-    // Misalnya, Anda dapat menggunakan CameraController dari CameraWidget
-    // untuk mengambil gambar dan menyimpannya ke file atau memprosesnya lebih lanjut.
+    // Implement the logic for taking a picture using the camera
+    // For example, you can use CameraController from CameraWidget
+    // to take a picture and save it to a file or process it further.
   }
 }
