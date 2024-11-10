@@ -7,6 +7,11 @@ import 'package:healthify/widgets/text_field.dart';
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,15 +63,18 @@ class RegisterScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
+                          controller: usernameController,
                           labelText: 'Username',
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
+                          controller: passwordController,
                           labelText: 'Password',
                           obscureText: true,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
+                          controller: confirmPasswordController,
                           labelText: 'Konfirmasi Password',
                           obscureText: true,
                         ),
@@ -74,10 +82,16 @@ class RegisterScreen extends StatelessWidget {
                         CustomButton(
                           text: 'Next',
                           onPressed: () {
+                            // Arahkan ke halaman DataUserForm dengan membawa data
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const DataUserForm(),
+                                builder: (context) => DataUserForm(
+                                  username: usernameController.text,
+                                  password: passwordController.text,
+                                  confirmPassword:
+                                      confirmPasswordController.text,
+                                ),
                               ),
                             );
                           },

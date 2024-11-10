@@ -5,7 +5,20 @@ import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/text_field.dart';
 
 class DataUserForm extends StatelessWidget {
-  const DataUserForm({super.key});
+  final String username;
+  final String password;
+  final String confirmPassword;
+
+  // Controller untuk data pengguna
+  final TextEditingController genderController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+
+  DataUserForm({
+    required this.username,
+    required this.password,
+    required this.confirmPassword,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,24 +71,41 @@ class DataUserForm extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
+                          controller: genderController,
                           labelText: 'Jenis Kelamin',
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
+                          controller: weightController,
                           labelText: 'Berat Badan',
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
+                          controller: heightController,
                           labelText: 'Tinggi Badan',
                         ),
                         const SizedBox(height: 20),
                         CustomButton(
                           text: 'Next',
                           onPressed: () {
+                            // Kirim data ke API untuk proses registrasi
+                            final authService = AuthService();
+                            authService.registerUser(
+                              username: username,
+                              email:
+                                  '', // Anda bisa menambahkan field email jika dibutuhkan
+                              password: password,
+                              confirmPassword: confirmPassword,
+                              gender: genderController.text,
+                              weight: weightController.text,
+                              height: heightController.text,
+                              age: '', // Tambahkan usia jika diperlukan
+                            );
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => FaceScan(),
+                                builder: (context) => const FaceScan(),
                               ),
                             );
                           },

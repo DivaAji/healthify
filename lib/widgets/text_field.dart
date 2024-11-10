@@ -25,6 +25,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void initState() {
     super.initState();
+    _isObscured = widget.obscureText;
   }
 
   void _toggleObscureText() {

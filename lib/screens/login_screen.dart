@@ -7,6 +7,8 @@ import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/healthify_text.dart';
 import 'package:healthify/widgets/text_field.dart'; // Pastikan ini mengimpor CustomTextField
 
+bool isObscured = true; // Set default to true for password fields
+
 // Inisialisasi Dio untuk HTTP request
 final Dio dio = Dio();
 final TextEditingController usernameController = TextEditingController();
@@ -89,17 +91,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
-                        const CustomTextField(
+                        CustomTextField(
                           labelText: 'Username',
                           controller:
                               usernameController, // Isi controller dengan data
                         ),
                         const SizedBox(height: 15),
-                        const CustomTextField(
+                        CustomTextField(
                           labelText: 'Password',
-                          obscureText: true,
-                          controller:
-                              passwordController, // Isi controller dengan data
+                          obscureText: isObscured, // Use isObscured here
+                          controller: passwordController,
                         ),
                         const SizedBox(height: 20),
                         CustomButton(
