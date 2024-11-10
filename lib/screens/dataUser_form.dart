@@ -3,6 +3,7 @@ import 'package:healthify/screens/faceScan_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/text_field.dart';
+import 'package:healthify/services/auth_services.dart';
 
 class DataUserForm extends StatelessWidget {
   final String username;
