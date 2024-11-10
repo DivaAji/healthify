@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart'; // Import dio untuk HTTP request
 import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/screens/register_screen.dart';
-import 'package:healthify/widgets/button.dart';
-import 'package:healthify/widgets/card.dart';
+
+import 'package:healthify/widgets/button.dart';import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/healthify_text.dart';
 import 'package:healthify/widgets/text_field.dart'; // Pastikan ini mengimpor CustomTextField
 
@@ -89,13 +89,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
-                        const CustomTextField(
+                        CustomTextField(
                           labelText: 'Username',
                           controller:
                               usernameController, // Isi controller dengan data
                         ),
                         const SizedBox(height: 15),
-                        const CustomTextField(
+                        CustomTextField(
                           labelText: 'Password',
                           obscureText: true,
                           controller:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:healthify/widgets/button.dart';
 
 class Latihan1Screen extends StatefulWidget {
   @override
@@ -191,9 +192,9 @@ class _HalamanBaruState extends State<HalamanBaru> {
           const SizedBox(height: 20),
 
           // Button Pause
-          ElevatedButton(
+          CustomButton(
+           text: _isPaused ? 'Resume' : 'Pause',
             onPressed: _pauseTimer,
-            child: Text(_isPaused ? 'Resume' : 'Pause'),
           ),
         ],
       ),

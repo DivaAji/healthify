@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/program/day/latihan/latihan1_screen.dart';
+import 'package:healthify/widgets/button.dart';
 
 class Day1Screen extends StatelessWidget {
   final int day;
@@ -103,8 +104,9 @@ class Day1Screen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
+          padding: const EdgeInsets.all(6.0),
+          child: CustomButton(
+            text: 'Start',
             onPressed: () {
               // Navigasi ke halaman ExerciseScreen
               Navigator.push(
@@ -112,10 +114,9 @@ class Day1Screen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => Latihan1Screen()),
               );
             },
-            child: Text('Start'),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 50), // Tombol memenuhi lebar
-            ),
+            // Optional: You can customize padding if needed
+            horizontalPadding: 10.0,
+            verticalPadding: 5.0,
           ),
         ),
       ),

@@ -5,14 +5,16 @@ class CustomTextField extends StatefulWidget {
   final bool obscureText;
   final double height;
   final TextEditingController?
-      controller; // Pastikan controller dideklarasikan di widget
+      controller;
+  final IconButton? suffixIcon; // Pastikan controller dideklarasikan di widget
 
   const CustomTextField({
     Key? key,
     required this.labelText,
     this.obscureText = false,
     this.height = 50.0,
-    this.controller,
+    this.controller, 
+    this.suffixIcon,
   }) : super(key: key);
 
   @override
@@ -25,6 +27,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void initState() {
     super.initState();
+    _isObscured = widget.obscureText;
   }
 
   void _toggleObscureText() {

@@ -41,7 +41,7 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Image.asset(
-              'assets/images/login_background.jpg', // Ganti dengan path gambar histori program
+              'assets/images/histori.jpg', // Ganti dengan path gambar histori program
               height: 200,
               width: double.infinity,
               fit: BoxFit.cover,

@@ -58,17 +58,17 @@ class RegisterScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
-                          labelText: 'Username',
+                          labelText: 'Username', suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Password',
-                          obscureText: true,
+                          obscureText: true, suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Konfirmasi Password',
-                          obscureText: true,
+                          obscureText: true, suffixIcon: null,
                         ),
                         const SizedBox(height: 20),
                         CustomButton(

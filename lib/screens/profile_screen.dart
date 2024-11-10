@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/widgets/button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -34,16 +35,13 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Tombol Edit Profil
-            ElevatedButton(
+            // Tombol Edit Profil menggunakan CustomButton
+            CustomButton(
+              text: 'Edit Profil',
               onPressed: () {
                 // Aksi ketika tombol edit ditekan
                 print('Edit Profile pressed');
               },
-              child: Text('Edit Profil'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Tombol memenuhi lebar
-              ),
             ),
 
             const SizedBox(height: 16),
