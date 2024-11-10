@@ -12,13 +12,11 @@ class CustomCarouselSlider extends StatefulWidget {
 }
 
 class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
-  late CarouselController _carouselController;
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _carouselController = CarouselController();
   }
 
   @override

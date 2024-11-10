@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/widgets/button.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -45,13 +46,13 @@ class EditProfileScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Tombol Simpan
-            ElevatedButton(
+            CustomButton(
               onPressed: () {
                 // Aksi ketika tombol simpan ditekan
                 print('Profile updated: ${nameController.text}, ${emailController.text}');
                 Navigator.pop(context); // Kembali ke halaman profil
               },
-              child: const Text('Simpan'),
+              text: 'Simpan',
             ),
           ],
         ),

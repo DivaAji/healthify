@@ -12,7 +12,14 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PROGRAM'),
+        title: const Text(
+          'PROGRAM', 
+        style: TextStyle(
+          color: Color(0xFF21324B),
+          fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -33,6 +40,7 @@ class HomeScreen extends StatelessWidget {
             child: Text(
               'Sedang Berlangsung',
               style: TextStyle(
+                color: Color(0xFF21324B),
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -49,6 +57,7 @@ class HomeScreen extends StatelessWidget {
             child: Text(
               'Pilihan Program',
               style: TextStyle(
+                color: Color(0xFF21324B),
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),

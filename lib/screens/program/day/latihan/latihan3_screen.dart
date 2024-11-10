@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:healthify/screens/break_screen.dart';
-import 'package:healthify/screens/program/day/latihan/latihan3_screen.dart';
+import 'package:healthify/screens/program/day/latihan/latihan4_screen.dart';
 import 'package:healthify/widgets/button.dart';
 
-class Latihan2Screen extends StatefulWidget {
-  const Latihan2Screen({super.key});
+class Latihan3Screen extends StatefulWidget {
+  const Latihan3Screen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _Latihan2ScreenState createState() => _Latihan2ScreenState();
+  _Latihan3ScreenState createState() => _Latihan3ScreenState();
 }
 
-class _Latihan2ScreenState extends State<Latihan2Screen> {
+class _Latihan3ScreenState extends State<Latihan3Screen> {
   int _start = 1; // Countdown starts from 1 second
   late Timer _timer;
   bool _isPaused = false;
@@ -34,7 +34,7 @@ class _Latihan2ScreenState extends State<Latihan2Screen> {
         // Navigate to BreakScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => BreakScreen(nextScreen: Latihan3Screen())),
+          MaterialPageRoute(builder: (context) => BreakScreen(nextScreen: Latihan4Screen())),
         );
       }
     });
@@ -59,7 +59,7 @@ class _Latihan2ScreenState extends State<Latihan2Screen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'LATIHAN 2/4',
+          'LATIHAN 3/4',
           style: TextStyle(color: Color(0xFF21324B), fontWeight: FontWeight.bold),
         ),
       ),

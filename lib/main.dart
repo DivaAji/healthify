@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/home_screen.dart';
+import 'package:healthify/screens/program/day/day1_screen.dart';
+import 'package:healthify/screens/program/day/latihan/end_screen.dart';
+import 'package:healthify/screens/program/day/latihan/latihan1_screen.dart';
+import 'package:healthify/screens/program/day/latihan/end_screen.dart';
+import 'package:healthify/screens/program/day/latihan/latihan4_screen.dart';
 import 'package:healthify/screens/splash_screen.dart';
 
 void main() => runApp(const MyApp());
@@ -14,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Galatea', // Terapkan font Galatea secara global
       ),
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }
