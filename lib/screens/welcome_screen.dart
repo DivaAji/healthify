@@ -42,7 +42,6 @@ class WelcomeScreen extends StatelessWidget {
             Text(
               'Welcome to',
               style: TextStyle(
-                fontFamily: 'Galatea',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: const Color.fromRGBO(33, 50, 75, 1),
@@ -54,13 +53,13 @@ class WelcomeScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Text(
-                'Temukan program yang tepat untuk perjalanan kesehatan anda, kapan pun dan di mana pun.',
+                'Kembangkan kemampuanmu dan raih kesehatan yang optimal bersama kami. Temukan program yang tepat untuk perjalanan kesehatanmu, kapan pun dan di mana pun.',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: const Color.fromRGBO(33, 50, 75, 1),
                 ),
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.justify,
               ),
             ),
             const SizedBox(height: 40),
