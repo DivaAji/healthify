@@ -24,7 +24,7 @@ class FaceScan extends StatelessWidget {
                     top: screenHeight *
                         0.05, // Padding atas 5% dari tinggi layar
                     right:
-                        screenWidth * 0.08, // Padding kanan 8% dari lebar layar
+                        screenWidth * 0.05, // Padding kanan 8% dari lebar layar
                   ),
                   child: InkWell(
                     onTap: () {
@@ -53,16 +53,15 @@ class FaceScan extends StatelessWidget {
                             style: TextStyle(
                               color: const Color.fromRGBO(0, 139, 144, 1),
                               fontSize:
-                                  screenWidth * 0.04, // Ukuran teks responsif
+                                  screenWidth * 0.04, 
                             ),
                           ),
                           SizedBox(
-                              width: screenWidth * 0.02), // Jarak responsif
+                              width: screenWidth * 0.02), 
                           Image.asset(
                             'assets/icons/upload.png',
                             width: screenWidth * 0.05,
                             height: screenWidth * 0.05,
-                            fit: BoxFit.cover,
                           ),
                         ],
                       ),
@@ -72,17 +71,17 @@ class FaceScan extends StatelessWidget {
               ),
               Center(
                 child: Padding(
-                  padding: EdgeInsets.only(top: screenHeight * 0.3),
+                  padding: EdgeInsets.only(top: screenWidth * 0.5),
                   child: Image.asset(
                     'assets/images/detect_rectangle.png',
-                    width: screenWidth * 0.8, // Lebar gambar responsif
-                    fit: BoxFit.cover,
+                    width: 300,
+                    // fit: BoxFit.cover,
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: screenHeight * 0.02),
+          SizedBox(height: 20),
           Text(
             'Pastikan wajah anda terlihat jelas',
             style: TextStyle(
@@ -92,20 +91,19 @@ class FaceScan extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: screenHeight * 0.01),
+          SizedBox(height: 5),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: screenHeight * 0.005),
+              padding: EdgeInsets.only(bottom: 5),
               child: GestureDetector(
                 onTap: () {
                   _takePicture();
                 },
                 child: Image.asset(
                   'assets/images/ellipse.png',
-                  width: screenWidth * 0.2, // Lebar responsif
-                  height: screenWidth *
-                      0.2, // Tinggi responsif agar tetap proporsional
-                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 40,
+                  // fit: BoxFit.cover,
                 ),
               ),
             ),

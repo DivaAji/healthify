@@ -23,22 +23,25 @@ class WelcomeScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height *
-                        0.5, // Sesuaikan tinggi untuk proporsi yang baik
+                        0.55, // Sesuaikan tinggi untuk proporsi yang baik
                   ),
                 ),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Image.asset(
-                    'assets/images/welcome.png',
-                    fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height *
-                        0.4, // Sesuaikan tinggi
+                Padding(
+                  padding: const EdgeInsets.only(top: 40.0),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Image.asset(
+                      'assets/images/welcome.png',
+                      fit: BoxFit.cover,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height *
+                          0.4, // Sesuaikan tinggi
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 85),
+            const SizedBox(height: 40),
             Text(
               'Welcome to',
               style: TextStyle(
@@ -47,11 +50,12 @@ class WelcomeScreen extends StatelessWidget {
                 color: const Color.fromRGBO(33, 50, 75, 1),
               ),
             ),
-            const SizedBox(height: 1),
-            const HealthifyText(),
-            const SizedBox(height: 8),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.only(top: 1.0, bottom: 8.0),
+              child: const HealthifyText(),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 35),
               child: Text(
                 'Kembangkan kemampuanmu dan raih kesehatan yang optimal bersama kami. Temukan program yang tepat untuk perjalanan kesehatanmu, kapan pun dan di mana pun.',
                 style: TextStyle(
@@ -59,20 +63,22 @@ class WelcomeScreen extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                   color: const Color.fromRGBO(33, 50, 75, 1),
                 ),
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 40),
-            CustomButton(
-              text: 'Get Started >>', // Ganti teks di sini
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
-              },
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: CustomButton(
+                text: 'Get Started >>', // Ganti teks di sini
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
