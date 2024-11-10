@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/homepage.dart';
+import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/screens/latihan_screen.dart';
 
 class MyNavigationBar extends StatefulWidget {
@@ -14,7 +14,7 @@ class _MyNavigationBar extends State<MyNavigationBar> {
 
   // Pages that correspond to the BottomNavigationBar items
   final List<Widget> _pages = [
-    const HomePage(),
+    const HomeScreen(),
     const MyLatihan(),
     // Add other pages here like History and Profile if needed
   ];

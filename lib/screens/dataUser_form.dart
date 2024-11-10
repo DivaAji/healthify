@@ -50,7 +50,7 @@ class DataUserForm extends StatelessWidget {
                         const Text(
                           'Lengkapi data berikut dan bantu kami menyesuaikan program anda!',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 14.5,
                             fontWeight: FontWeight.w400,
                             color: Color.fromRGBO(33, 50, 75, 1),
                           ),

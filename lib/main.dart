@@ -8,9 +8,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: SplashScreen(),
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Galatea', // Terapkan font Galatea secara global
+      ),
+      home: SplashScreen(),
     );
   }
 }
