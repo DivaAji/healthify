@@ -69,7 +69,12 @@ class _CameraWidgetState extends State<CameraWidget> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     if (_isInitializing) {
+=======
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      // Tampilkan loading spinner saat kamera belum terinisialisasi
+>>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
       return Center(child: CircularProgressIndicator());
     }
 
@@ -94,8 +99,13 @@ class _CameraWidgetState extends State<CameraWidget> {
           child: FloatingActionButton(
             onPressed: _toggleCamera,
             child: Icon(Icons.cameraswitch),
+<<<<<<< HEAD
             backgroundColor: const Color.fromRGBO(214, 222, 222, 1), // Button background color
             foregroundColor: const Color.fromRGBO(0, 139, 144, 1), // Icon color
+=======
+            backgroundColor: const Color.fromRGBO(214, 222, 222, 1),
+            foregroundColor: const Color.fromRGBO(0, 139, 144, 1),
+>>>>>>> 1642cb71365a0d58944cbe2ca86b0e29bbe34b9e
           ),
         ),
       ],

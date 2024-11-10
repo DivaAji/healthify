@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart'; // Import dio untuk HTTP request
-import 'package:healthify/screens/home_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:healthify/screens/register_screen.dart';
 
 import 'package:healthify/widgets/button.dart';import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/healthify_text.dart';
-import 'package:healthify/widgets/text_field.dart'; // Pastikan ini mengimpor CustomTextField
+import 'package:healthify/widgets/navigation_bar.dart';
+import 'package:healthify/widgets/text_field.dart';
+
+bool isObscured = true; // Set default to true for password fields
 
 // Inisialisasi Dio untuk HTTP request
 final Dio dio = Dio();
@@ -25,6 +27,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  String? errorMessage;
+
   @override
   void initState() {
     super.initState();
@@ -39,16 +43,34 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         // Jika data ditemukan, masukkan data ke controller
         setState(() {
-          usernameController.text = response.data['username'] ??
-              ''; // Ganti 'name' sesuai data yang diterima
-          passwordController.text = response.data['password'] ??
-              ''; // Ganti 'password' sesuai data yang diterima
+          usernameController.text = response.data['username'] ?? '';
+          passwordController.text = response.data['password'] ?? '';
         });
       } else {
         print('Failed to fetch data: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching data: $e');
+    }
+  }
+
+  // Fungsi untuk validasi input
+  void validateLogin() {
+    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Username dan Password harus diisi!';
+      });
+    } else {
+      setState(() {
+        errorMessage = null;
+      });
+      // Arahkan ke halaman berikutnya jika valid
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MyNavigationBar(),
+        ),
+      );
     }
   }
 
@@ -70,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    top: 150), // Menurunkan card agar lebih rendah
+                    top: 250), // Menurunkan card agar lebih rendah
                 child: MyCard(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -82,8 +104,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Text(
                           'Siap untuk memulai perjalanan kebugaran Anda? Mari masuk!',
                           style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.normal,
                             color: Color.fromRGBO(33, 50, 75, 1),
                           ),
                           textAlign: TextAlign.center,
@@ -97,26 +119,31 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Password',
-                          obscureText: true,
-                          controller:
-                              passwordController, // Isi controller dengan data
+                          obscureText: isObscured, // Use isObscured here
+                          controller: passwordController,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
+
+                        // Menampilkan pesan error jika ada
+                        if (errorMessage != null)
+                          Text(
+                            errorMessage!,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+
                         CustomButton(
                           text: 'Login',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
-                              ),
-                            );
-                          },
+                          onPressed: validateLogin,
                           horizontalPadding:
                               50.0, // Mengatur padding horizontal
                           verticalPadding: 10.0, // Mengatur padding vertical
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
                         const Text(
                           'Belum punya akun?',
                           style: TextStyle(
@@ -126,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 7),
                         InkWell(
                           onTap: () {
                             Navigator.push(
@@ -139,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text(
                             'Daftar untuk memulai!',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.w400,
                               color: Color.fromRGBO(0, 139, 144, 1),
                               decoration: TextDecoration.underline,
