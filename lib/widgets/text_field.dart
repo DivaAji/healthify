@@ -4,12 +4,15 @@ class CustomTextField extends StatefulWidget {
   final String labelText;
   final bool obscureText;
   final double height;
+  final TextEditingController?
+      controller; // Pastikan controller dideklarasikan di widget
 
   const CustomTextField({
     Key? key,
     required this.labelText,
     this.obscureText = false,
     this.height = 50.0,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -22,8 +25,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void initState() {
     super.initState();
-    _isObscured =
-        widget.obscureText; // Mulai dengan status sesuai nilai `obscureText`
+    _isObscured = widget.obscureText; // Inisialisasi sesuai nilai `obscureText`
   }
 
   void _toggleObscureText() {
@@ -37,9 +39,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Container(
       height: widget.height,
       child: TextField(
+        controller: widget.controller, // Gunakan controller dari widget
         obscureText: _isObscured,
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           labelText: widget.labelText,
           suffixIcon: widget.obscureText
               ? IconButton(
@@ -48,7 +51,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   ),
                   onPressed: _toggleObscureText,
                 )
-              : null, // Hanya tampilkan ikon mata jika `obscureText` true
+              : null, // Tampilkan ikon hanya jika `obscureText` true
         ),
       ),
     );

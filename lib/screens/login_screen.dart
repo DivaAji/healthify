@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart'; // Import dio untuk HTTP request
 import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/screens/register_screen.dart';
 import 'package:healthify/widgets/button.dart';
@@ -6,8 +7,50 @@ import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/healthify_text.dart';
 import 'package:healthify/widgets/text_field.dart'; // Pastikan ini mengimpor CustomTextField
 
-class LoginScreen extends StatelessWidget {
+// Inisialisasi Dio untuk HTTP request
+final Dio dio = Dio();
+final TextEditingController usernameController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
+
+// Ganti URL dengan URL backend Anda
+String urlDomain =
+    "http://localhost:8000/"; // Ganti dengan IP server lokal atau domain
+String urlGetData = urlDomain + "api/user/2"; // Endpoint API yang sesuai
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  @override
+  void initState() {
+    super.initState();
+    fetchData(); // Panggil fetchData untuk mengambil data dari API
+  }
+
+  // Fungsi untuk mengambil data dari API
+  Future<void> fetchData() async {
+    try {
+      Response response = await dio.get(urlGetData);
+
+      if (response.statusCode == 200) {
+        // Jika data ditemukan, masukkan data ke controller
+        setState(() {
+          usernameController.text = response.data['username'] ??
+              ''; // Ganti 'name' sesuai data yang diterima
+          passwordController.text = response.data['password'] ??
+              ''; // Ganti 'password' sesuai data yang diterima
+        });
+      } else {
+        print('Failed to fetch data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +66,6 @@ class LoginScreen extends StatelessWidget {
           ),
           Center(
             child: SingleChildScrollView(
-              // Tambahkan SingleChildScrollView agar layar dapat di-scroll
               child: Padding(
                 padding: const EdgeInsets.only(
                     top: 250), // Menurunkan card dari tengah
@@ -47,11 +89,15 @@ class LoginScreen extends StatelessWidget {
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Username',
+                          controller:
+                              usernameController, // Isi controller dengan data
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Password',
                           obscureText: true,
+                          controller:
+                              passwordController, // Isi controller dengan data
                         ),
                         const SizedBox(height: 20),
                         CustomButton(
