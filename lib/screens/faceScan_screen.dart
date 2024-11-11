@@ -1,13 +1,16 @@
+import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/image_picker_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:healthify/screens/login_screen.dart';
 import 'package:healthify/widgets/camera.dart';
+import 'package:image_picker/image_picker.dart';
 
 class FaceScan extends StatelessWidget {
   const FaceScan({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Mendapatkan ukuran layar menggunakan MediaQuery
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -16,23 +19,21 @@ class FaceScan extends StatelessWidget {
         children: [
           Stack(
             children: [
+              // Menambahkan widget kamera untuk menangkap gambar
               CameraWidget(),
               Align(
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: EdgeInsets.only(
-                    top: screenHeight *
-                        0.05, // Padding atas 5% dari tinggi layar
-                    right:
-                        screenWidth * 0.05, // Padding kanan 8% dari lebar layar
+                    top: screenHeight * 0.05,
+                    right: screenWidth * 0.05,
                   ),
                   child: InkWell(
                     onTap: () {
-                      // Navigasi ke screen image picker
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ImagePickerScreen(),
+                          builder: (context) => LoginScreen(),
                         ),
                       );
                     },
@@ -42,7 +43,7 @@ class FaceScan extends StatelessWidget {
                         vertical: screenHeight * 0.01,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color.fromRGBO(214, 222, 222, 1),
+                        color: Color.fromRGBO(214, 222, 222, 1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -51,13 +52,11 @@ class FaceScan extends StatelessWidget {
                           Text(
                             'Unggah',
                             style: TextStyle(
-                              color: const Color.fromRGBO(0, 139, 144, 1),
-                              fontSize:
-                                  screenWidth * 0.04, 
+                              color: Color.fromRGBO(0, 139, 144, 1),
+                              fontSize: screenWidth * 0.04,
                             ),
                           ),
-                          SizedBox(
-                              width: screenWidth * 0.02), 
+                          SizedBox(width: screenWidth * 0.02),
                           Image.asset(
                             'assets/icons/upload.png',
                             width: screenWidth * 0.05,
@@ -75,7 +74,6 @@ class FaceScan extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/detect_rectangle.png',
                     width: 300,
-                    // fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -97,13 +95,13 @@ class FaceScan extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 5),
               child: GestureDetector(
                 onTap: () {
-                  _takePicture();
+                  _takePictureAndUpload(
+                      context); // Menangkap gambar dan langsung upload
                 },
                 child: Image.asset(
                   'assets/images/ellipse.png',
                   width: 80,
                   height: 40,
-                  // fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -113,8 +111,44 @@ class FaceScan extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk mengambil gambar
-  void _takePicture() {
-    // Implementasikan logika pengambilan gambar menggunakan camera
+  // Fungsi untuk mengambil gambar dan upload ke server
+  Future<void> _takePictureAndUpload(BuildContext context) async {
+    try {
+      // Menggunakan ImagePicker untuk membuka kamera dan mengambil gambar
+      final ImagePicker _picker = ImagePicker();
+      final XFile? pickedFile = await _picker.pickImage(
+          source: ImageSource.camera); // Pastikan hanya kamera yang digunakan
+
+      if (pickedFile != null) {
+        final File imageFile = File(pickedFile.path);
+
+        // Mengirim gambar ke server menggunakan HTTP
+        final uri = Uri.parse(
+            'http://localhost:8000/api/upload-image'); // Ganti dengan URL server Laravel
+        final request = http.MultipartRequest('POST', uri)
+          ..fields['user_id'] = 'user_id' // Gantilah dengan user_id yang sesuai
+          ..files
+              .add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          // Jika sukses, tampilkan pesan sukses
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gambar berhasil diunggah')),
+          );
+        } else {
+          // Jika gagal, tampilkan pesan gagal
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gagal mengunggah gambar')),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan saat mengambil gambar')),
+      );
+    }
   }
 }
