@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Galatea', // Terapkan font Galatea secara global
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
