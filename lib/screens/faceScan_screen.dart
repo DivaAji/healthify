@@ -3,11 +3,98 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:healthify/screens/login_screen.dart';
-import 'package:healthify/widgets/camera.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:camera/camera.dart';
+import 'package:healthify/widgets/camera.dart'; // Assuming CameraWidget is defined in this file
+import 'package:flutter/services.dart';
 
-class FaceScan extends StatelessWidget {
+class FaceScan extends StatefulWidget {
   const FaceScan({super.key});
+
+  @override
+  _FaceScanState createState() => _FaceScanState();
+}
+
+class _FaceScanState extends State<FaceScan> {
+  CameraController? _cameraController;
+  List<CameraDescription>? cameras;
+  int _selectedCameraIndex = 0;
+  bool isCameraInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  // Initialize the camera
+  Future<void> _initializeCamera() async {
+    cameras = await availableCameras();
+    if (cameras != null && cameras!.isNotEmpty) {
+      _selectedCameraIndex = cameras!.indexWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.front,
+      );
+      if (_selectedCameraIndex == -1) {
+        _selectedCameraIndex =
+            0; // Default to rear camera if no front camera found
+      }
+      _cameraController = CameraController(
+        cameras![_selectedCameraIndex],
+        ResolutionPreset.high,
+      );
+
+      await _cameraController!.initialize();
+      setState(() {
+        isCameraInitialized = true;
+      });
+    }
+  }
+
+  // Capture image and upload it
+  Future<void> _takePictureAndUpload(BuildContext context) async {
+    try {
+      if (!_cameraController!.value.isInitialized) {
+        return;
+      }
+
+      final image = await _cameraController!.takePicture();
+      if (image != null) {
+        final File imageFile = File(image.path);
+
+        // Send the image to the server using HTTP
+        final uri = Uri.parse(
+            'http://localhost:8000/api/upload-image'); // Update with your server URL
+        final request = http.MultipartRequest('POST', uri)
+          ..fields['user_id'] = 'user_id' // Replace with actual user_id
+          ..files
+              .add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          // Success
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gambar berhasil diunggah')),
+          );
+        } else {
+          // Failure
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gagal mengunggah gambar')),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan saat mengambil gambar')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +106,8 @@ class FaceScan extends StatelessWidget {
         children: [
           Stack(
             children: [
-              // Menambahkan widget kamera untuk menangkap gambar
-              CameraWidget(),
+              // Camera widget for live scanning
+              if (isCameraInitialized) CameraPreview(_cameraController!),
               Align(
                 alignment: Alignment.topRight,
                 child: Padding(
@@ -96,7 +183,7 @@ class FaceScan extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {
                   _takePictureAndUpload(
-                      context); // Menangkap gambar dan langsung upload
+                      context); // Capture and upload the image
                 },
                 child: Image.asset(
                   'assets/images/ellipse.png',
@@ -109,46 +196,5 @@ class FaceScan extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  // Fungsi untuk mengambil gambar dan upload ke server
-  Future<void> _takePictureAndUpload(BuildContext context) async {
-    try {
-      // Menggunakan ImagePicker untuk membuka kamera dan mengambil gambar
-      final ImagePicker _picker = ImagePicker();
-      final XFile? pickedFile = await _picker.pickImage(
-          source: ImageSource.camera); // Pastikan hanya kamera yang digunakan
-
-      if (pickedFile != null) {
-        final File imageFile = File(pickedFile.path);
-
-        // Mengirim gambar ke server menggunakan HTTP
-        final uri = Uri.parse(
-            'http://localhost:8000/api/upload-image'); // Ganti dengan URL server Laravel
-        final request = http.MultipartRequest('POST', uri)
-          ..fields['user_id'] = 'user_id' // Gantilah dengan user_id yang sesuai
-          ..files
-              .add(await http.MultipartFile.fromPath('image', imageFile.path));
-
-        final response = await request.send();
-
-        if (response.statusCode == 200) {
-          // Jika sukses, tampilkan pesan sukses
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gambar berhasil diunggah')),
-          );
-        } else {
-          // Jika gagal, tampilkan pesan gagal
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal mengunggah gambar')),
-          );
-        }
-      }
-    } catch (e) {
-      print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan saat mengambil gambar')),
-      );
-    }
   }
 }
