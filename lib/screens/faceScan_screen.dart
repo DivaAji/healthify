@@ -1,230 +1,174 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart'; // For checking if running on Web
 import 'package:camera/camera.dart';
 import 'package:http/http.dart' as http;
 
+
 class FaceScan extends StatefulWidget {
-  const FaceScan({super.key});
+  final int userId;
+
+  const FaceScan({super.key, required this.userId});
 
   @override
   _FaceScanState createState() => _FaceScanState();
 }
 
 class _FaceScanState extends State<FaceScan> {
-  CameraController? _cameraController;
-  List<CameraDescription>? cameras;
-  int _selectedCameraIndex = 0;
-  bool isCameraInitialized = false;
+  final ImagePicker _picker = ImagePicker();
+  File? _image; // For mobile
+  Uint8List? _webImage; // For web
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeCamera();
-  }
+  // Method to pick image from camera
+  Future<void> _pickImageFromCamera() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.camera);
 
-  // Initialize the camera
-  Future<void> _initializeCamera() async {
-    cameras = await availableCameras();
-    if (cameras != null && cameras!.isNotEmpty) {
-      _selectedCameraIndex = cameras!.indexWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front,
-      );
-      if (_selectedCameraIndex == -1) {
-        _selectedCameraIndex =
-            0; // Default to rear camera if no front camera found
+    if (pickedFile != null) {
+      if (kIsWeb) {
+        // For Web, convert file to byte array (Uint8List)
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _webImage = bytes;
+        });
+      } else {
+        setState(() {
+          _image = File(pickedFile.path); // For mobile
+        });
       }
-      _cameraController = CameraController(
-        cameras![_selectedCameraIndex],
-        ResolutionPreset.high,
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengambil gambar')),
       );
-
-      await _cameraController!.initialize();
-      setState(() {
-        isCameraInitialized = true;
-      });
     }
   }
 
-  // Flip camera
-  Future<void> _flipCamera() async {
-    if (cameras != null && cameras!.isNotEmpty) {
-      // Toggle between 0 and 1 to switch cameras
-      _selectedCameraIndex = (_selectedCameraIndex + 1) % cameras!.length;
+  // Method to pick image from gallery
+  Future<void> _pickImageFromGallery() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
 
-      // Dispose of the current camera and reinitialize it
-      await _cameraController?.dispose();
-      _cameraController = CameraController(
-        cameras![_selectedCameraIndex],
-        ResolutionPreset.high,
+    if (pickedFile != null) {
+      if (kIsWeb) {
+        // For Web, convert file to byte array (Uint8List)
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _webImage = bytes;
+        });
+      } else {
+        setState(() {
+          _image = File(pickedFile.path); // For mobile
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal memilih gambar')),
       );
-
-      await _cameraController!.initialize();
-      setState(() {});
     }
   }
 
-  // Capture image and save it locally
-  Future<void> _takePictureAndSave(BuildContext context) async {
+  Future<void> _uploadImage() async {
+    if (_image == null && _webImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tidak ada gambar untuk diunggah')),
+      );
+      return;
+    }
     try {
-      if (!_cameraController!.value.isInitialized) {
-        return;
+      final uri = Uri.parse('http://192.168.1.6:8000/api/upload-image');
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['user_id'] = widget.userId.toString();
+
+      // Untuk Web
+      if (kIsWeb && _webImage != null) {
+        final byteStream = http.ByteStream.fromBytes(_webImage!);
+        final length = _webImage!.length;
+        request.files.add(http.MultipartFile(
+          'image', byteStream, length,
+          filename: 'image.png', // pastikan ekstensi benar
+        ));
+      }
+      // Untuk Mobile
+      else if (_image != null) {
+        request.files
+            .add(await http.MultipartFile.fromPath('image', _image!.path));
       }
 
-      final image = await _cameraController!.takePicture();
-      if (image != null) {
-        final File imageFile = File(image.path);
+      final response = await request.send();
 
-        // Save the image to the gallery
-        final result = await ImageGallerySaver.saveFile(imageFile.path);
-        if (result != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gambar berhasil disimpan ke galeri')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gagal menyimpan gambar')),
-          );
-        }
+      // Cek status code dan response
+      final responseBody = await http.Response.fromStream(response);
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gambar berhasil diunggah')),
+        );
+
+        // Arahkan ke halaman login setelah berhasil mengunggah gambar
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        print("Error: ${response.statusCode}, ${responseBody.body}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengunggah gambar')),
+        );
       }
     } catch (e) {
-      print('Error: $e');
+      print('Error uploading image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Terjadi kesalahan saat mengambil gambar')),
+
+        SnackBar(content: Text('Terjadi kesalahan saat mengunggah gambar')),
+
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _cameraController?.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     // Get screen dimensions using MediaQuery
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      appBar: AppBar(title: Text('Scan Wajah')),
       body: Column(
         children: [
-          Stack(
-            children: [
-              // Display live camera feed when initialized
-              if (isCameraInitialized)
-                CameraPreview(_cameraController!),
-              _buildUploadButton(context, screenWidth, screenHeight),
-              _buildDetectionOverlay(screenWidth, screenHeight),
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: screenHeight * 0.05,
-                    right: screenWidth * 0.05,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      // Navigate to the image picker screen
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.03,
-                        vertical: screenHeight * 0.01,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(214, 222, 222, 1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Unggah',
-                            style: TextStyle(
-                              color: const Color.fromRGBO(0, 139, 144, 1),
-                              fontSize: screenWidth * 0.04,
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.02),
-                          Image.asset(
-                            'assets/icons/upload.png',
-                            width: screenWidth * 0.05,
-                            height: screenWidth * 0.05,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Flip Camera Button
-              Positioned(
-                top: screenHeight * 0.05,
-                left: screenWidth * 0.05,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.switch_camera,
-                    color: Colors.white,
-                    size: screenWidth * 0.07,
-                  ),
-                  onPressed: _flipCamera,
-                ),
-              ),
-            ],
+          Expanded(
+            child: Center(
+              child: kIsWeb
+                  ? (_webImage == null
+                      ? Text('Tidak ada gambar yang dipilih')
+                      : Image.memory(_webImage!)) // For web
+                  : (_image == null
+                      ? Text('Tidak ada gambar yang dipilih')
+                      : Image.file(_image!)), // For mobile
+            ),
           ),
-          SizedBox(height: screenHeight * 0.02),
-          _buildInstructionText(screenWidth),
-          SizedBox(height: screenHeight * 0.01),
-          _buildCaptureButton(context, screenWidth, screenHeight),
+          Text(
+            'Pastikan gambar yang diunggah benar',
+            style: TextStyle(
+              fontSize: screenWidth * 0.04,
+              fontWeight: FontWeight.w400,
+              color: Color.fromRGBO(33, 50, 75, 1),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _pickImageFromCamera,
+            child: Text('Ambil Gambar'),
+          ),
+          ElevatedButton(
+            onPressed: _pickImageFromGallery,
+            child: Text('Pilih dari Galeri'),
+          ),
+          ElevatedButton(
+            onPressed: _uploadImage,
+            child: Text('Unggah Gambar'),
+          ),
+          const SizedBox(height: 20),
         ],
-      ),
-    );
-  }
-
-  // Function to build the upload button
-  Widget _buildUploadButton(BuildContext context, double screenWidth, double screenHeight) {
-    return Align(
-      alignment: Alignment.topRight,
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: screenHeight * 0.05, // 5% top padding from screen height
-          right: screenWidth * 0.05, // 5% right padding from screen width
-        ),
-        child: InkWell(
-          onTap: () {
-            // Navigate to the image picker screen
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.03,
-              vertical: screenHeight * 0.01,
-            ),
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(214, 222, 222, 1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Unggah',
-                  style: TextStyle(
-                    color: const Color.fromRGBO(0, 139, 144, 1),
-                    fontSize: screenWidth * 0.04, // Responsive text size
-                  ),
-                ),
-                SizedBox(width: screenWidth * 0.02), // Responsive spacing
-                Image.asset(
-                  'assets/icons/upload.png',
-                  width: screenWidth * 0.05,
-                  height: screenWidth * 0.05,
-                  fit: BoxFit.cover,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

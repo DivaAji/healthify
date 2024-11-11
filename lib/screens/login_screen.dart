@@ -16,7 +16,7 @@ final TextEditingController passwordController = TextEditingController();
 
 // Ganti URL dengan URL backend Anda
 String urlDomain =
-    "http://localhost:8000/"; // Ganti dengan IP server lokal atau domain
+    "http://192.168.1.6:8000/"; // Ganti dengan IP server lokal atau domain
 String urlGetData = urlDomain + "api/user/12"; // Endpoint API yang sesuai
 
 class LoginScreen extends StatefulWidget {
