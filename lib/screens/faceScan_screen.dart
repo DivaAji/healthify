@@ -1,11 +1,7 @@
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:healthify/screens/login_screen.dart';
 import 'package:camera/camera.dart';
-import 'package:healthify/widgets/camera.dart'; // Assuming CameraWidget is defined in this file
-import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 class FaceScan extends StatefulWidget {
   const FaceScan({super.key});
@@ -49,8 +45,26 @@ class _FaceScanState extends State<FaceScan> {
     }
   }
 
-  // Capture image and upload it
-  Future<void> _takePictureAndUpload(BuildContext context) async {
+  // Flip camera
+  Future<void> _flipCamera() async {
+    if (cameras != null && cameras!.isNotEmpty) {
+      // Toggle between 0 and 1 to switch cameras
+      _selectedCameraIndex = (_selectedCameraIndex + 1) % cameras!.length;
+
+      // Dispose of the current camera and reinitialize it
+      await _cameraController?.dispose();
+      _cameraController = CameraController(
+        cameras![_selectedCameraIndex],
+        ResolutionPreset.high,
+      );
+
+      await _cameraController!.initialize();
+      setState(() {});
+    }
+  }
+
+  // Capture image and save it locally
+  Future<void> _takePictureAndSave(BuildContext context) async {
     try {
       if (!_cameraController!.value.isInitialized) {
         return;
@@ -60,32 +74,22 @@ class _FaceScanState extends State<FaceScan> {
       if (image != null) {
         final File imageFile = File(image.path);
 
-        // Send the image to the server using HTTP
-        final uri = Uri.parse(
-            'http://localhost:8000/api/upload-image'); // Update with your server URL
-        final request = http.MultipartRequest('POST', uri)
-          ..fields['user_id'] = 'user_id' // Replace with actual user_id
-          ..files
-              .add(await http.MultipartFile.fromPath('image', imageFile.path));
-
-        final response = await request.send();
-
-        if (response.statusCode == 200) {
-          // Success
+        // Save the image to the gallery
+        final result = await ImageGallerySaver.saveFile(imageFile.path);
+        if (result != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gambar berhasil diunggah')),
+            const SnackBar(content: Text('Gambar berhasil disimpan ke galeri')),
           );
         } else {
-          // Failure
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal mengunggah gambar')),
+            const SnackBar(content: Text('Gagal menyimpan gambar')),
           );
         }
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan saat mengambil gambar')),
+        const SnackBar(content: Text('Terjadi kesalahan saat mengambil gambar')),
       );
     }
   }
@@ -98,10 +102,7 @@ class _FaceScanState extends State<FaceScan> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     // Get screen dimensions using MediaQuery
-=======
->>>>>>> cb12d56cb5780946e27ea91020fe7d02b37777b3
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -110,13 +111,11 @@ class _FaceScanState extends State<FaceScan> {
         children: [
           Stack(
             children: [
-<<<<<<< HEAD
-              CameraWidget(),
+              // Display live camera feed when initialized
+              if (isCameraInitialized)
+                CameraPreview(_cameraController!),
               _buildUploadButton(context, screenWidth, screenHeight),
               _buildDetectionOverlay(screenWidth, screenHeight),
-=======
-              // Camera widget for live scanning
-              if (isCameraInitialized) CameraPreview(_cameraController!),
               Align(
                 alignment: Alignment.topRight,
                 child: Padding(
@@ -126,12 +125,7 @@ class _FaceScanState extends State<FaceScan> {
                   ),
                   child: InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
-                        ),
-                      );
+                      // Navigate to the image picker screen
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(
@@ -139,7 +133,7 @@ class _FaceScanState extends State<FaceScan> {
                         vertical: screenHeight * 0.01,
                       ),
                       decoration: BoxDecoration(
-                        color: Color.fromRGBO(214, 222, 222, 1),
+                        color: const Color.fromRGBO(214, 222, 222, 1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -148,7 +142,7 @@ class _FaceScanState extends State<FaceScan> {
                           Text(
                             'Unggah',
                             style: TextStyle(
-                              color: Color.fromRGBO(0, 139, 144, 1),
+                              color: const Color.fromRGBO(0, 139, 144, 1),
                               fontSize: screenWidth * 0.04,
                             ),
                           ),
@@ -164,57 +158,29 @@ class _FaceScanState extends State<FaceScan> {
                   ),
                 ),
               ),
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: screenWidth * 0.5),
-                  child: Image.asset(
-                    'assets/images/detect_rectangle.png',
-                    width: 300,
+              // Flip Camera Button
+              Positioned(
+                top: screenHeight * 0.05,
+                left: screenWidth * 0.05,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.switch_camera,
+                    color: Colors.white,
+                    size: screenWidth * 0.07,
                   ),
+                  onPressed: _flipCamera,
                 ),
               ),
->>>>>>> cb12d56cb5780946e27ea91020fe7d02b37777b3
             ],
           ),
           SizedBox(height: screenHeight * 0.02),
           _buildInstructionText(screenWidth),
           SizedBox(height: screenHeight * 0.01),
-          Expanded(
-            child: Padding(
-<<<<<<< HEAD
-              padding: EdgeInsets.only(bottom: screenHeight * 0.005),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    _takePicture();
-                  },
-                  child: Image.asset(
-                    'assets/images/ellipse.png',
-                    width: screenWidth * 0.2, // Responsive width
-                    height: screenWidth * 0.2, // Responsive height to maintain aspect ratio
-                    fit: BoxFit.cover,
-                  ),
-=======
-              padding: EdgeInsets.only(bottom: 5),
-              child: GestureDetector(
-                onTap: () {
-                  _takePictureAndUpload(
-                      context); // Capture and upload the image
-                },
-                child: Image.asset(
-                  'assets/images/ellipse.png',
-                  width: 80,
-                  height: 40,
->>>>>>> cb12d56cb5780946e27ea91020fe7d02b37777b3
-                ),
-              ),
-            ),
-          ),
+          _buildCaptureButton(context, screenWidth, screenHeight),
         ],
       ),
     );
   }
-<<<<<<< HEAD
 
   // Function to build the upload button
   Widget _buildUploadButton(BuildContext context, double screenWidth, double screenHeight) {
@@ -228,12 +194,6 @@ class _FaceScanState extends State<FaceScan> {
         child: InkWell(
           onTap: () {
             // Navigate to the image picker screen
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ImagePickerScreen(),
-              ),
-            );
           },
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -290,19 +250,34 @@ class _FaceScanState extends State<FaceScan> {
       style: TextStyle(
         fontSize: screenWidth * 0.04,
         fontWeight: FontWeight.w400,
-        color: Color.fromRGBO(33, 50, 75, 1),
+        color: const Color.fromRGBO(33, 50, 75, 1),
       ),
       textAlign: TextAlign.center,
     );
   }
 
-  // Function to take a picture
-  void _takePicture() {
-    // Implement the logic for taking a picture using the camera
-    // For example, you can use CameraController from CameraWidget
-    // to take a picture and save it to a file or process it further.
+  // Function to capture and save the picture
+  Widget _buildCaptureButton(BuildContext context, double screenWidth, double screenHeight) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: screenHeight * 0.005),
+        child: Center(
+          child: GestureDetector(
+            onTap: () {
+              _takePictureAndSave(context); // Capture and save the image
+            },
+            child: Image.asset(
+              'assets/images/ellipse.png',
+              width: 80,
+              height: 40,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
-=======
+
+class ImageGallerySaver {
+  static saveFile(String path) {}
 }
->>>>>>> cb12d56cb5780946e27ea91020fe7d02b37777b3

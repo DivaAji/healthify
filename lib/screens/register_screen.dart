@@ -177,7 +177,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: heightController,
                           keyboardType: TextInputType.number, suffixIcon: null,
                         ),
-<<<<<<< HEAD
                         const SizedBox(height: 15),
                         CustomDropdownButton(
                           labelText: 'Input Umur',
@@ -196,8 +195,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             controller: ageController,
                             keyboardType: TextInputType.number, suffixIcon: null,
                           ),
-=======
->>>>>>> cb12d56cb5780946e27ea91020fe7d02b37777b3
                         const SizedBox(height: 20),
                         CustomButton(
                           text: 'Next',

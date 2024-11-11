@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/faceScan_screen.dart';
 import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/screens/program/day/day1_screen.dart';
 import 'package:healthify/screens/program/day/latihan/end_screen.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Galatea', // Terapkan font Galatea secara global
       ),
-      home: const SplashScreen(),
+      home: const FaceScan(),
     );
   }
 }
