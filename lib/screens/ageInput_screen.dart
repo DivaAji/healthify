@@ -61,7 +61,7 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
       };
 
       final response = await http.post(
-        Uri.parse('http://localhost:8000/api/update-age'),
+        Uri.parse('http://192.168.64.21:8000/api/update-age'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
@@ -92,7 +92,7 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
     }
 
     try {
-      final uri = Uri.parse('http://localhost:8000/api/upload-image');
+      final uri = Uri.parse('http://192.168.64.21:8000/api/upload-image');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString()
         ..files.add(await http.MultipartFile.fromPath('image', _image!.path));

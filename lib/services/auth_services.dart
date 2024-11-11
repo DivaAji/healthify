@@ -13,7 +13,7 @@ class AuthService {
     required String age,
   }) async {
     final url = Uri.parse(
-        'http://localhost:8000/api/register'); // Ganti dengan URL API backend Anda
+        'http://192.168.64.21:8000/api/register'); // Ganti dengan URL API backend Anda
 
     final response = await http.post(
       url,

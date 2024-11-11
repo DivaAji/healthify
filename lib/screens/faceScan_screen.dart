@@ -70,7 +70,7 @@ class _FaceScanState extends State<FaceScan> {
     if (_image == null && _webImage == null) return;
 
     try {
-      final uri = Uri.parse('http://localhost:8000/api/upload-image');
+      final uri = Uri.parse('http://192.168.64.21:8000/api/upload-image');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString(); // Add the userId
 
