@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'package:healthify/screens/login_screen.dart'; // Atau halaman lainnya sesuai kebutuhan
+import 'package:image_picker/image_picker.dart'; // Make sure the image_picker package is imported
+import 'package:healthify/screens/login_screen.dart';
 import 'package:healthify/screens/faceScan_screen.dart';
-import 'package:healthify/widgets/button.dart'; // Custom button widget
-import 'package:healthify/widgets/card.dart'; // Custom card widget
-import 'package:healthify/widgets/text_field.dart'; // Custom text field widget
-import 'package:healthify/widgets/dropdown_button.dart'; // Custom dropdown button widget
+import 'package:healthify/widgets/button.dart';
+import 'package:healthify/widgets/card.dart';
+import 'package:healthify/widgets/text_field.dart';
+import 'package:healthify/widgets/dropdown_button.dart';
 
 class AgeinputScreen extends StatefulWidget {
   final int userId; // Menyimpan userId yang dikirim dari halaman sebelumnya
@@ -21,32 +21,35 @@ class AgeinputScreen extends StatefulWidget {
 class _AgeinputScreenState extends State<AgeinputScreen> {
   final TextEditingController ageController = TextEditingController();
   String ageInputOption = 'Manual'; // Pilihan input umur
+  File? _image; // Image file for the uploaded image
 
-  // // Fungsi untuk mengambil gambar dan mengarahkan ke FaceScan
-  // Future<void> captureAndUploadImage() async {
-  //   try {
-  //     final ImagePicker _picker = ImagePicker();
-  //     final XFile? pickedFile =
-  //         await _picker.pickImage(source: ImageSource.camera);
+  Future<void> captureAndUploadImage() async {
+    try {
+      final ImagePicker _picker = ImagePicker();
+      final XFile? pickedFile =
+          await _picker.pickImage(source: ImageSource.camera);
 
-  //     if (pickedFile != null) {
-  //       // Menyimpan path gambar yang diambil
-  //       String imagePath = pickedFile.path;
+      if (pickedFile != null) {
+        // Store image path in a variable
+        String imagePath = pickedFile.path;
 
-  //       // Arahkan ke halaman FaceScan
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (context) => FaceScan(imagePath: imagePath),
-  //         ),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print("Error: $e");
-  //     ScaffoldMessenger.of(context)
-  //         .showSnackBar(SnackBar(content: Text('Terjadi kesalahan')));
-  //   }
-  // }
+        // Navigate to FaceScan screen and pass the image path and userId
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FaceScan(
+              imagePath: imagePath, // Pass the image path
+              userId: widget.userId, // Pass the userId
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Terjadi kesalahan')));
+    }
+  }
 
   // Fungsi untuk memperbarui umur secara manual
   Future<void> updateAgeManually() async {
@@ -82,17 +85,17 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
 
   // Fungsi untuk memperbarui umur dan upload image bersamaan
   Future<void> updateAgeAndImage() async {
-    try {
-      final data = {
-        'user_id': widget.userId,
-        'age': null, // Jika ambil gambar, umur tidak diupdate secara manual
-      };
+    if (_image == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gambar belum dipilih')));
+      return;
+    }
 
+    try {
       final uri = Uri.parse('http://localhost:8000/api/upload-image');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString()
-        ..files
-            .add(await http.MultipartFile.fromPath('image', 'path/to/image'));
+        ..files.add(await http.MultipartFile.fromPath('image', _image!.path));
 
       final response = await request.send();
 
@@ -110,15 +113,16 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
     }
   }
 
-  // Navigates directly to FaceScan screen
-  void navigateToFaceScan() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FaceScan(), // Directly open FaceScan screen
-      ),
-    );
-  }
+// Navigates directly to FaceScan screen
+  // void navigateToFaceScan(String imagePath) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) =>
+  //           FaceScan(imagePath: imagePath), // Pass imagePath to FaceScan
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +152,7 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
             if (ageInputOption == 'Ambil dari Gambar')
               CustomButton(
                 text: 'Ambil Gambar untuk Deteksi Umur',
-                onPressed: navigateToFaceScan,
+                onPressed: captureAndUploadImage,
                 horizontalPadding: 50.0,
                 verticalPadding: 10.0,
               ),

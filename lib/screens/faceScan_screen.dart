@@ -2,98 +2,109 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:healthify/screens/login_screen.dart';
-import 'package:camera/camera.dart';
-import 'package:healthify/widgets/camera.dart'; // Assuming CameraWidget is defined in this file
-import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart'; // For checking if running on Web
 
 class FaceScan extends StatefulWidget {
-  const FaceScan({super.key});
+  final String imagePath; // Path to the selected image
+  final int userId;
+
+  const FaceScan({super.key, required this.imagePath, required this.userId});
 
   @override
   _FaceScanState createState() => _FaceScanState();
 }
 
 class _FaceScanState extends State<FaceScan> {
-  CameraController? _cameraController;
-  List<CameraDescription>? cameras;
-  int _selectedCameraIndex = 0;
-  bool isCameraInitialized = false;
+  final ImagePicker _picker = ImagePicker();
+  File? _image; // For mobile
+  Uint8List? _webImage; // For web
 
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
-  }
-
-  // Initialize the camera
-  Future<void> _initializeCamera() async {
-    cameras = await availableCameras();
-    if (cameras != null && cameras!.isNotEmpty) {
-      _selectedCameraIndex = cameras!.indexWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front,
-      );
-      if (_selectedCameraIndex == -1) {
-        _selectedCameraIndex =
-            0; // Default to rear camera if no front camera found
+    // If imagePath is passed, we can display the image on initial load
+    if (widget.imagePath.isNotEmpty) {
+      if (kIsWeb) {
+        // For Web, we fetch the image as bytes
+        _loadImageFromWeb();
+      } else {
+        // For mobile, load the image from the path directly
+        _image = File(widget.imagePath);
       }
-      _cameraController = CameraController(
-        cameras![_selectedCameraIndex],
-        ResolutionPreset.high,
-      );
-
-      await _cameraController!.initialize();
-      setState(() {
-        isCameraInitialized = true;
-      });
     }
   }
 
-  // Capture image and upload it
-  Future<void> _takePictureAndUpload(BuildContext context) async {
-    try {
-      if (!_cameraController!.value.isInitialized) {
-        return;
+  // Load the image for web (using bytes)
+  Future<void> _loadImageFromWeb() async {
+    final byteData = await http.get(Uri.parse(widget.imagePath));
+    setState(() {
+      _webImage = byteData.bodyBytes;
+    });
+  }
+
+  // Function to pick an image from the gallery
+  Future<void> _pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      if (kIsWeb) {
+        // For Web, we convert the file to a byte array (Uint8List)
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _webImage = bytes;
+        });
+      } else {
+        setState(() {
+          _image = File(pickedFile.path); // For mobile
+        });
       }
 
-      final image = await _cameraController!.takePicture();
-      if (image != null) {
-        final File imageFile = File(image.path);
+      // Call the upload function once the image is picked
+      _uploadImage();
+    }
+  }
 
-        // Send the image to the server using HTTP
-        final uri = Uri.parse(
-            'http://localhost:8000/api/upload-image'); // Update with your server URL
-        final request = http.MultipartRequest('POST', uri)
-          ..fields['user_id'] = 'user_id' // Replace with actual user_id
-          ..files
-              .add(await http.MultipartFile.fromPath('image', imageFile.path));
+  Future<void> _uploadImage() async {
+    if (_image == null && _webImage == null) return;
 
-        final response = await request.send();
+    try {
+      final uri = Uri.parse('http://localhost:8000/api/upload-image');
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['user_id'] = widget.userId.toString(); // Add the userId
 
-        if (response.statusCode == 200) {
-          // Success
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gambar berhasil diunggah')),
-          );
-        } else {
-          // Failure
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal mengunggah gambar')),
-          );
-        }
+      if (kIsWeb) {
+        // For Web, upload the image as bytes (Uint8List)
+        final byteStream = http.ByteStream.fromBytes(_webImage!);
+        final length = _webImage!.length;
+        request.files.add(http.MultipartFile('image', byteStream, length,
+            filename: 'image.png')); // You can change the filename extension
+      } else {
+        // For Mobile, upload the image from the path
+        request.files
+            .add(await http.MultipartFile.fromPath('image', _image!.path));
+      }
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gambar berhasil diunggah')),
+        );
+      } else {
+        final responseBody = await http.Response.fromStream(response);
+        print("Server response: ${responseBody.body}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengunggah gambar')),
+        );
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan saat mengambil gambar')),
+        SnackBar(content: Text('Terjadi kesalahan saat mengunggah gambar')),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _cameraController?.dispose();
-    super.dispose();
   }
 
   @override
@@ -106,8 +117,16 @@ class _FaceScanState extends State<FaceScan> {
         children: [
           Stack(
             children: [
-              // Camera widget for live scanning
-              if (isCameraInitialized) CameraPreview(_cameraController!),
+              // Camera widget for live scanning (optional)
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: screenWidth * 0.5),
+                  child: Image.asset(
+                    'assets/images/detect_rectangle.png',
+                    width: 300,
+                  ),
+                ),
+              ),
               Align(
                 alignment: Alignment.topRight,
                 child: Padding(
@@ -116,14 +135,7 @@ class _FaceScanState extends State<FaceScan> {
                     right: screenWidth * 0.05,
                   ),
                   child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
-                        ),
-                      );
-                    },
+                    onTap: _pickImage, // Trigger image picker on tap
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.03,
@@ -155,20 +167,11 @@ class _FaceScanState extends State<FaceScan> {
                   ),
                 ),
               ),
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: screenWidth * 0.5),
-                  child: Image.asset(
-                    'assets/images/detect_rectangle.png',
-                    width: 300,
-                  ),
-                ),
-              ),
             ],
           ),
           SizedBox(height: 20),
           Text(
-            'Pastikan wajah anda terlihat jelas',
+            'Pastikan gambar yang diunggah benar',
             style: TextStyle(
               fontSize: screenWidth * 0.04,
               fontWeight: FontWeight.w400,
@@ -180,17 +183,13 @@ class _FaceScanState extends State<FaceScan> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(bottom: 5),
-              child: GestureDetector(
-                onTap: () {
-                  _takePictureAndUpload(
-                      context); // Capture and upload the image
-                },
-                child: Image.asset(
-                  'assets/images/ellipse.png',
-                  width: 80,
-                  height: 40,
-                ),
-              ),
+              child: kIsWeb
+                  ? (_webImage == null
+                      ? Center(child: Text('Tidak ada gambar yang dipilih'))
+                      : Image.memory(_webImage!)) // For web
+                  : (_image == null
+                      ? Center(child: Text('Tidak ada gambar yang dipilih'))
+                      : Image.file(_image!)), // For mobile
             ),
           ),
         ],
