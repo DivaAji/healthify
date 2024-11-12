@@ -17,7 +17,7 @@ final TextEditingController passwordController = TextEditingController();
 // Ganti URL dengan URL backend Anda
 String urlDomain =
     "http://192.168.1.6:8000/"; // Ganti dengan IP server lokal atau domain
-String urlGetData = urlDomain + "api/user/12"; // Endpoint API yang sesuai
+String urlGetData = urlDomain + "api/user/1"; // Endpoint API yang sesuai
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
