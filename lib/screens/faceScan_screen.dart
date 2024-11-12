@@ -20,7 +20,7 @@ class _FaceScanState extends State<FaceScan> {
   Uint8List? _webImage; // For web
 
   // Method to pick image from camera
-  Future<void> _pickImageFromCamera() async {
+  Future<void> _pickImage() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.camera);
 
@@ -39,30 +39,6 @@ class _FaceScanState extends State<FaceScan> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal mengambil gambar')),
-      );
-    }
-  }
-
-  // Method to pick image from gallery
-  Future<void> _pickImageFromGallery() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      if (kIsWeb) {
-        // For Web, convert file to byte array (Uint8List)
-        final bytes = await pickedFile.readAsBytes();
-        setState(() {
-          _webImage = bytes;
-        });
-      } else {
-        setState(() {
-          _image = File(pickedFile.path); // For mobile
-        });
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memilih gambar')),
       );
     }
   }
@@ -151,12 +127,8 @@ class _FaceScanState extends State<FaceScan> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: _pickImageFromCamera,
+            onPressed: _pickImage,
             child: Text('Ambil Gambar'),
-          ),
-          ElevatedButton(
-            onPressed: _pickImageFromGallery,
-            child: Text('Pilih dari Galeri'),
           ),
           ElevatedButton(
             onPressed: _uploadImage,
