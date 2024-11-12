@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart'; // Import image_picker
 import 'package:http/http.dart' as http;
 import 'package:healthify/screens/login_screen.dart';
-import 'package:healthify/screens/ageInput_screen.dart';
+import 'package:healthify/screens/age_detection_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/text_field.dart';
@@ -60,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AgeinputScreen(userId: userId),
+              builder: (context) => AgeDetectionScreen(userId: userId),
             ),
           );
         } else {
@@ -177,6 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: heightController,
                           keyboardType: TextInputType.number, suffixIcon: null,
                         ),
+<<<<<<< HEAD
                         const SizedBox(height: 15),
                         CustomDropdownButton(
                           labelText: 'Input Umur',
@@ -195,6 +196,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             controller: ageController,
                             keyboardType: TextInputType.number, suffixIcon: null,
                           ),
+=======
+                        // const SizedBox(height: 15),
+                        // CustomDropdownButton(
+                        //   labelText: 'Input Umur',
+                        //   selectedValue: ageInputOption,
+                        //   items: ['Manual', 'Ambil dari Gambar'],
+                        //   onChanged: (String? newValue) {
+                        //     setState(() {
+                        //       ageInputOption = newValue!;
+                        //     });
+                        //   },
+                        // ),
+                        // const SizedBox(height: 15),
+                        // if (ageInputOption == 'Manual')
+                        //   CustomTextField(
+                        //     labelText: 'Umur',
+                        //     controller: ageController,
+                        //     keyboardType: TextInputType.number,
+                        //   ),
+                        // const SizedBox(height: 15),
+                        // if (ageInputOption == 'Ambil dari Gambar')
+                        //   CustomButton(
+                        //     text: 'Ambil Gambar',
+                        //     onPressed:
+                        //         _takePicture, // Panggil fungsi untuk mengambil gambar
+                        //     horizontalPadding: 50.0,
+                        //     verticalPadding: 10.0,
+                        //   ),
+>>>>>>> parent of cb12d56 (Commit)
                         const SizedBox(height: 20),
                         CustomButton(
                           text: 'Next',
