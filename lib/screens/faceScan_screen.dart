@@ -1,9 +1,12 @@
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart'; // For checking if running on Web
+import 'package:camera/camera.dart';
+import 'package:http/http.dart' as http;
+
 
 class FaceScan extends StatefulWidget {
   final int userId;
@@ -50,7 +53,6 @@ class _FaceScanState extends State<FaceScan> {
       );
       return;
     }
-
     try {
       final uri = Uri.parse('http://192.168.1.6:8000/api/upload-image');
       final request = http.MultipartRequest('POST', uri)
@@ -92,13 +94,16 @@ class _FaceScanState extends State<FaceScan> {
     } catch (e) {
       print('Error uploading image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
+
         SnackBar(content: Text('Terjadi kesalahan saat mengunggah gambar')),
+
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions using MediaQuery
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -139,4 +144,56 @@ class _FaceScanState extends State<FaceScan> {
       ),
     );
   }
+
+  // Function to build the detection overlay
+  Widget _buildDetectionOverlay(double screenWidth, double screenHeight) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.only(top: screenHeight * 0.3),
+        child: Image.asset(
+          'assets/images/detect_rectangle.png',
+          width: screenWidth * 0.8, // Responsive image width
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  // Function to build the instruction text
+  Widget _buildInstructionText(double screenWidth) {
+    return Text(
+      'Pastikan wajah anda terlihat jelas',
+      style: TextStyle(
+        fontSize: screenWidth * 0.04,
+        fontWeight: FontWeight.w400,
+        color: const Color.fromRGBO(33, 50, 75, 1),
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  // Function to capture and save the picture
+  Widget _buildCaptureButton(BuildContext context, double screenWidth, double screenHeight) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: screenHeight * 0.005),
+        child: Center(
+          child: GestureDetector(
+            onTap: () {
+              _takePictureAndSave(context); // Capture and save the image
+            },
+            child: Image.asset(
+              'assets/images/ellipse.png',
+              width: 80,
+              height: 40,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ImageGallerySaver {
+  static saveFile(String path) {}
 }

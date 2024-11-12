@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:healthify/screens/break_screen.dart';
-import 'package:healthify/screens/program/day/latihan/latihan3_screen.dart';
+import 'package:healthify/screens/program/day/latihan/end_screen.dart';
 import 'package:healthify/widgets/button.dart';
 
-class Latihan2Screen extends StatefulWidget {
-  const Latihan2Screen({super.key});
+class Latihan4Screen extends StatefulWidget {
+  const Latihan4Screen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _Latihan2ScreenState createState() => _Latihan2ScreenState();
+  _Latihan4ScreenState createState() => _Latihan4ScreenState();
 }
 
-class _Latihan2ScreenState extends State<Latihan2Screen> {
+class _Latihan4ScreenState extends State<Latihan4Screen> {
   int _start = 1; // Countdown starts from 1 second
   late Timer _timer;
   bool _isPaused = false;
@@ -31,10 +30,19 @@ class _Latihan2ScreenState extends State<Latihan2Screen> {
         });
       } else if (_start == 0) {
         _timer.cancel(); // Stop the timer when countdown reaches 0
-        // Navigate to BreakScreen
+        // Navigate to CompletionScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => BreakScreen(nextScreen: Latihan3Screen())),
+          MaterialPageRoute(
+            builder: (context) => const CompletionScreen(
+              exercises: [
+                'Latihan 1: Pemanasan',
+                'Latihan 2: Latihan Kekuatan',
+                'Latihan 3: Latihan Ketahanan',
+                'Latihan 4: Pendinginan',
+              ],
+            ),
+          ),
         );
       }
     });
@@ -54,12 +62,12 @@ class _Latihan2ScreenState extends State<Latihan2Screen> {
 
   @override
   Widget build(BuildContext context) {
-    double progress = _start / 3; // Calculate the progress based on the countdown duration
+    double progress = _start / 1; // Calculate the progress based on the countdown duration
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'LATIHAN 2/4',
+          'LATIHAN 4/4',
           style: TextStyle(color: Color(0xFF21324B), fontWeight: FontWeight.bold),
         ),
       ),

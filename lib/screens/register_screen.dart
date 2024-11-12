@@ -130,29 +130,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 13),
                         CustomTextField(
-                          controller: usernameController,
                           labelText: 'Username',
-                          keyboardType: TextInputType.name,
+                          keyboardType: TextInputType.name, suffixIcon: null,
+
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: passwordController,
                           labelText: 'Password',
-                          obscureText: true,
+                          obscureText: true, suffixIcon: null,
                           keyboardType: TextInputType.text,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: confirmPasswordController,
                           labelText: 'Konfirmasi Password',
-                          obscureText: true,
+                          obscureText: true, suffixIcon: null,
                           keyboardType: TextInputType.text,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: emailController,
                           labelText: 'Email',
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.text, suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomDropdownButton(
@@ -169,14 +169,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         CustomTextField(
                           labelText: 'Berat Badan',
                           controller: weightController,
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.number, suffixIcon: null,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Tinggi Badan',
                           controller: heightController,
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.number, suffixIcon: null,
                         ),
+                        const SizedBox(height: 15),
+                        CustomDropdownButton(
+                          labelText: 'Input Umur',
+                          selectedValue: ageInputOption,
+                          items: ['Manual', 'Ambil dari Gambar'],
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              ageInputOption = newValue!;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        if (ageInputOption == 'Manual')
+                          CustomTextField(
+                            labelText: 'Umur',
+                            controller: ageController,
+                            keyboardType: TextInputType.number, suffixIcon: null,
+                          ),
                         const SizedBox(height: 20),
                         CustomButton(
                           text: 'Next',

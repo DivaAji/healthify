@@ -82,7 +82,7 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
               CustomTextField(
                 controller: ageController,
                 labelText: 'Masukkan Umur',
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.number, suffixIcon: null,
               ),
             if (ageInputOption == 'Ambil dari Gambar')
               CustomButton(
