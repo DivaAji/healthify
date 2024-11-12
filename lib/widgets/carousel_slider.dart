@@ -1,11 +1,13 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:healthify/screens/detail_program_screen.dart';
 import 'package:healthify/widgets/program_indicator.dart';
 
 class CustomCarouselSlider extends StatefulWidget {
   final List<String> imageUrls;
+  final List<String> chosenPrograms;
 
-  CustomCarouselSlider({required this.imageUrls});
+  CustomCarouselSlider({required this.imageUrls, required this.chosenPrograms});
 
   @override
   _CustomCarouselSliderState createState() => _CustomCarouselSliderState();
@@ -42,55 +44,70 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
       items: widget.imageUrls.map((url) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: screenWidth,
-            margin: EdgeInsets.symmetric(horizontal: 5.0),
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/images/$url',
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: screenHeight * 0.35,
+          child: GestureDetector(
+            onTap: () {
+              // Navigasi ke halaman DetailProgram
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyDetailProgram(
+                    programName: widget.chosenPrograms[_currentIndex],
+                    programImage: url,
                   ),
                 ),
-                Positioned(
-                  bottom: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(0, 139, 144, 1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        margin: EdgeInsets.only(left: 20),
-                        padding: EdgeInsets.only(
-                          top: 2,
-                          bottom: 2,
-                          left: 10,
-                          right: 10,
-                        ),
-                        height: 25,
-                        child: Text(
-                          '${_currentIndex + 1} / ${widget.imageUrls.length}',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(33, 50, 75, 1),
-                            fontFamily: 'Galatea',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
+              );
+            },
+            child: Container(
+              width: screenWidth,
+              margin: EdgeInsets.symmetric(horizontal: 5.0),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/images/$url',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: screenHeight * 0.28,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    left: 0,
+                    right: 0,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color.fromRGBO(0, 139, 144, 1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          margin: EdgeInsets.only(left: 20),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 2,
+                            horizontal: 10,
+                          ),
+                          height: 25,
+                          child: Text(
+                            '${_currentIndex + 1} / ${widget.imageUrls.length}',
+                            style: TextStyle(
+                              color: const Color.fromRGBO(33, 50, 75, 1),
+                              fontFamily: 'Galatea',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 8),
-                      // Menggunakan widget `ProgramIndicator`
-                      ProgramIndicator(text: 'KELENTURAN TUBUH'),
-                    ],
+                        SizedBox(height: 8),
+                        ProgramIndicator(
+                          name: widget.chosenPrograms[_currentIndex],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

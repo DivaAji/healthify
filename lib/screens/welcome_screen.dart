@@ -22,20 +22,21 @@ class WelcomeScreen extends StatelessWidget {
                     'assets/images/shape.png',
                     fit: BoxFit.cover,
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height *
-                        0.55, // Sesuaikan tinggi untuk proporsi yang baik
+                    height: MediaQuery.of(context).size.height * 0.55,
+                    alignment: Alignment
+                        .bottomCenter, // Fokus pada bagian bawah gambar
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 40.0),
+                  padding: const EdgeInsets.only(top: 10.0),
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Image.asset(
                       'assets/images/welcome.png',
-                      fit: BoxFit.cover,
-                      width: MediaQuery.of(context).size.width,
+                      // fit: BoxFit.cover,
+                      width: MediaQuery.of(context).size.width * 1.8,
                       height: MediaQuery.of(context).size.height *
-                          0.4, // Sesuaikan tinggi
+                          0.6, // Sesuaikan tinggi
                     ),
                   ),
                 ),
@@ -67,7 +68,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20, bottom: 20),
               child: CustomButton(
                 text: 'Get Started >>', // Ganti teks di sini
                 onPressed: () {
