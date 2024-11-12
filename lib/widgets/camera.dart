@@ -10,7 +10,6 @@ class _CameraWidgetState extends State<CameraWidget> {
   CameraController? _cameraController;
   List<CameraDescription>? cameras;
   int _selectedCameraIndex = 0;
-  bool _isInitializing = true;
 
   @override
   void initState() {
@@ -18,33 +17,26 @@ class _CameraWidgetState extends State<CameraWidget> {
     initCamera();
   }
 
+  // Inisialisasi kamera dan setel kamera depan jika ada
   Future<void> initCamera() async {
-    try {
-      cameras = await availableCameras();
-      if (cameras!.isNotEmpty) {
-        _selectedCameraIndex = cameras!.indexWhere(
-            (camera) => camera.lensDirection == CameraLensDirection.front);
+    cameras = await availableCameras();
+    if (cameras!.isNotEmpty) {
+      // Cari kamera depan jika tersedia
+      _selectedCameraIndex = cameras!.indexWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.front);
 
-        // If no front camera, use the first available camera
-        if (_selectedCameraIndex == -1) {
-          _selectedCameraIndex = 0;
-        }
-
-        await _initializeCamera(_selectedCameraIndex);
-      } else {
-        print('No cameras available');
+      // Jika tidak ada kamera depan, gunakan kamera pertama
+      if (_selectedCameraIndex == -1) {
+        _selectedCameraIndex = 0;
       }
-    } catch (e) {
-      print('Error initializing camera: $e');
-    } finally {
-      setState(() {
-        _isInitializing = false;
-      });
+
+      _initializeCamera(_selectedCameraIndex);
     }
   }
 
+  // Inisialisasi kamera dengan index yang dipilih
   Future<void> _initializeCamera(int cameraIndex) async {
-    _cameraController?.dispose();
+    _cameraController?.dispose(); // Bersihkan kontroler kamera sebelumnya
     _cameraController = CameraController(
       cameras![cameraIndex],
       ResolutionPreset.high,
@@ -54,20 +46,17 @@ class _CameraWidgetState extends State<CameraWidget> {
     setState(() {});
   }
 
+  // Fungsi untuk mengganti kamera
   void _toggleCamera() {
-    if (cameras!.length < 2) return; // Prevent toggling if there's only one camera
     _selectedCameraIndex = (_selectedCameraIndex + 1) % cameras!.length;
     _initializeCamera(_selectedCameraIndex);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isInitializing) {
-      return Center(child: CircularProgressIndicator());
-    }
-
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return Center(child: Text('Camera not initialized'));
+      // Tampilkan loading spinner saat kamera belum terinisialisasi
+      return Center(child: CircularProgressIndicator());
     }
 
     bool isFrontCamera = cameras![_selectedCameraIndex].lensDirection ==
