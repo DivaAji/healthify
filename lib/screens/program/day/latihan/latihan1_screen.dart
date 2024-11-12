@@ -1,36 +1,30 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:healthify/screens/break_screen.dart';
-import 'package:healthify/screens/program/day/latihan/latihan2_screen.dart';
-import 'package:healthify/widgets/button.dart';
 
 class Latihan1Screen extends StatefulWidget {
-  const Latihan1Screen({super.key});
-
   @override
-  // ignore: library_private_types_in_public_api
   _Latihan1ScreenState createState() => _Latihan1ScreenState();
 }
 
 class _Latihan1ScreenState extends State<Latihan1Screen> {
-  int _start = 1; // Countdown starts from 1 second
+  int _start = 1; // Waktu countdown mulai dari 10 detik
   late Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    // Start the timer
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    // Memulai timer setiap detik
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_start > 0) {
         setState(() {
           _start--;
         });
       } else {
-        _timer.cancel(); // Stop the timer when countdown reaches 0
-        // Navigate to the next screen
-        Navigator.pushReplacement(
+        _timer.cancel(); // Hentikan timer ketika countdown mencapai 0
+        // Navigasi ke halaman baru
+        Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HalamanBaru()),
+          MaterialPageRoute(builder: (context) => HalamanBaru()), // Ganti dengan halaman tujuan
         );
       }
     });
@@ -38,7 +32,7 @@ class _Latihan1ScreenState extends State<Latihan1Screen> {
 
   @override
   void dispose() {
-    _timer.cancel(); // Stop the timer when the widget is disposed
+    _timer.cancel(); // Hentikan timer saat widget dihapus
     super.dispose();
   }
 
@@ -46,46 +40,55 @@ class _Latihan1ScreenState extends State<Latihan1Screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Latihan 1', style: TextStyle(color: Color(0xFF21324B))),
+        title: const Text('Latihan 1'),
       ),
       body: Column(
         children: [
           // Banner
           Container(
             height: 200,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/kelenturan.jpg'), // Change to your banner image path
+                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),
           ),
           const SizedBox(height: 20),
 
-          // Center Text
-          const Center(
+          // Teks Center 1
+          Center(
             child: Text(
-              'PERSIAPAN',
-              style: TextStyle(fontSize: 48, color: Colors.red, fontWeight: FontWeight.bold),
+              'Selamat datang di Latihan 1!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 20),
 
-          // Countdown Circle
+          // Teks Center 2
+          Center(
+            child: Text(
+              'Siap untuk memulai?',
+              style: TextStyle(fontSize: 20),
+            ),
+          ),
+          const SizedBox(height: 40),
+
+          // Lingkaran dengan Angka Countdown
           Center(
             child: Container(
-              width: 100,
-              height: 100,
-              decoration: const BoxDecoration(
+              width: 100, // Lebar lingkaran
+              height: 100, // Tinggi lingkaran
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.red,
+                color: Colors.red, // Warna lingkaran
               ),
               alignment: Alignment.center,
               child: Text(
                 '$_start',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 36,
-                  color: Colors.white,
+                  color: Colors.white, // Warna teks di dalam lingkaran
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -104,7 +107,7 @@ class HalamanBaru extends StatefulWidget {
 }
 
 class _HalamanBaruState extends State<HalamanBaru> {
-  int _start = 3; // Countdown starts from 3 seconds
+  int _start = 45; // Waktu countdown mulai dari 45 detik
   late Timer _timer;
   bool _isPaused = false;
 
@@ -115,20 +118,13 @@ class _HalamanBaruState extends State<HalamanBaru> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_start > 0 && !_isPaused) {
         setState(() {
           _start--;
         });
       } else if (_start == 0) {
-        _timer.cancel(); // Stop the timer when countdown reaches 0
-        if (mounted) { // Ensure the widget is still mounted
-          print("Countdown finished, navigating to Latihan2Screen");
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BreakScreen(nextScreen: Latihan2Screen(),)),
-          );
-        }
+        _timer.cancel(); // Hentikan timer ketika countdown mencapai 0
       }
     });
   }
@@ -141,53 +137,46 @@ class _HalamanBaruState extends State<HalamanBaru> {
 
   @override
   void dispose() {
-    _timer.cancel(); // Stop the timer when the widget is disposed
+    _timer.cancel(); // Hentikan timer saat widget dihapus
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double progress = _start / 3; // Calculate the progress based on the countdown duration
+    double progress = _start / 45; // Hitung progress bar
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'LATIHAN 1/4',
-          style: TextStyle(color: Color(0xFF21324B), fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Halaman Baru'),
       ),
       body: Column(
         children: [
           // Banner
           Container(
             height: 200,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/kelenturan.jpg'), // Change to your banner image path
+                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),
           ),
           const SizedBox(height: 20),
 
-          // Center Text
-          const Center(
+          // Teks Center
+          Center(
             child: Text(
-              'PEMANASAN',
-              style: TextStyle(fontSize: 24, color: Color(0xFF21324B), fontWeight: FontWeight.bold),
+              'Countdown Timer',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 20),
 
           // Countdown Timer
           Center(
             child: Text(
               '00:${_start.toString().padLeft(2, '0')}',
-              style: const TextStyle(
-                fontSize: 100,
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 36, color: Colors.red),
             ),
           ),
           const SizedBox(height: 20),
@@ -195,16 +184,16 @@ class _HalamanBaruState extends State<HalamanBaru> {
           // Progress Bar
           LinearProgressIndicator(
             value: progress,
-            minHeight: 50,
+            minHeight: 20,
             backgroundColor: Colors.grey[300],
-            color: Colors.red,
+            color: Colors.blue,
           ),
           const SizedBox(height: 20),
 
-          // Pause Button
-          CustomButton(
-            text: _isPaused ? 'Resume' : 'Pause',
+          // Button Pause
+          ElevatedButton(
             onPressed: _pauseTimer,
+            child: Text(_isPaused ? 'Resume' : 'Pause'),
           ),
         ],
       ),

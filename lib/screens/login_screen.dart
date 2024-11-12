@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:healthify/screens/register_screen.dart';
-
-import 'package:healthify/widgets/button.dart';import 'package:healthify/widgets/card.dart';
+import 'package:healthify/widgets/button.dart';
+import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/healthify_text.dart';
 import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/widgets/text_field.dart';
@@ -114,13 +114,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         CustomTextField(
                           labelText: 'Username',
                           controller:
-                              usernameController, suffixIcon: null, // Isi controller dengan data
+                              usernameController, // Isi controller dengan data
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Password',
                           obscureText: isObscured, // Use isObscured here
-                          controller: passwordController, suffixIcon: null,
+                          controller: passwordController,
                         ),
                         const SizedBox(height: 10),
 

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/editProfile_screen.dart';
-import 'package:healthify/widgets/button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -18,34 +16,34 @@ class ProfileScreen extends StatelessWidget {
             // Gambar Profil
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/kelenturan.jpg'), // Ganti dengan path gambar profil
+              backgroundImage: AssetImage('assets/images/profile_picture.png'), // Ganti dengan path gambar profil
             ),
             const SizedBox(height: 16),
 
             // Nama Pengguna
             Text(
-              'Dappa',
+              'Nama Pengguna',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
             // Email Pengguna
             Text(
-              'Dappa@healthidy.com',
+              'email@example.com',
               style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
             const SizedBox(height: 16),
 
-            // Tombol Edit Profil menggunakan CustomButton
-            CustomButton(
-              text: 'Edit Profil',
+            // Tombol Edit Profil
+            ElevatedButton(
               onPressed: () {
                 // Aksi ketika tombol edit ditekan
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const EditProfileScreen()),
-                );
+                print('Edit Profile pressed');
               },
+              child: Text('Edit Profil'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 50), // Tombol memenuhi lebar
+              ),
             ),
 
             const SizedBox(height: 16),
@@ -62,7 +60,7 @@ class ProfileScreen extends StatelessWidget {
               child: ListView(
                 children: [
                   _buildInfoItem('Tanggal Lahir', '01 Januari 2000'),
-                  _buildInfoItem('Alamat', 'Jl. Pegangsaan Timur.54'),
+                  _buildInfoItem('Alamat', 'Jl. Contoh No.123'),
                   _buildInfoItem('Nomor Telepon', '+62123456789'),
                 ],
               ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/program/day/latihan/latihan1_screen.dart';
-import 'package:healthify/widgets/button.dart';
 
 class Day1Screen extends StatelessWidget {
   final int day;
@@ -15,9 +14,9 @@ class Day1Screen extends StatelessWidget {
           // Banner
           Container(
             height: 200,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/kelenturan.jpg'), // Ganti dengan path gambar banner
+                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),
@@ -31,34 +30,23 @@ class Day1Screen extends StatelessWidget {
                     children: [
                       Text(
                         'Latihan Hari $day',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Row(
+                      Row(
                         children: [
                           Icon(Icons.timer, color: Colors.white),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
-                            '10 menit',
+                            'Durasi: 10 menit',
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                         ],
                       ),
                     ],
-                  ),
-                ),
-                // Back button on the banner
-                Positioned(
-                  top: 16,
-                  left: 5,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pop(context); // Navigate back to the previous screen
-                    },
                   ),
                 ),
               ],
@@ -68,35 +56,33 @@ class Day1Screen extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Teks Center
-          const Center(
+          Center(
             child: Text(
               'Panduan',
-              style: TextStyle(fontSize: 20, color: Color(0xFF21324B), fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
 
           const SizedBox(height: 4),
 
           // Teks
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
               'Video Latihan',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Color(0xFF21324B)),
+              style: TextStyle(fontSize: 16),
             ),
           ),
 
           const SizedBox(height: 16),
 
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                '5 Latihan',
-                style: TextStyle(fontSize: 16, color: Color(0xFF21324B)),
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              '5 Latihan',
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 16),
             ),
           ),
 
@@ -106,10 +92,10 @@ class Day1Screen extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                _buildExerciseItem('Pemanasan', '00:45'),
-                _buildExerciseItem('Peregangan', '01:00'),
-                _buildExerciseItem('Latihan Kekuatan', '01:30'),
-                _buildExerciseItem('Pendinginan', '00:30'),
+                _buildExerciseItem('Pemanasan', '5 menit'),
+                _buildExerciseItem('Peregangan', '10 menit'),
+                _buildExerciseItem('Latihan Kekuatan', '15 menit'),
+                _buildExerciseItem('Pendinginan', '5 menit'),
               ],
             ),
           ),
@@ -117,9 +103,8 @@ class Day1Screen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: CustomButton(
-            text: 'Start',
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
             onPressed: () {
               // Navigasi ke halaman ExerciseScreen
               Navigator.push(
@@ -127,9 +112,10 @@ class Day1Screen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => Latihan1Screen()),
               );
             },
-            // Optional: You can customize padding if needed
-            horizontalPadding: 10.0,
-            verticalPadding: 5.0,
+            child: Text('Start'),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(double.infinity, 50), // Tombol memenuhi lebar
+            ),
           ),
         ),
       ),
@@ -147,15 +133,15 @@ class Day1Screen extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF78B9BA),
               borderRadius: BorderRadius.circular(8.0),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 4.0,
-                  offset: Offset(0,  2),
-                ),
+                  offset: Offset(0, 2),
+ ),
               ],
             ),
-            child: const Icon(Icons.fitness_center, color: Colors.black),
+            child: Icon(Icons.fitness_center, color: Colors.black),
           ),
           const SizedBox(width: 16),
 
@@ -166,7 +152,7 @@ class Day1Screen extends StatelessWidget {
               children: [
                 Text(
                   exerciseName,
-                  style: const TextStyle(fontSize: 18, color: Color(0xFF21324B), fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   duration,

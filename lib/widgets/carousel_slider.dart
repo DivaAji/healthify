@@ -12,11 +12,13 @@ class CustomCarouselSlider extends StatefulWidget {
 }
 
 class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
+  late CarouselController _carouselController;
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _carouselController = CarouselController();
   }
 
   @override
@@ -39,7 +41,7 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
       ),
       items: widget.imageUrls.map((url) {
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Container(
             width: screenWidth,
             margin: EdgeInsets.symmetric(horizontal: 5.0),

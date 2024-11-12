@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:healthify/screens/break_screen.dart';
-import 'package:healthify/screens/program/day/latihan/latihan3_screen.dart';
-import 'package:healthify/widgets/button.dart';
 
+// Halaman baru yang akan dituju
 class Latihan2Screen extends StatefulWidget {
-  const Latihan2Screen({super.key});
-
   @override
-  // ignore: library_private_types_in_public_api
   _Latihan2ScreenState createState() => _Latihan2ScreenState();
 }
 
 class _Latihan2ScreenState extends State<Latihan2Screen> {
-  int _start = 1; // Countdown starts from 1 second
+  int _start = 3; // Waktu countdown mulai dari 45 detik
   late Timer _timer;
   bool _isPaused = false;
 
@@ -24,18 +19,14 @@ class _Latihan2ScreenState extends State<Latihan2Screen> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_start > 0 && !_isPaused) {
         setState(() {
           _start--;
         });
       } else if (_start == 0) {
-        _timer.cancel(); // Stop the timer when countdown reaches 0
-        // Navigate to BreakScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => BreakScreen(nextScreen: Latihan3Screen())),
-        );
+        _timer.cancel(); // Hentikan timer ketika countdown mencapai 0
+        _navigateToNextPage(); // Navigasi ke halaman baru
       }
     });
   }
@@ -46,74 +37,98 @@ class _Latihan2ScreenState extends State<Latihan2Screen> {
     });
   }
 
+  void _navigateToNextPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HalamanSelesai()), // Ganti dengan halaman tujuan
+    );
+  }
+
   @override
   void dispose() {
-    _timer.cancel(); // Stop the timer when the widget is disposed
+    _timer.cancel(); // Hentikan timer saat widget dihapus
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double progress = _start / 3; // Calculate the progress based on the countdown duration
+    double progress = _start / 45; // Hitung progress bar
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'LATIHAN 2/4',
-          style: TextStyle(color: Color(0xFF21324B), fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Halaman Baru'),
       ),
       body: Column(
         children: [
           // Banner
           Container(
             height: 200,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/kelenturan.jpg'), // Change to your banner image path
+                image: AssetImage('assets/images/banner.png'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),
           ),
           const SizedBox(height: 20),
 
-          // Center Text
-          const Center(
+          // Teks Center
+          Center(
             child: Text(
-              'PEMANASAN',
-              style: TextStyle(fontSize: 24, color: Color(0xFF21324B), fontWeight: FontWeight.bold),
+              'Countdown Timer',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 20),
 
           // Countdown Timer
           Center(
             child: Text(
               '00:${_start.toString().padLeft(2, '0')}',
-              style: const TextStyle(
-                fontSize: 100,
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 36, color: Colors.red),
             ),
           ),
           const SizedBox(height: 20),
 
-          // Progress Bar
-          LinearProgressIndicator(
-            value: progress,
-            minHeight: 50,
-            backgroundColor: Colors.grey[300],
-            color: Colors.red,
+          // Progress Bar dan Button Pause dalam satu Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 20,
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(width: 10), // Jarak antara progress bar dan tombol
+              ElevatedButton(
+                onPressed: _pauseTimer,
+                child: Text(_isPaused ? 'Resume' : 'Pause'),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
-
-          // Pause Button
-          CustomButton(
-            text: _isPaused ? 'Resume' : 'Pause',
-            onPressed: _pauseTimer,
-          ),
         ],
+      ),
+    );
+  }
+}
+
+// Halaman tujuan setelah countdown selesai
+class HalamanSelesai extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Selesai'),
+      ),
+      body: Center(
+        child: Text(
+          'Countdown telah selesai!',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
     );
   }
