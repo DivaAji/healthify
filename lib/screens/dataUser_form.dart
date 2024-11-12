@@ -73,22 +73,35 @@ class DataUserForm extends StatelessWidget {
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: genderController,
+<<<<<<< HEAD
                           labelText: 'Jenis Kelamin', suffixIcon: null,
+=======
+                          labelText: 'Jenis Kelamin',
+>>>>>>> parent of cb12d56 (Commit)
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: weightController,
+<<<<<<< HEAD
                           labelText: 'Berat Badan', suffixIcon: null,
+=======
+                          labelText: 'Berat Badan',
+>>>>>>> parent of cb12d56 (Commit)
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           controller: heightController,
+<<<<<<< HEAD
                           labelText: 'Tinggi Badan', suffixIcon: null,
+=======
+                          labelText: 'Tinggi Badan',
+>>>>>>> parent of cb12d56 (Commit)
                         ),
                         const SizedBox(height: 20),
                         CustomButton(
                           text: 'Next',
                           onPressed: () {
+<<<<<<< HEAD
                             // Validasi input sebelum melanjutkan
                             if (genderController.text.isEmpty ||
                                 weightController.text.isEmpty ||
@@ -116,6 +129,22 @@ class DataUserForm extends StatelessWidget {
                             );
 
                             // Navigasi ke FaceScan setelah registrasi berhasil
+=======
+                            // Kirim data ke API untuk proses registrasi
+                            final authService = AuthService();
+                            authService.registerUser(
+                              username: username,
+                              email:
+                                  '', // Anda bisa menambahkan field email jika dibutuhkan
+                              password: password,
+                              confirmPassword: confirmPassword,
+                              gender: genderController.text,
+                              weight: weightController.text,
+                              height: heightController.text,
+                              age: '', // Tambahkan usia jika diperlukan
+                            );
+
+>>>>>>> parent of cb12d56 (Commit)
                             Navigator.push(
                               context,
                               MaterialPageRoute(
