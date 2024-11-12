@@ -20,7 +20,6 @@
 //     required this.password,
 //     required this.confirmPassword,
 //   });
-
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
