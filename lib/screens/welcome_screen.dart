@@ -35,8 +35,7 @@ class WelcomeScreen extends StatelessWidget {
                       'assets/images/welcome.png',
                       // fit: BoxFit.cover,
                       width: MediaQuery.of(context).size.width * 1.8,
-                      height: MediaQuery.of(context).size.height *
-                          0.55, 
+                      height: MediaQuery.of(context).size.height * 0.55,
                     ),
                   ),
                 ),
@@ -68,9 +67,9 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 20),
+              padding: const EdgeInsets.only(top: 20, bottom: 5),
               child: CustomButton(
-                text: 'Get Started >>', 
+                text: 'Get Started >>',
                 onPressed: () {
                   Navigator.push(
                     context,

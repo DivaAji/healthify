@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/home_screen.dart';
+import 'package:healthify/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart'; // For checking if running on Web
@@ -16,7 +18,7 @@ class FaceScan extends StatefulWidget {
 
 class _FaceScanState extends State<FaceScan> {
   final ImagePicker _picker = ImagePicker();
-  File? _image;         // For mobile
+  File? _image; // For mobile
   Uint8List? _webImage; // For web
 
   // Method to pick image from camera
@@ -126,41 +128,63 @@ class _FaceScanState extends State<FaceScan> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Scan Wajah')),
+      appBar: AppBar(title: Text('Upload Foto')),
       body: Column(
         children: [
           Expanded(
             child: Center(
-              child: kIsWeb
-                  ? (_webImage == null
-                      ? Text('Tidak ada gambar yang dipilih')
-                      : Image.memory(_webImage!)) // For web
-                  : (_image == null
-                      ? Text('Tidak ada gambar yang dipilih')
-                      : Image.file(_image!)), // For mobile
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                child: kIsWeb
+                    ? (_webImage == null
+                        ? Text('Tidak ada gambar yang dipilih')
+                        : Image.memory(_webImage!)) // For web
+                    : (_image == null
+                        ? Text('Tidak ada gambar yang dipilih')
+                        : Image.file(_image!)),
+              ), // For mobile
             ),
           ),
           Text(
-            'Pastikan gambar yang diunggah benar',
+            'Pastikan wajah terlihat jelas!',
             style: TextStyle(
-              fontSize: screenWidth * 0.04,
+              fontSize: 17,
               fontWeight: FontWeight.w400,
               color: Color.fromRGBO(33, 50, 75, 1),
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
+          CustomButton(
             onPressed: _pickImageFromCamera,
-            child: Text('Ambil Gambar'),
+            text: 'Ambil Gambar',
+            textStyle: TextStyle(fontSize: 16),
+            horizontalPadding: 30.0,
+            verticalPadding: 10.0,
           ),
-          ElevatedButton(
+          SizedBox(height: 5),
+          CustomButton(
             onPressed: _pickImageFromGallery,
-            child: Text('Pilih dari Galeri'),
+            text: 'Pilih dari Galeri',
+            textStyle: TextStyle(fontSize: 16),
+            horizontalPadding: 30.0,
+            verticalPadding: 10.0,
           ),
-          ElevatedButton(
-            onPressed: _uploadImage,
-            child: Text('Unggah Gambar'),
+          SizedBox(height: 5),
+          CustomButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      HomeScreen(), // Mengarahkan ke HomeScreen
+                ),
+              );
+            },
+            text: 'Next >>',
+            textStyle: TextStyle(fontSize: 16),
+            horizontalPadding: 30.0,
+            verticalPadding: 10.0,
           ),
           const SizedBox(height: 20),
         ],

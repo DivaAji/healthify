@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/image_picker_screen.dart';
+import 'package:healthify/screens/design_awal/image_picker_screen.dart';
 import 'package:healthify/widgets/camera.dart';
 
 class CameraScreen extends StatelessWidget {
