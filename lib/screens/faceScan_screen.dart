@@ -16,7 +16,7 @@ class FaceScan extends StatefulWidget {
 
 class _FaceScanState extends State<FaceScan> {
   final ImagePicker _picker = ImagePicker();
-  File? _image; // For mobile
+  File? _image;         // For mobile
   Uint8List? _webImage; // For web
 
   // Method to pick image from camera
@@ -76,7 +76,7 @@ class _FaceScanState extends State<FaceScan> {
     }
 
     try {
-      final uri = Uri.parse('http://192.168.1.6:8000/api/upload-image');
+      final uri = Uri.parse('http://192.168.1.10:8000/api/upload-image');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString();
 

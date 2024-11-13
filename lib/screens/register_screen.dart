@@ -18,10 +18,10 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  // text editing controller
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
@@ -29,10 +29,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String selectedGender = '';
   String ageInputOption = 'Manual';
+  
   XFile? _imageFile; // Variable untuk menyimpan gambar yang diambil
 
   final ImagePicker _picker = ImagePicker(); // Inisialisasi image picker
 
+  //proses registrasi
   Future<void> registerUser() async {
     try {
       final data = {
@@ -46,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       };
 
       final response = await http.post(
-        Uri.parse('http://192.168.1.6:8000/api/user'),
+        Uri.parse('http://192.168.1.10:8000/api/user'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
@@ -125,6 +127,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             fontFamily: 'Galatea',
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
+                            color: Color.fromRGBO(33, 50, 75, 1),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Bantu kami menyesuaikan program kebugaran yang paling sesuai untuk Anda.',
+                          style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.normal,
                             color: Color.fromRGBO(33, 50, 75, 1),
                           ),
                           textAlign: TextAlign.center,

@@ -16,7 +16,7 @@ final TextEditingController passwordController = TextEditingController();
 
 // Ganti URL dengan URL backend Anda
 String urlDomain =
-    "http://192.168.1.6:8000/"; // Ganti dengan IP server lokal atau domain
+    "http://192.168.1.10:8000/"; // Ganti dengan IP server lokal atau domain
 String urlGetData = urlDomain + "api/user/1"; // Endpoint API yang sesuai
 
 class LoginScreen extends StatefulWidget {
@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Image.asset(
               'assets/images/login_background.jpg',
               fit: BoxFit.cover,
-              height: MediaQuery.of(context).size.height, // Sesuaikan tinggi
+              height: MediaQuery.of(context).size.height, 
             ),
           ),
           // Centering the content with a scrollable card

@@ -28,7 +28,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
+                  padding: const EdgeInsets.only(top: 0),
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Image.asset(
@@ -36,13 +36,13 @@ class WelcomeScreen extends StatelessWidget {
                       // fit: BoxFit.cover,
                       width: MediaQuery.of(context).size.width * 1.8,
                       height: MediaQuery.of(context).size.height *
-                          0.6, // Sesuaikan tinggi
+                          0.55, 
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             Text(
               'Welcome to',
               style: TextStyle(
@@ -70,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 20, bottom: 20),
               child: CustomButton(
-                text: 'Get Started >>', // Ganti teks di sini
+                text: 'Get Started >>', 
                 onPressed: () {
                   Navigator.push(
                     context,
