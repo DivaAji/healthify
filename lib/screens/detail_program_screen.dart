@@ -4,11 +4,13 @@ import 'package:healthify/screens/program/day/day1_screen.dart';
 class MyDetailProgram extends StatefulWidget {
   final String programName;
   final String programImage;
+  final String programDescription; // Tambahkan parameter deskripsi
 
   const MyDetailProgram({
     Key? key,
     required this.programName,
     required this.programImage,
+    required this.programDescription, 
   }) : super(key: key);
 
   @override
@@ -22,7 +24,7 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.programName), // Use the programName here
+        title: Text(widget.programName), // Gunakan programName
         backgroundColor: Color.fromRGBO(0, 139, 144, 1).withOpacity(0.5),
       ),
       body: Padding(
@@ -36,7 +38,7 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage(
-                      'assets/images/${widget.programImage}'), // Dynamically use the program image
+                      'assets/images/${widget.programImage}'), // Gunakan programImage
                   fit: BoxFit.cover,
                 ),
               ),
@@ -45,7 +47,7 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
 
             // Description
             Text(
-              'Tingkatkan fleksibilitas dan mobilitas tubuh dengan latihan peregangan yang aman dan efektif. Cocok untuk semua tingkatan, program ini membantu mengurangi kekakuan, meningkatkan postur, serta mencegah cedera. Jadikan kelenturan bagian dari rutinitas sehat Anda!',
+              widget.programDescription, // Gunakan programDescription
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.justify,
             ),

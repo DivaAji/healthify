@@ -6,8 +6,13 @@ import 'package:healthify/widgets/program_indicator.dart';
 class CustomCarouselSlider extends StatefulWidget {
   final List<String> imageUrls;
   final List<String> chosenPrograms;
+  final List<String> descriptions;
 
-  CustomCarouselSlider({required this.imageUrls, required this.chosenPrograms});
+  CustomCarouselSlider({
+    required this.imageUrls,
+    required this.chosenPrograms,
+    required this.descriptions,
+  });
 
   @override
   _CustomCarouselSliderState createState() => _CustomCarouselSliderState();
@@ -53,6 +58,7 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
                   builder: (context) => MyDetailProgram(
                     programName: widget.chosenPrograms[_currentIndex],
                     programImage: url,
+                    programDescription: widget.descriptions[_currentIndex],
                   ),
                 ),
               );

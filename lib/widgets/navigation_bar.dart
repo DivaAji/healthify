@@ -48,10 +48,8 @@ class _MyNavigationBar extends State<MyNavigationBar> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: const Color.fromRGBO(0, 139, 144, 1),
         unselectedItemColor: Colors.grey,
-        selectedLabelStyle: const TextStyle(fontFamily: 'Galatea'),
-        unselectedLabelStyle: const TextStyle(fontFamily: 'Galatea'),
         items: const [
           BottomNavigationBarItem(
             label: 'Home',
@@ -60,13 +58,13 @@ class _MyNavigationBar extends State<MyNavigationBar> {
               size: 24,
             ),
           ),
-          BottomNavigationBarItem(
-            label: 'Latihan',
-            icon: ImageIcon(
-              AssetImage('assets/icons/latihan.png'),
-              size: 24,
-            ),
-          ),
+          // BottomNavigationBarItem(
+          //   label: 'Latihan',
+          //   icon: ImageIcon(
+          //     AssetImage('assets/icons/latihan.png'),
+          //     size: 24,
+          //   ),
+          // ),
           BottomNavigationBarItem(
             label: 'History',
             icon: ImageIcon(

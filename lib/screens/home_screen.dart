@@ -154,16 +154,40 @@ class HomeScreen extends StatelessWidget {
 
     // List program yang sedang berlangsung (sesuaikan dg database)
     final List<Map<String, String>> selectedPrograms = [
-      {'name': 'KELENTURAN', 'image': 'kelenturan.jpg'},
-      {'name': 'KELENTURAN', 'image': 'kelenturan.jpg'},
-      {'name': 'KELENTURAN', 'image': 'kelenturan.jpg'},
+      {
+        'name': 'KELENTURAN',
+        'image': 'kelenturan.jpg',
+        'description':
+            'Tingkatkan fleksibilitas dan mobilitas tubuh dengan latihan peregangan yang aman dan efektif.'
+      },
+      {
+        'name': 'KELINCAHAN',
+        'image': 'kelenturan.jpg',
+        'description':
+            'Tingkatkan pergerakan anda dengan kelincahan'
+      },
     ];
 
     // List semua program yang ditawarkan (sesuaikan dengan database)
     final List<Map<String, String>> allPrograms = [
-      {'name': 'KELINCAHAN', 'image': 'kelenturan.jpg'},
-      {'name': 'KESEIMBANGAN', 'image': 'kelenturan.jpg'},
-      {'name': 'KELENTURAN', 'image': 'kelenturan.jpg'},
+      {
+        'name': 'KELINCAHAN',
+        'image': 'kelenturan.jpg',
+        'description':
+            'Tingkatkan pergerakan anda dengan kelincahan'
+      },
+      {
+        'name': 'KESEIMBANGAN',
+        'image': 'kelenturan.jpg',
+        'description':
+            'Keseimbangan merupakan salah satu faktor penting dalam aktivitas kita sehari-hari'
+      },
+      {
+        'name': 'KELENTURAN',
+        'image': 'kelenturan.jpg',
+        'description':
+            'Tingkatkan fleksibilitas dan mobilitas tubuh dengan latihan peregangan yang aman dan efektif.'
+      },
     ];
 
     return Scaffold(
@@ -224,6 +248,9 @@ class HomeScreen extends StatelessWidget {
                 chosenPrograms: selectedPrograms
                     .map((program) => program['name']!)
                     .toList(),
+                descriptions: selectedPrograms
+                    .map((program) => program['description']!)
+                    .toList(),
               ),
             ),
             // Menampilkan bagian "PILIHAN PROGRAM"
@@ -266,6 +293,7 @@ class HomeScreen extends StatelessWidget {
                               builder: (context) => MyDetailProgram(
                                 programName: program['name']!,
                                 programImage: program['image']!,
+                                programDescription: program['description']!,
                               ),
                             ),
                           );

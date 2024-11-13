@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Galatea', // Terapkan font Galatea secara global
       ),
-      home: SplashScreen(),
+      home: FaceScan(userId: 1),
       routes: {
         '/login': (context) => LoginScreen(), // Rute untuk halaman login
       },

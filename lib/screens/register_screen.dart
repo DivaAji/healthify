@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:healthify/screens/faceScan_screen.dart';
 import 'package:image_picker/image_picker.dart'; // Import image_picker
 import 'package:http/http.dart' as http;
-import 'package:healthify/screens/login_screen.dart';
-import 'package:healthify/screens/ageInput_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/text_field.dart';
@@ -191,13 +189,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           keyboardType: TextInputType.number,
                         ),
                         const SizedBox(height: 20),
-                        CustomButton(
-                          text: 'Next',
-                          onPressed:
-                              registerUser, // Calls registerUser and navigates upon success
-                          horizontalPadding: 50.0,
-                          verticalPadding: 10.0,
-                        ),
+                        if (_imageFile != null)
+                          CustomButton(
+                            text: 'Next',
+                            onPressed:
+                                registerUser, 
+                            horizontalPadding: 50.0,
+                            verticalPadding: 10.0,
+                          ),
                       ],
                     ),
                   ),

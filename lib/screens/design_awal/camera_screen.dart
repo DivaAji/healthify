@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:healthify/screens/design_awal/image_picker_screen.dart';
 import 'package:healthify/widgets/camera.dart';
 
-class CameraScreen extends StatelessWidget {
-  const CameraScreen({super.key});
+class CameraScreen extends StatefulWidget {
+  final int userId;
 
+  const CameraScreen({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  _CameraScreenState createState() => _CameraScreenState();
+}
+
+class _CameraScreenState extends State<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     // Mendapatkan ukuran layar menggunakan MediaQuery
@@ -21,10 +28,8 @@ class CameraScreen extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: EdgeInsets.only(
-                    top: screenHeight *
-                        0.05, // Padding atas 5% dari tinggi layar
-                    right:
-                        screenWidth * 0.05, // Padding kanan 8% dari lebar layar
+                    top: screenHeight * 0.05, // Padding atas 5% dari tinggi layar
+                    right: screenWidth * 0.05, // Padding kanan 5% dari lebar layar
                   ),
                   child: InkWell(
                     onTap: () {
@@ -52,12 +57,10 @@ class CameraScreen extends StatelessWidget {
                             'Unggah',
                             style: TextStyle(
                               color: const Color.fromRGBO(0, 139, 144, 1),
-                              fontSize:
-                                  screenWidth * 0.04, 
+                              fontSize: screenWidth * 0.04,
                             ),
                           ),
-                          SizedBox(
-                              width: screenWidth * 0.02), 
+                          SizedBox(width: screenWidth * 0.02),
                           Image.asset(
                             'assets/icons/upload.png',
                             width: screenWidth * 0.05,
@@ -75,35 +78,31 @@ class CameraScreen extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/detect_rectangle.png',
                     width: 300,
-                    // fit: BoxFit.cover,
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             'Pastikan wajah anda terlihat jelas',
             style: TextStyle(
               fontSize: screenWidth * 0.04,
               fontWeight: FontWeight.w400,
-              color: Color.fromRGBO(33, 50, 75, 1),
+              color: const Color.fromRGBO(33, 50, 75, 1),
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: 5),
+              padding: const EdgeInsets.only(bottom: 5),
               child: GestureDetector(
-                onTap: () {
-                  _takePicture();
-                },
+                onTap: _takePicture,
                 child: Image.asset(
                   'assets/images/ellipse.png',
                   width: 80,
                   height: 40,
-                  // fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -116,5 +115,6 @@ class CameraScreen extends StatelessWidget {
   // Fungsi untuk mengambil gambar
   void _takePicture() {
     // Implementasikan logika pengambilan gambar menggunakan camera
+    print("Picture taken");
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/widgets/button.dart';
+import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart'; // For checking if running on Web
@@ -171,21 +172,22 @@ class _FaceScanState extends State<FaceScan> {
             verticalPadding: 10.0,
           ),
           SizedBox(height: 5),
-          CustomButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      HomeScreen(), // Mengarahkan ke HomeScreen
-                ),
-              );
-            },
-            text: 'Next >>',
-            textStyle: TextStyle(fontSize: 16),
-            horizontalPadding: 30.0,
-            verticalPadding: 10.0,
-          ),
+          if (_image != null)
+            CustomButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        HomeScreen(), 
+                  ),
+                );
+              },
+              text: 'Next >>',
+              textStyle: TextStyle(fontSize: 16),
+              horizontalPadding: 30.0,
+              verticalPadding: 10.0,
+            ),
           const SizedBox(height: 20),
         ],
       ),
