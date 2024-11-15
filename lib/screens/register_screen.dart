@@ -19,7 +19,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // text editing controller
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
@@ -27,7 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String selectedGender = '';
   String ageInputOption = 'Manual';
-  
+
   XFile? _imageFile; // Variable untuk menyimpan gambar yang diambil
 
   final ImagePicker _picker = ImagePicker(); // Inisialisasi image picker
@@ -189,14 +190,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           keyboardType: TextInputType.number,
                         ),
                         const SizedBox(height: 20),
-                        if (_imageFile != null)
-                          CustomButton(
-                            text: 'Next',
-                            onPressed:
-                                registerUser, 
-                            horizontalPadding: 50.0,
-                            verticalPadding: 10.0,
-                          ),
+                        // if (_imageFile != null)
+                        //   CustomButton(
+                        //     text: 'Next',
+                        //     onPressed: registerUser,
+                        //     horizontalPadding: 50.0,
+                        //     verticalPadding: 10.0,
+                        //   ),
+
+                        const SizedBox(height: 20),
+                        CustomButton(
+                          text: 'Next',
+                          onPressed:
+                              registerUser, // Calls registerUser and navigates upon success
+                          horizontalPadding: 50.0,
+                          verticalPadding: 10.0,
+                        ),
                       ],
                     ),
                   ),
