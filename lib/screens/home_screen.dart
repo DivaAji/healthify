@@ -158,13 +158,13 @@ class HomeScreen extends StatelessWidget {
         'name': 'KELENTURAN',
         'image': 'kelenturan.jpg',
         'description':
-            'Tingkatkan fleksibilitas dan mobilitas tubuh dengan latihan peregangan yang aman dan efektif.'
+            'Latihan kelenturan adalah jenis latihan fisik yang bertujuan untuk meningkatkan kemampuan otot dan sendi tubuh agar dapat bergerak dengan leluasa, nyaman, dan tanpa rasa sakit dalam rentang gerak yang maksimal. Latihan ini penting untuk menjaga postur tubuh, mencegah cedera, dan meningkatkan performa dalam aktivitas sehari-hari.'
       },
       {
         'name': 'KELINCAHAN',
         'image': 'kelenturan.jpg',
         'description':
-            'Tingkatkan pergerakan anda dengan kelincahan'
+            'Kelincahan merupakan salah satu komponen penting dalam kebugaran fisik yang mencerminkan kemampuan seseorang untuk bergerak cepat, tepat, dan seimbang dalam berbagai arah. Selain itu, kelincahan yang baik juga berperan dalam mengurangi risiko cedera serta meningkatkan kemampuan fungsional sehari-hari. Latihan ini penting bagi pengguna yang ingin mencapai tubuh yang lebih sehat dan tangkas.'
       },
     ];
 
@@ -174,19 +174,19 @@ class HomeScreen extends StatelessWidget {
         'name': 'KELINCAHAN',
         'image': 'kelenturan.jpg',
         'description':
-            'Tingkatkan pergerakan anda dengan kelincahan'
+            'Kelincahan merupakan salah satu komponen penting dalam kebugaran fisik yang mencerminkan kemampuan seseorang untuk bergerak cepat, tepat, dan seimbang dalam berbagai arah. Selain itu, kelincahan yang baik juga berperan dalam mengurangi risiko cedera serta meningkatkan kemampuan fungsional sehari-hari. Latihan ini penting bagi pengguna yang ingin mencapai tubuh yang lebih sehat dan tangkas.'
       },
       {
         'name': 'KESEIMBANGAN',
         'image': 'kelenturan.jpg',
         'description':
-            'Keseimbangan merupakan salah satu faktor penting dalam aktivitas kita sehari-hari'
+            'Latihan keseimbangan adalah jenis aktivitas yang bertujuan untuk meningkatkan kemampuan tubuh dalam mempertahankan posisi stabil, baik dalam keadaan diam maupun bergerak. Keseimbangan merupakan komponen penting dalam kebugaran fisik, terutama untuk mendukung koordinasi tubuh, postur, dan mencegah cedera, terutama pada orang lanjut usia atau atlet.'
       },
       {
         'name': 'KELENTURAN',
         'image': 'kelenturan.jpg',
         'description':
-            'Tingkatkan fleksibilitas dan mobilitas tubuh dengan latihan peregangan yang aman dan efektif.'
+            'Latihan kelenturan adalah jenis latihan fisik yang bertujuan untuk meningkatkan kemampuan otot dan sendi tubuh agar dapat bergerak dengan leluasa, nyaman, dan tanpa rasa sakit dalam rentang gerak yang maksimal. Latihan ini penting untuk menjaga postur tubuh, mencegah cedera, dan meningkatkan performa dalam aktivitas sehari-hari.'
       },
     ];
 

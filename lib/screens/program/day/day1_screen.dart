@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/program/day/latihan/latihan1_screen.dart';
+import 'package:healthify/widgets/button.dart';
 
 class Day1Screen extends StatelessWidget {
   final int day;
@@ -13,10 +14,11 @@ class Day1Screen extends StatelessWidget {
         children: [
           // Banner
           Container(
-            height: 200,
+            height: 300,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
+                image: AssetImage(
+                    'assets/images/kelenturan.jpg'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),
@@ -66,27 +68,25 @@ class Day1Screen extends StatelessWidget {
           const SizedBox(height: 4),
 
           // Teks
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              'Video Latihan',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //   child: Text(
+          //     'Video Latihan',
+          //     textAlign: TextAlign.center,
+          //     style: TextStyle(fontSize: 16),
+          //   ),
+          // ),
 
-          const SizedBox(height: 16),
+          // const SizedBox(height: 16),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.only(bottom: 16.0),
             child: Text(
-              '5 Latihan',
+              '5 Latihan', //jumlah latihan disesuikan database
               textAlign: TextAlign.left,
               style: TextStyle(fontSize: 16),
             ),
           ),
-
-          const SizedBox(height: 16),
 
           // Daftar latihan
           Expanded(
@@ -103,19 +103,19 @@ class Day1Screen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
+          padding: const EdgeInsets.all(4.0),
+          child: CustomButton(
+            text: 'Start',
             onPressed: () {
-              // Navigasi ke halaman ExerciseScreen
+              // Navigasi ke halaman Latihan1Screen
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Latihan1Screen()),
               );
             },
-            child: Text('Start'),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 50), // Tombol memenuhi lebar
-            ),
+            horizontalPadding:
+                10.0, // Mengatur padding horizontal jika diperlukan
+            verticalPadding: 10.0,
           ),
         ),
       ),
@@ -138,7 +138,7 @@ class Day1Screen extends StatelessWidget {
                   color: Colors.black12,
                   blurRadius: 4.0,
                   offset: Offset(0, 2),
- ),
+                ),
               ],
             ),
             child: Icon(Icons.fitness_center, color: Colors.black),
