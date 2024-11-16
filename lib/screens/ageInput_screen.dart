@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:healthify/screens/faceScan_screen.dart';
 import 'package:healthify/widgets/button.dart';
@@ -52,9 +53,7 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FaceScan(
-          userId: widget.userId,
-        ),
+        builder: (context) => HomeScreen(),
       ),
     );
   }

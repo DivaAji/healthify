@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/faceScan_screen.dart';
+import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/screens/splash_screen.dart';
 import 'package:healthify/screens/login_screen.dart'; 
 
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Galatea', 
       ),
-      home: SplashScreen(),
+      home: FaceScan(userId: 1),
       routes: {
         '/login': (context) => LoginScreen(), 
       },

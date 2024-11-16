@@ -139,7 +139,7 @@
 // Lebih dinamis
 
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/detail_program_screen.dart';
+import 'package:healthify/screens/program/detail_program_screen.dart';
 import 'package:healthify/screens/profile_screen.dart';
 import 'package:healthify/widgets/carousel_slider.dart';
 import 'package:healthify/widgets/program_indicator.dart';

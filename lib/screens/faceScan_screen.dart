@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart'; // For checking if running on Web
 
 class FaceScan extends StatefulWidget {
@@ -21,6 +20,8 @@ class _FaceScanState extends State<FaceScan> {
   File? _image; // For mobile
   Uint8List? _webImage; // For web
   bool _isCardVisible = false;
+  bool _isAgeConfirmationVisible = true; // To toggle between text and TextField
+  final TextEditingController _ageController = TextEditingController(); // Controller for the age input
 
   // Method to pick image from camera
   Future<void> _pickImageFromCamera() async {
@@ -68,6 +69,22 @@ class _FaceScanState extends State<FaceScan> {
     }
   }
 
+  // Method to handle submit age
+  void _submitAge() {
+    if (_ageController.text.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Mohon masukkan usia')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,7 +120,7 @@ class _FaceScanState extends State<FaceScan> {
               const SizedBox(height: 20),
               CustomButton(
                 onPressed: _pickImageFromCamera,
-                text: 'Ambil Gambar',
+                text: 'Ambil dari Kamera',
                 textStyle: TextStyle(fontSize: 16),
                 horizontalPadding: 30.0,
                 verticalPadding: 10.0,
@@ -166,42 +183,69 @@ class _FaceScanState extends State<FaceScan> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        'Apakah umur anda berada direntang 18 - 30 tahun?',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          CustomButton(
-                            onPressed: () {
-                              setState(() {
-                                _isCardVisible = false;
-                              });
-                            },
-                            text: 'Tidak',
-                            textStyle: TextStyle(fontSize: 16),
-                            horizontalPadding: 25.0,
-                            verticalPadding: 5.0,
-                          ),
-                          CustomButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
+                      _isAgeConfirmationVisible
+                          ? Column(
+                              children: [
+                                Text(
+                                  'Apakah umur anda berada direntang 18 - 30 tahun?',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 16),
                                 ),
-                              );
-                            },
-                            text: 'Ya',
-                            textStyle: TextStyle(fontSize: 16),
-                            horizontalPadding: 35.0,
-                            verticalPadding: 5.0,
-                          ),
-                        ],
-                      ),
+                                const SizedBox(height: 20),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    CustomButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _isAgeConfirmationVisible =
+                                              false; // Show TextField
+                                        });
+                                      },
+                                      text: 'Tidak',
+                                      textStyle: TextStyle(fontSize: 16),
+                                      horizontalPadding: 25.0,
+                                      verticalPadding: 5.0,
+                                    ),
+                                    CustomButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => HomeScreen(),
+                                          ),
+                                        );
+                                      },
+                                      text: 'Ya',
+                                      textStyle: TextStyle(fontSize: 16),
+                                      horizontalPadding: 35.0,
+                                      verticalPadding: 5.0,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                TextField(
+                                  controller: _ageController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'Masukkan Usia',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                CustomButton(
+                                  onPressed: _submitAge,
+                                  text: 'Submit',
+                                  textStyle: TextStyle(fontSize: 16),
+                                  horizontalPadding: 35.0,
+                                  verticalPadding: 10.0,
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ),

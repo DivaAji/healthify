@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:healthify/screens/detail_program_screen.dart';
+import 'package:healthify/screens/program/detail_program_screen.dart';
 import 'package:healthify/widgets/program_indicator.dart';
 
 class CustomCarouselSlider extends StatefulWidget {

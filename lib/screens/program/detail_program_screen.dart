@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/program/day/day1_screen.dart';
+import 'package:healthify/screens/program/day1_screen.dart';
 
 class MyDetailProgram extends StatefulWidget {
   final String programName;
   final String programImage;
-  final String programDescription; // Tambahkan parameter deskripsi
+  final String programDescription;
 
   const MyDetailProgram({
     Key? key,
     required this.programName,
     required this.programImage,
-    required this.programDescription, 
+    required this.programDescription,
   }) : super(key: key);
 
   @override
@@ -18,60 +18,65 @@ class MyDetailProgram extends StatefulWidget {
 }
 
 class _MyDetailProgramState extends State<MyDetailProgram> {
-  int completedDays = 0; // Store the number of completed days
+  int completedDays = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.programName), // Gunakan programName
-        backgroundColor: Color.fromRGBO(0, 139, 144, 1).withOpacity(0.5),
+        title: Text(widget.programName),
+        backgroundColor: const Color.fromRGBO(0, 139, 144, 1).withOpacity(0.5),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Banner image
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(
-                      'assets/images/${widget.programImage}'), // Gunakan programImage
-                  fit: BoxFit.cover,
-                ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Banner image
+          Container(
+            height: 230,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/${widget.programImage}'),
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 16.0),
+          ),
+          const SizedBox(height: 10.0),
 
-            // Description
-            Text(
-              widget.programDescription, // Gunakan programDescription
-              style: TextStyle(fontSize: 16),
+          // Description
+          Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Text(
+              widget.programDescription,
+              style: const TextStyle(fontSize: 16),
               textAlign: TextAlign.justify,
             ),
-            const SizedBox(height: 16.0),
+          ),
+          // const SizedBox(height: 16.0),
 
-            // Day grid
-            Expanded(
+          // Day grid
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 18.0, left: 18.0),
               child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 5, // Number of columns
-                  crossAxisSpacing: 8.0,
-                  mainAxisSpacing: 8.0,
+                  crossAxisSpacing: 9.0,
+                  mainAxisSpacing: 7.0,
                 ),
                 itemCount: 30, // Number of days
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
                       if (index <= completedDays) {
-                        // Navigate to the day detail if the day is accessible
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => Day1Screen(
-                                day: index + 1), // Implement Day1Screen
+                              day: index + 1,
+                              bannerImage: widget.programImage,
+                              programCategory: widget.programName,
+                            ),
+                            // builder: (context) => DayScreen(day: index + 1),
                           ),
                         );
                       }
@@ -90,27 +95,24 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
+                              const Text(
                                 'Day',
                                 style: TextStyle(
-                                    color: const Color(0xFF21324B),
-                                    fontSize: 16),
+                                    color: Color(0xFF21324B), fontSize: 16),
                               ),
                               Text(
                                 '${index + 1}',
-                                style: TextStyle(
-                                    color: const Color(0xFF21324B),
-                                    fontSize: 30),
+                                style: const TextStyle(
+                                    color: Color(0xFF21324B), fontSize: 23),
                               ),
                             ],
                           ),
-                          if (index >
-                              completedDays) // Show lock icon for inaccessible days
-                            Center(
+                          if (index > completedDays)
+                            const Center(
                               child: Icon(
                                 Icons.lock,
                                 color: Colors.white,
-                                size: 40,
+                                size: 35,
                               ),
                             ),
                         ],
@@ -120,8 +122,8 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
                 },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
