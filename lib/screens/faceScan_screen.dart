@@ -76,7 +76,7 @@ class _FaceScanState extends State<FaceScan> {
     }
 
     try {
-      final uri = Uri.parse('http://192.168.1.6:8000/api/upload-image');
+      final uri = Uri.parse('http://192.168.64.199:8000/api/upload-image');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString();
 
@@ -104,7 +104,7 @@ class _FaceScanState extends State<FaceScan> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gambar berhasil diunggah')),
         );
-
+        await _sendImageToFlask(responseBody.body);
         // Arahkan ke halaman login setelah berhasil mengunggah gambar
         Navigator.pushReplacementNamed(context, '/login');
       } else {
@@ -118,6 +118,42 @@ class _FaceScanState extends State<FaceScan> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Terjadi kesalahan saat mengunggah gambar')),
       );
+    }
+  }
+
+  Future<void> _sendImageToFlask(String filePath) async {
+    final uri =
+        Uri.parse('http://192.168.64.199:5000/predict'); // Flask API URL
+    final request = http.MultipartRequest('POST', uri)
+      ..fields['file_path'] = filePath; // Kirim path gambar ke Flask
+
+    final response = await request.send();
+    final responseBody = await http.Response.fromStream(response);
+
+    if (response.statusCode == 200) {
+      final predictedAge = responseBody.body; // Ambil usia yang diprediksi
+      // Kirim hasil prediksi kembali ke Laravel
+      await _sendPredictedAgeToLaravel(predictedAge);
+    } else {
+      print('Error sending image to Flask: ${response.statusCode}');
+    }
+  }
+
+  Future<void> _sendPredictedAgeToLaravel(String predictedAge) async {
+    final uri = Uri.parse('http://192.168.64.199:8000/api/save-predicted-age');
+    final request = http.MultipartRequest('POST', uri)
+      ..fields['user_id'] = widget.userId.toString()
+      ..fields['predicted_age'] = predictedAge;
+
+    final response = await request.send();
+    final responseBody = await http.Response.fromStream(response);
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Prediksi usia berhasil disimpan')),
+      );
+    } else {
+      print('Error saving predicted age: ${response.statusCode}');
     }
   }
 
