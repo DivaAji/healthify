@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/profile/edit_profil_screen.dart';
 import 'package:healthify/widgets/button.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -8,7 +9,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil'),
+        title: const Text('PROFIL'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -40,8 +42,11 @@ class ProfileScreen extends StatelessWidget {
             CustomButton(
               text: 'Edit Profil',
               onPressed: () {
-                // Aksi ketika tombol edit ditekan
-                print('Edit Profile pressed');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const EditProfilScreen()),
+                );
               },
               verticalPadding: 10.0,
               textStyle: const TextStyle(fontSize: 18),

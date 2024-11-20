@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/screens/registration/register_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
@@ -69,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
+          builder: (context) => const MyNavigationBar(),
         ),
       );
     }
@@ -85,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Image.asset(
               'assets/images/login_background.jpg',
               fit: BoxFit.cover,
-              height: MediaQuery.of(context).size.height, 
+              height: MediaQuery.of(context).size.height,
             ),
           ),
           // Centering the content with a scrollable card

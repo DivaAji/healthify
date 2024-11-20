@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/widgets/button.dart';
+import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart'; // For checking if running on Web
 
@@ -21,7 +21,8 @@ class _FaceScanState extends State<FaceScan> {
   Uint8List? _webImage; // For web
   bool _isCardVisible = false;
   bool _isAgeConfirmationVisible = true; // To toggle between text and TextField
-  final TextEditingController _ageController = TextEditingController(); // Controller for the age input
+  final TextEditingController _ageController =
+      TextEditingController(); // Controller for the age input
 
   // Method to pick image from camera
   Future<void> _pickImageFromCamera() async {
@@ -75,7 +76,7 @@ class _FaceScanState extends State<FaceScan> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(),
+          builder: (context) => MyNavigationBar(),
         ),
       );
     } else {
@@ -213,7 +214,8 @@ class _FaceScanState extends State<FaceScan> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => HomeScreen(),
+                                            builder: (context) =>
+                                                MyNavigationBar(),
                                           ),
                                         );
                                       },
@@ -232,7 +234,8 @@ class _FaceScanState extends State<FaceScan> {
                                   controller: _ageController,
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
-                                    labelText: 'Pilih rentang Usia', //diganti ke dropdown button saja sehingga rentang usianya sudah di tentukan. Gunakan class CustomDropdownButton() yang ada di widget
+                                    labelText:
+                                        'Masukkan Usia', //diganti ke dropdown button saja sehingga rentang usianya sudah di tentukan. Gunakan class CustomDropdownButton() yang ada di widget
                                     border: OutlineInputBorder(),
                                   ),
                                 ),

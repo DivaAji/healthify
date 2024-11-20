@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/program/detail_program_screen.dart';
-import 'package:healthify/screens/profil/profile_screen.dart';
 import 'package:healthify/widgets/carousel_slider.dart';
-import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/widgets/program_indicator.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -55,17 +53,6 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('PROGRAM'),
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
-              );
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -196,7 +183,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // bottomNavigationBar: const MyNavigationBar(),
     );
   }
 }
