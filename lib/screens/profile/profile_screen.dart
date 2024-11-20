@@ -2,8 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:healthify/screens/profile/edit_profil_screen.dart';
 import 'package:healthify/widgets/button.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String username = 'Username';
+  String email = 'email@example.com';
+  String height = '165';
+  String weight = '50';
+  String gender = 'Perempuan';
+  String profileImagePath = 'assets/images/profile_picture.png'; // Default image path
+  String ageRange = '18-30'; // Menambahkan rentang usia
 
   @override
   Widget build(BuildContext context) {
@@ -16,37 +29,63 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Gambar Profil
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(
-                  'assets/images/profile_picture.png'), //gambar dari scan
+            // Profile Picture
+            GestureDetector(
+              onTap: () {
+                // Optionally, you can add functionality to edit the profile picture here
+              },
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage(profileImagePath),
+              ),
             ),
             const SizedBox(height: 16),
 
-            // Nama Pengguna
+            // Username
             Text(
-              'Username',
+              username,
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
-            // Email Pengguna
+            // Email
             Text(
-              'email@example.com',
+              email,
               style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
             const SizedBox(height: 16),
 
-            // Tombol Edit Profil
+            // Edit Profile Button
             CustomButton(
               text: 'Edit Profil',
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final updatedData = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const EditProfilScreen()),
+                    builder: (context) => EditProfilScreen(
+                      username: username,
+                      email: email,
+                      height: height,
+                      weight: weight,
+                      gender: gender,
+                      profileImagePath: profileImagePath,
+                      ageRange: ageRange, // Mengirimkan rentang usia
+                    ),
+                  ),
                 );
+
+                // Update the state with the new data
+                if (updatedData != null) {
+                  setState(() {
+                    username = updatedData['username'];
+                    email = updatedData['email'];
+                    height = updatedData['height'];
+                    weight = updatedData['weight'];
+                    gender = updatedData['gender'];
+                    profileImagePath = updatedData['profileImagePath'];
+                    ageRange = updatedData['ageRange']; // Mengupdate rentang usia
+                  });
+                }
               },
               verticalPadding: 10.0,
               textStyle: const TextStyle(fontSize: 18),
@@ -54,35 +93,24 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Informasi Tambahan
+            // Additional Information
             Text(
               'Informasi Tambahan',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
-            // Daftar Informasi
+            // Info List
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView(
                   children: [
-                    _buildInfoItem('Jenis Kelamin', 'Perempuan'),
-                    _buildInfoItem('Tinggi Badan', '165'),
-                    _buildInfoItem('Berat Badan', '50'),
-                    _buildInfoItem('Rentang usia', '18-30'),
-                    _buildInfoItem('Indeks Masa Tubuh',
-                        'Ideal'), //ideal, underweight, atau overweight
-
-                    //Rumus perhitungan indeks masa tubuh
-
-                    //IMT = berat badan (kg) / tinggi badan (m)
-
-                    // Kategori IMT (WHO untuk Asia Tenggara):
-                    // < 18,5: Berat badan kurang (underweight)
-                    // 18,5 - 22,9: Normal (ideal)
-                    // 23 - 24,9: Berat badan berlebih (overweight)
-                    // ≥ 25: Obesitas
+                    _buildInfoItem('Jenis Kelamin', gender),
+                    _buildInfoItem('Tinggi Badan', height),
+                    _buildInfoItem('Berat Badan', weight),
+                    _buildInfoItem('Rentang Usia', ageRange), // Menampilkan rentang usia
+                    _buildInfoItem('Indeks Masa Tubuh', 'Ideal'),
                   ],
                 ),
               ),
