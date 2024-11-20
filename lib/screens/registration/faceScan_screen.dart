@@ -232,7 +232,7 @@ class _FaceScanState extends State<FaceScan> {
                                   controller: _ageController,
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
-                                    labelText: 'Masukkan Usia',
+                                    labelText: 'Pilih rentang Usia', //diganti ke dropdown button saja sehingga rentang usianya sudah di tentukan. Gunakan class CustomDropdownButton() yang ada di widget
                                     border: OutlineInputBorder(),
                                   ),
                                 ),

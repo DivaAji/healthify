@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/program/day1_screen.dart';
+import 'package:healthify/screens/program/day_screen.dart';
 
 class KelenturanScreen extends StatefulWidget {
   final String title;

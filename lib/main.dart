@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/splash_screen.dart';
-import 'package:healthify/screens/login_screen.dart'; 
+import 'package:healthify/screens/welcome/splash_screen.dart';
+import 'package:healthify/screens/login/login_screen.dart';
 
 void main() => runApp(const MyApp());
 
@@ -12,11 +12,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Galatea', 
+        fontFamily: 'Galatea',
       ),
       home: SplashScreen(),
       routes: {
-        '/login': (context) => LoginScreen(), 
+        '/login': (context) => LoginScreen(),
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:healthify/screens/register_screen.dart';
+import 'package:healthify/screens/home_screen.dart';
+import 'package:healthify/screens/registration/register_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/healthify_text.dart';
@@ -68,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const MyNavigationBar(),
+          builder: (context) => const HomeScreen(),
         ),
       );
     }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/program/day1_screen.dart';
+import 'package:healthify/screens/program/day_screen.dart';
 
 class MyDetailProgram extends StatefulWidget {
   final String programName;
@@ -27,37 +27,43 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
         title: Text(widget.programName),
         backgroundColor: const Color.fromRGBO(0, 139, 144, 1).withOpacity(0.5),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Banner image
-          Container(
-            height: 230,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/${widget.programImage}'),
-                fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        // Membungkus seluruh konten agar bisa discroll
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Banner image
+            Container(
+              height: 230,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/${widget.programImage}'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
 
-          // Description
-          Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Text(
-              widget.programDescription,
-              style: const TextStyle(fontSize: 16),
-              textAlign: TextAlign.justify,
+            // Description
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Text(
+                widget.programDescription,
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.justify,
+              ),
             ),
-          ),
-          // const SizedBox(height: 16.0),
 
-          // Day grid
-          Expanded(
-            child: Padding(
+            const SizedBox(height: 10.0),
+
+            // Day grid (GridView di sini sudah di-wrap dalam SingleChildScrollView)
+            Padding(
               padding: const EdgeInsets.only(right: 18.0, left: 18.0),
               child: GridView.builder(
+                physics:
+                    const NeverScrollableScrollPhysics(), // Menghentikan scroll pada GridView
+                shrinkWrap:
+                    true, // Membuat GridView menyesuaikan dengan ukuran yang tersedia
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 5, // Number of columns
                   crossAxisSpacing: 9.0,
@@ -76,7 +82,6 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
                               bannerImage: widget.programImage,
                               programCategory: widget.programName,
                             ),
-                            // builder: (context) => DayScreen(day: index + 1),
                           ),
                         );
                       }
@@ -122,8 +127,8 @@ class _MyDetailProgramState extends State<MyDetailProgram> {
                 },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

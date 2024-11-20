@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/design_awal/latihan/latihan2_screen.dart';
 import 'dart:async';
+
+import 'package:healthify/widgets/button.dart';
 
 class Latihan1Screen extends StatefulWidget {
   @override
@@ -7,7 +10,7 @@ class Latihan1Screen extends StatefulWidget {
 }
 
 class _Latihan1ScreenState extends State<Latihan1Screen> {
-  int _start = 1; // Waktu countdown mulai dari 10 detik
+  int _start = 10; // Waktu countdown mulai dari 10 detik
   late Timer _timer;
 
   @override
@@ -24,7 +27,9 @@ class _Latihan1ScreenState extends State<Latihan1Screen> {
         // Navigasi ke halaman baru
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HalamanBaru()), // Ganti dengan halaman tujuan
+          MaterialPageRoute(
+              builder: (context) =>
+                  Latihan2Screen()), // Ganti dengan halaman tujuan
         );
       }
     });
@@ -40,45 +45,48 @@ class _Latihan1ScreenState extends State<Latihan1Screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Latihan 1'),
+        title: const Text('Step 1'), //disesuaikan dengan banyaknya step
       ),
       body: Column(
         children: [
           // Banner
           Container(
-            height: 200,
+            height: 300,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
+                image: AssetImage(
+                    'assets/images/shape.png'), //ganti dengan gambar latihan
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 35),
 
-          // Teks Center 1
-          Center(
-            child: Text(
-              'Selamat datang di Latihan 1!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+          Container(
+            child: Center(
+                child: Column(children: [
+              Text(
+                'Siap untuk memulai?',
+                style: TextStyle(fontSize: 20),
+              ),
+              Text(
+                'Ambil poisi untuk gerakan: ',
+                style: TextStyle(fontSize: 20),
+              ),
+            ])),
           ),
-          const SizedBox(height: 20),
-
-          // Teks Center 2
-          Center(
-            child: Text(
-              'Siap untuk memulai?',
-              style: TextStyle(fontSize: 20),
-            ),
+          const SizedBox(height: 15),
+          Text(
+            'Peregangan Kaki', //disesuaikan nama step latihan
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 40),
 
           // Lingkaran dengan Angka Countdown
           Center(
             child: Container(
-              width: 100, // Lebar lingkaran
-              height: 100, // Tinggi lingkaran
+              width: 125, // Lebar lingkaran
+              height: 125, // Tinggi lingkaran
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.red, // Warna lingkaran
@@ -87,7 +95,7 @@ class _Latihan1ScreenState extends State<Latihan1Screen> {
               child: Text(
                 '$_start',
                 style: TextStyle(
-                  fontSize: 36,
+                  fontSize: 50,
                   color: Colors.white, // Warna teks di dalam lingkaran
                   fontWeight: FontWeight.bold,
                 ),
@@ -156,7 +164,8 @@ class _HalamanBaruState extends State<HalamanBaru> {
             height: 200,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/shape.png'), // Ganti dengan path gambar banner
+                image: AssetImage(
+                    'assets/images/shape.png'), // Ganti dengan path gambar banner
                 fit: BoxFit.cover,
               ),
             ),

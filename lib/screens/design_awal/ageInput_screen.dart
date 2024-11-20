@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:healthify/screens/faceScan_screen.dart';
+import 'package:healthify/screens/registration/faceScan_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/text_field.dart';
 import 'package:healthify/widgets/dropdown_button.dart';

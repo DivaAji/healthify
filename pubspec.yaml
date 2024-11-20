@@ -75,6 +75,8 @@ flutter:
     - assets/images/rectangle.png
     - assets/images/kelenturan.jpg
     - assets/images/profil_picture.png
+    - assets/images/check.png
+    - assets/images/vector.png
     - assets/icons/upload.png
     - assets/icons/home.png
     - assets/icons/latihan.png

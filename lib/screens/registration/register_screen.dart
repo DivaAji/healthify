@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/faceScan_screen.dart';
+import 'package:healthify/screens/registration/faceScan_screen.dart';
 import 'package:image_picker/image_picker.dart'; // Import image_picker
 import 'package:http/http.dart' as http;
 import 'package:healthify/widgets/button.dart';

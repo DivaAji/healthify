@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/program/day/latihan/latihan1_screen.dart';
+import 'package:healthify/screens/program/steps_start.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/program_indicator.dart';
 
@@ -8,7 +8,7 @@ Map<int, List<Map<String, String>>> latihanProgram = {
     {
       'kategori': 'Kelincahan',
       'step': 'Lari tempat',
-      'durasi': '1 menit',
+      'durasi': '1 menit', //waktunya menyesuaikan tipe datanya
       'image': 'assets/images/kelenturan.jpg'
     },
     {
@@ -254,10 +254,17 @@ class _Day1ScreenState extends State<Day1Screen> {
           child: CustomButton(
             text: 'Start',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Latihan1Screen()),
-              );
+              if (filteredPrograms != null && filteredPrograms.isNotEmpty) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProgramSteps(
+                      steps: filteredPrograms, // Kirim langkah-langkah
+                      currentStep: 0, // Mulai dari langkah pertama
+                    ),
+                  ),
+                );
+              }
             },
             horizontalPadding: 10.0,
             verticalPadding: 10.0,
