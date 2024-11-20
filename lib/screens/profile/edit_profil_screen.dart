@@ -9,7 +9,10 @@ class EditProfilScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Edit Profil'),
       ),
-      
+      body: 
+      Text(
+        'Halaman Edit Profil'
+      )
     );
   }
 }
