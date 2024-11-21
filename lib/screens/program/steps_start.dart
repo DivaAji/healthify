@@ -23,7 +23,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
   late Timer _initialTimer; // Timer untuk hitung mundur awal
   bool _isCountdownFinished = false; // Menandai apakah hitung mundur selesai
 
-  int _timerDuration = 45; // Waktu latihan per langkah (menjadi 45 detik)
+  int _timerDuration = 5; // Waktu latihan per langkah (menjadi 45 detik)
   late Timer _timer; // Timer untuk waktu latihan per langkah
   bool _isPaused = false; // Status apakah timer sedang dijeda
 
@@ -79,7 +79,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
         _currentStep++; // Langkah bertambah
         _isCountdownFinished = false; // Reset status hitung mundur
         _start = 10; // Reset hitung mundur awal
-        _timerDuration = 45; // Reset timer latihan ke 45 detik
+        _timerDuration = 5; // Reset timer latihan ke 45 detik
         _startInitialTimer(); // Mulai lagi hitung mundur awal
       });
     } else {
@@ -107,7 +107,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
   Widget build(BuildContext context) {
     // Hitung progress untuk LinearProgressIndicator (perbaikan)
     double progress =
-        (_timerDuration / 45); // Progress berdasarkan timer yang benar
+        (_timerDuration / 5); // Progress berdasarkan timer yang benar
 
     // Data langkah saat ini
     final currentStepData = widget.steps[_currentStep];

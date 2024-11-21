@@ -21,13 +21,11 @@ class _FaceScanState extends State<FaceScan> {
   Uint8List? _webImage; // For web
   bool _isCardVisible = false;
   bool _isAgeConfirmationVisible = true; // To toggle between text and TextField
-  final TextEditingController _ageController =
-      TextEditingController(); // Controller for the age input
+  final TextEditingController _ageController = TextEditingController(); // Controller for the age input
 
   // Method to pick image from camera
   Future<void> _pickImageFromCamera() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.camera);
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       if (kIsWeb) {
@@ -49,8 +47,7 @@ class _FaceScanState extends State<FaceScan> {
 
   // Method to pick image from gallery
   Future<void> _pickImageFromGallery() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       if (kIsWeb) {
@@ -92,7 +89,7 @@ class _FaceScanState extends State<FaceScan> {
       appBar: AppBar(title: Text('Upload Foto')),
       body: Stack(
         children: [
-          // Konten utama
+          // Main content
           Column(
             children: [
               Expanded(
@@ -135,7 +132,7 @@ class _FaceScanState extends State<FaceScan> {
                 verticalPadding: 10.0,
               ),
               SizedBox(height: 5),
-              if (_image != null)
+              if (_image != null || _webImage != null)
                 CustomButton(
                   onPressed: () {
                     setState(() {
@@ -144,22 +141,22 @@ class _FaceScanState extends State<FaceScan> {
                   },
                   text: 'Next >>',
                   textStyle: TextStyle(fontSize: 16),
-                  horizontalPadding: 30.0,
+                  horizontalPadding: 30.0 ,
                   verticalPadding: 10.0,
                 ),
               const SizedBox(height: 10),
             ],
           ),
 
-          // Layer transparan hitam
+          // Transparent black layer
           if (_isCardVisible)
             Container(
-              color: Colors.black.withOpacity(0.6), // Warna hitam transparan
+              color: Colors.black.withOpacity(0.6), // Transparent black color
               width: double.infinity,
               height: double.infinity,
             ),
 
-          // Card konfirmasi usia
+          // Age confirmation card
           if (_isCardVisible)
             Positioned(
               top: MediaQuery.of(context).size.height * 0.25,
@@ -194,14 +191,12 @@ class _FaceScanState extends State<FaceScan> {
                                 ),
                                 const SizedBox(height: 20),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     CustomButton(
                                       onPressed: () {
                                         setState(() {
-                                          _isAgeConfirmationVisible =
-                                              false; // Show TextField
+                                          _isAgeConfirmationVisible = false; // Show TextField
                                         });
                                       },
                                       text: 'Tidak',
@@ -214,8 +209,7 @@ class _FaceScanState extends State<FaceScan> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                MyNavigationBar(),
+                                            builder: (context) => MyNavigationBar(),
                                           ),
                                         );
                                       },
@@ -234,8 +228,7 @@ class _FaceScanState extends State<FaceScan> {
                                   controller: _ageController,
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
-                                    labelText:
-                                        'Masukkan Usia', //diganti ke dropdown button saja sehingga rentang usianya sudah di tentukan. Gunakan class CustomDropdownButton() yang ada di widget
+                                    labelText: 'Masukkan Usia', // Change to dropdown button for predefined age range
                                     border: OutlineInputBorder(),
                                   ),
                                 ),

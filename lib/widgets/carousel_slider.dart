@@ -48,7 +48,7 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
       ),
       items: widget.imageUrls.map((url) {
         return Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: GestureDetector(
             onTap: () {
               // Navigasi ke halaman DetailProgram
