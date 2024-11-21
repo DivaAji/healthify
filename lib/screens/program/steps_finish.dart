@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/widgets/button.dart';
+import 'package:healthify/widgets/navigation_bar.dart';
 
 class StepsFinish extends StatefulWidget {
   const StepsFinish({super.key});
@@ -80,7 +81,7 @@ class _StepsFinishState extends State<StepsFinish> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
+                          builder: (context) => MyNavigationBar(),
                         ),
                       );
                     },
