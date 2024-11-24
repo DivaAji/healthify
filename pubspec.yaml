@@ -42,6 +42,7 @@ dependencies:
   http: ^1.2.2
   file_picker: ^5.0.1
   path_provider: ^2.0.11
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

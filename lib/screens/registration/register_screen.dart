@@ -33,6 +33,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final ImagePicker _picker = ImagePicker(); // Inisialisasi image picker
 
+  // Pre-fill the form with dummy data for debugging
+  @override
+  void initState() {
+    super.initState();
+    usernameController.text = "JohnDoe";
+    passwordController.text = "password123";
+    confirmPasswordController.text = "password123";
+    emailController.text = "johndoe@example.com";
+    weightController.text = "70";
+    heightController.text = "175";
+    ageController.text = ""; // Age for manual input
+  }
+
   //proses registrasi
   Future<void> registerUser() async {
     try {
@@ -47,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       };
 
       final response = await http.post(
-        Uri.parse('http://192.168.1.10:8000/api/user'),
+        Uri.parse('http://192.168.1.6:8000/api/user'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );

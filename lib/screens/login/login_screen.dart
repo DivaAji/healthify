@@ -6,6 +6,7 @@ import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/healthify_text.dart';
 import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/widgets/text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool isObscured = true; // Set default to true for password fields
 
@@ -16,8 +17,8 @@ final TextEditingController passwordController = TextEditingController();
 
 // Ganti URL dengan URL backend Anda
 String urlDomain =
-    "http://192.168.1.10:8000/"; // Ganti dengan IP server lokal atau domain
-String urlGetData = urlDomain + "api/user/1"; // Endpoint API yang sesuai
+    "http://192.168.1.6:8000/"; // Ganti dengan IP server lokal atau domain
+String urlLogin = urlDomain + "api/login"; // Endpoint API untuk login
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,33 +30,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String? errorMessage;
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData(); // Panggil fetchData untuk mengambil data dari API
-  }
-
-  // Fungsi untuk mengambil data dari API
-  Future<void> fetchData() async {
-    try {
-      Response response = await dio.get(urlGetData);
-
-      if (response.statusCode == 200) {
-        // Jika data ditemukan, masukkan data ke controller
-        setState(() {
-          usernameController.text = response.data['username'] ?? '';
-          passwordController.text = response.data['password'] ?? '';
-        });
-      } else {
-        print('Failed to fetch data: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
-  // Fungsi untuk validasi input
-  void validateLogin() {
+  // Fungsi untuk validasi login dan autentikasi
+  Future<void> validateLogin() async {
     if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
       setState(() {
         errorMessage = 'Username dan Password harus diisi!';
@@ -64,12 +40,57 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         errorMessage = null;
       });
-      // Arahkan ke halaman berikutnya jika valid
-      Navigator.push(
+      // Kirim request ke backend untuk login dan mendapatkan token
+      try {
+        Response response = await dio.post(urlLogin, data: {
+          'username': usernameController.text,
+          'password': passwordController.text,
+        });
+
+        if (response.statusCode == 200) {
+          // Jika login berhasil, ambil token dari response
+          String token = response.data['token'];
+
+          // Simpan token di shared preferences untuk digunakan nanti
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('jwt_token', token);
+
+          // Arahkan ke halaman utama setelah login sukses
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MyNavigationBar(),
+            ),
+          );
+        } else {
+          setState(() {
+            errorMessage = 'Username atau Password salah!';
+          });
+        }
+      } catch (e) {
+        print('Login Error: $e');
+        setState(() {
+          errorMessage = 'Terjadi kesalahan saat login!';
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkToken();
+  }
+
+  // Fungsi untuk memeriksa token saat aplikasi dimulai
+  void checkToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('jwt_token');
+    if (token != null) {
+      // Jika token ada, arahkan ke halaman utama
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const MyNavigationBar(),
-        ),
+        MaterialPageRoute(builder: (context) => const MyNavigationBar()),
       );
     }
   }
@@ -113,13 +134,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 20),
                         CustomTextField(
                           labelText: 'Username',
-                          controller:
-                              usernameController, // Isi controller dengan data
+                          controller: usernameController,
                         ),
                         const SizedBox(height: 15),
                         CustomTextField(
                           labelText: 'Password',
-                          obscureText: isObscured, // Use isObscured here
+                          obscureText: isObscured,
                           controller: passwordController,
                         ),
                         const SizedBox(height: 10),
@@ -139,9 +159,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         CustomButton(
                           text: 'Login',
                           onPressed: validateLogin,
-                          horizontalPadding:
-                              50.0, // Mengatur padding horizontal
-                          verticalPadding: 10.0, // Mengatur padding vertical
+                          horizontalPadding: 50.0,
+                          verticalPadding: 10.0,
                         ),
                         const SizedBox(height: 15),
                         const Text(
@@ -185,5 +204,29 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+}
+
+// Fungsi untuk menambahkan token ke header
+Future<void> getUserData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token =
+      prefs.getString('jwt_token'); // Ambil token dari SharedPreferences
+
+  if (token != null) {
+    // Menambahkan token ke header Authorization
+    dio.options.headers = {
+      'Authorization': 'Bearer $token',
+    };
+
+    try {
+      Response response = await dio.get('http://192.168.1.6:8000/api/user');
+      if (response.statusCode == 200) {
+        // Mengolah data yang diterima
+        print(response.data);
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
   }
 }
