@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
@@ -74,7 +75,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MyNavigationBar(),
+                      builder: (context) => const HomeScreen(),
                     ),
                   );
                 },

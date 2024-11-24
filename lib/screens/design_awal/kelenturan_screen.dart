@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/program/day/day1_screen.dart';
+import 'package:healthify/screens/program/day_screen.dart';
 
 class KelenturanScreen extends StatefulWidget {
   final String title;
@@ -61,7 +61,7 @@ class _KelenturanScreenState extends State<KelenturanScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Day1Screen(day: index + 1),
+                            builder: (context) => Day1Screen(day: index + 1, bannerImage: widget.title, programCategory: widget.title),
                           ),
                         );
                       }

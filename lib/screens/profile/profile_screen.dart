@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/profile/edit_profil_screen.dart';
+import 'package:healthify/widgets/button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -7,7 +9,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil'),
+        title: const Text('PROFIL'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -16,13 +19,14 @@ class ProfileScreen extends StatelessWidget {
             // Gambar Profil
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/profile_picture.png'), // Ganti dengan path gambar profil
+              backgroundImage: AssetImage(
+                  'assets/images/profile_picture.png'), //gambar dari scan
             ),
             const SizedBox(height: 16),
 
             // Nama Pengguna
             Text(
-              'Nama Pengguna',
+              'Username',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -35,15 +39,17 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Tombol Edit Profil
-            ElevatedButton(
+            CustomButton(
+              text: 'Edit Profil',
               onPressed: () {
-                // Aksi ketika tombol edit ditekan
-                print('Edit Profile pressed');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const EditProfilScreen()),
+                );
               },
-              child: Text('Edit Profil'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Tombol memenuhi lebar
-              ),
+              verticalPadding: 10.0,
+              textStyle: const TextStyle(fontSize: 18),
             ),
 
             const SizedBox(height: 16),
@@ -57,12 +63,28 @@ class ProfileScreen extends StatelessWidget {
 
             // Daftar Informasi
             Expanded(
-              child: ListView(
-                children: [
-                  _buildInfoItem('Tanggal Lahir', '01 Januari 2000'),
-                  _buildInfoItem('Alamat', 'Jl. Contoh No.123'),
-                  _buildInfoItem('Nomor Telepon', '+62123456789'),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView(
+                  children: [
+                    _buildInfoItem('Jenis Kelamin', 'Perempuan'),
+                    _buildInfoItem('Tinggi Badan', '165'),
+                    _buildInfoItem('Berat Badan', '50'),
+                    _buildInfoItem('Rentang usia', '18-30'),
+                    _buildInfoItem('Indeks Masa Tubuh',
+                        'Ideal'), //ideal, underweight, atau overweight
+
+                    //Rumus perhitungan indeks masa tubuh
+
+                    //IMT = berat badan (kg) / tinggi badan (m)
+
+                    // Kategori IMT (WHO untuk Asia Tenggara):
+                    // < 18,5: Berat badan kurang (underweight)
+                    // 18,5 - 22,9: Normal (ideal)
+                    // 23 - 24,9: Berat badan berlebih (overweight)
+                    // ≥ 25: Obesitas
+                  ],
+                ),
               ),
             ),
           ],

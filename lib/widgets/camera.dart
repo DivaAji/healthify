@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 
 class CameraWidget extends StatefulWidget {
+
   @override
   _CameraWidgetState createState() => _CameraWidgetState();
 }

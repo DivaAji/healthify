@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/registration/faceScan_screen.dart';
 import 'package:image_picker/image_picker.dart'; // Import image_picker
 import 'package:http/http.dart' as http;
-import 'package:healthify/screens/login_screen.dart';
-import 'package:healthify/screens/ageInput_screen.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/text_field.dart';
@@ -17,6 +16,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  // text editing controller
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -28,10 +28,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String selectedGender = '';
   String ageInputOption = 'Manual';
+
   XFile? _imageFile; // Variable untuk menyimpan gambar yang diambil
 
   final ImagePicker _picker = ImagePicker(); // Inisialisasi image picker
 
+  // Pre-fill the form with dummy data for debugging
+  @override
+  void initState() {
+    super.initState();
+    usernameController.text = "JohnDoe";
+    passwordController.text = "password123";
+    confirmPasswordController.text = "password123";
+    emailController.text = "johndoe@example.com";
+    weightController.text = "70";
+    heightController.text = "175";
+    ageController.text = ""; // Age for manual input
+  }
+
+  //proses registrasi
   Future<void> registerUser() async {
     try {
       final data = {
@@ -60,7 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AgeinputScreen(userId: userId),
+              builder: (context) => FaceScan(userId: userId),
             ),
           );
         } else {
@@ -128,6 +143,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Bantu kami menyesuaikan program kebugaran yang paling sesuai untuk Anda.',
+                          style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromRGBO(33, 50, 75, 1),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                         const SizedBox(height: 13),
                         CustomTextField(
                           controller: usernameController,
@@ -177,6 +202,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: heightController,
                           keyboardType: TextInputType.number,
                         ),
+                        const SizedBox(height: 20),
+                        // if (_imageFile != null)
+                        //   CustomButton(
+                        //     text: 'Next',
+                        //     onPressed: registerUser,
+                        //     horizontalPadding: 50.0,
+                        //     verticalPadding: 10.0,
+                        //   ),
+
                         const SizedBox(height: 20),
                         CustomButton(
                           text: 'Next',
