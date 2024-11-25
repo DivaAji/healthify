@@ -110,9 +110,11 @@ class _FaceScanState extends State<FaceScan> {
       final responseBody = await http.Response.fromStream(response);
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gambar berhasil diunggah')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gambar berhasil diunggah')),
+          );
+        }
         setState(() {
           _isImageUploaded = true;
         });
@@ -143,40 +145,203 @@ class _FaceScanState extends State<FaceScan> {
     }
   }
 
-  // Show age confirmation dialog
   void _showAgeConfirmationDialog(int predictedAge) {
-    String ageRange = '';
-    if (predictedAge >= 18 && predictedAge <= 30) {
-      ageRange = '18-30';
+    int ageRange = 0; // Default value
+    String message = '';
+
+    // Determine age range based on prediction
+    if (predictedAge < 18) {
+      ageRange = 1;
+      message =
+          'Prediksi usia Anda adalah $predictedAge tahun. \nMaaf, Anda belum memenuhi syarat usia minimal untuk menggunakan aplikasi ini.';
+    } else if (predictedAge >= 18 && predictedAge <= 30) {
+      ageRange = 2;
+      message =
+          'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: 18-30 tahun). Apakah ini benar?';
     } else if (predictedAge >= 30 && predictedAge <= 50) {
-      ageRange = '30-50';
+      ageRange = 3;
+      message =
+          'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: 30-50 tahun). Apakah ini benar?';
     } else if (predictedAge > 50) {
-      ageRange = '50+';
+      ageRange = 4;
+      message =
+          'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: di atas 50 tahun). Apakah ini benar?';
     }
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Prediksi Usia: $ageRange'),
-          content: Text('Apakah prediksi usia Anda benar?'),
+          title: const Text('Konfirmasi Usia'),
+          content: Text(message),
+          actions: <Widget>[
+            // Options for users under 18 years
+            if (predictedAge < 18) ...[
+              CustomButton(
+                onPressed: () {
+                  // Navigate back to login
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
+                text: 'Kembali ke Login',
+                textStyle: TextStyle(fontSize: 14),
+                horizontalPadding: 25.0,
+                verticalPadding: 8.0,
+              ),
+              CustomButton(
+                onPressed: () {
+                  // Input age manually
+                  Navigator.pop(context);
+                  _showManualAgeInputDialog();
+                },
+                text: 'Masukkan Usia Manual',
+                textStyle: TextStyle(fontSize: 14),
+                horizontalPadding: 25.0,
+                verticalPadding: 8.0,
+              ),
+            ],
+            // Options for users above 18 years
+            if (predictedAge >= 18) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomButton(
+                    onPressed: () {
+                      // If age is correct, go to the next screen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginScreen(),
+                        ),
+                      );
+                      print('Rentang usia pengguna: $ageRange');
+                    },
+                    text: 'Benar',
+                    textStyle: TextStyle(fontSize: 16),
+                    horizontalPadding: 30.0,
+                    verticalPadding: 8.0,
+                  ),
+                  SizedBox(width: 10), // Space between the buttons
+                  CustomButton(
+                    onPressed: () {
+                      // If age is incorrect, input age manually
+                      Navigator.pop(context);
+                      _showManualAgeInputDialog();
+                    },
+                    text: 'Salah',
+                    textStyle: TextStyle(fontSize: 16),
+                    horizontalPadding: 30.0,
+                    verticalPadding: 8.0,
+                  ),
+                ],
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  void _showManualAgeInputDialog() {
+    final TextEditingController ageController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Masukkan Usia Anda'),
+          content: TextField(
+            controller: ageController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Usia',
+              hintText: 'Masukkan usia Anda',
+            ),
+          ),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
-                // If "Benar" is pressed, navigate to the Login screen
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
+              onPressed: () async {
+                int? manualAge = int.tryParse(ageController.text);
+                if (manualAge != null && manualAge > 0) {
+                  // Simpan usia manual ke database
+                  final uri =
+                      Uri.parse('http://192.168.1.6:8000/api/submit-age');
+                  try {
+                    final response = await http.post(
+                      uri,
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                      },
+                      body: json.encode({
+                        'user_id': widget.userId,
+                        'age': manualAge,
+                      }),
+                    );
+
+                    // Debugging the response
+                    print('Response: ${response.body}');
+                    if (response.statusCode == 200) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Usia berhasil disimpan')),
+                        );
+                      }
+
+                      // Menutup dialog sebelum navigasi
+                      if (mounted) {
+                        Navigator.pop(context); // Menutup dialog
+                      }
+
+                      // Navigasi ke halaman login
+                      if (mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginScreen(),
+                          ),
+                        );
+                      }
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Gagal menyimpan usia: ${response.body} (Status: ${response.statusCode})',
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    print('Error: $e');
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Terjadi kesalahan')),
+                      );
+                    }
+                  }
+                } else {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Harap masukkan usia yang valid dan lebih besar dari 0.'),
+                      ),
+                    );
+                  }
+                }
               },
-              child: Text('Benar'),
+              child: const Text('Submit'),
             ),
             TextButton(
               onPressed: () {
-                // If "Salah" is pressed, go back to FaceScan screen
-                Navigator.pop(context);
+                Navigator.pop(context); // Tutup dialog jika batal
               },
-              child: Text('Salah'),
+              child: const Text('Batal'),
             ),
           ],
         );
