@@ -32,20 +32,28 @@ class _FaceScanState extends State<FaceScan> {
         await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
+      setState(() {
+        _isImageUploaded = false; // Reset status upload
+        _isUploading = false; // Pastikan spinner tidak aktif
+        _image = null;
+        _webImage = null;
+      });
+
       if (kIsWeb) {
-        // For Web, convert file to byte array (Uint8List)
+        // Untuk Web: Konversi file menjadi Uint8List
         final bytes = await pickedFile.readAsBytes();
         setState(() {
           _webImage = bytes;
         });
       } else {
+        // Untuk Mobile: Simpan path file
         setState(() {
-          _image = File(pickedFile.path); // For mobile
+          _image = File(pickedFile.path);
         });
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengambil gambar')),
+        const SnackBar(content: Text('Gagal mengambil gambar')),
       );
     }
   }
@@ -56,20 +64,28 @@ class _FaceScanState extends State<FaceScan> {
         await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
+      setState(() {
+        _isImageUploaded = false; // Reset status upload
+        _isUploading = false; // Pastikan spinner tidak aktif
+        _image = null;
+        _webImage = null;
+      });
+
       if (kIsWeb) {
-        // For Web, convert file to byte array (Uint8List)
+        // Untuk Web: Konversi file menjadi Uint8List
         final bytes = await pickedFile.readAsBytes();
         setState(() {
           _webImage = bytes;
         });
       } else {
+        // Untuk Mobile: Simpan path file
         setState(() {
-          _image = File(pickedFile.path); // For mobile
+          _image = File(pickedFile.path);
         });
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memilih gambar')),
+        const SnackBar(content: Text('Gagal memilih gambar')),
       );
     }
   }
@@ -146,24 +162,19 @@ class _FaceScanState extends State<FaceScan> {
   }
 
   void _showAgeConfirmationDialog(int predictedAge) {
-    int ageRange = 0; // Default value
-    String message = '';
+    String message;
 
-    // Determine age range based on prediction
+    // Pesan untuk setiap rentang usia
     if (predictedAge < 18) {
-      ageRange = 1;
       message =
-          'Prediksi usia Anda adalah $predictedAge tahun. \nMaaf, Anda belum memenuhi syarat usia minimal untuk menggunakan aplikasi ini.';
+          'Prediksi usia Anda adalah $predictedAge tahun. Maaf, Anda belum memenuhi syarat usia minimal untuk menggunakan aplikasi ini.';
     } else if (predictedAge >= 18 && predictedAge <= 30) {
-      ageRange = 2;
       message =
           'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: 18-30 tahun). Apakah ini benar?';
     } else if (predictedAge >= 30 && predictedAge <= 50) {
-      ageRange = 3;
       message =
           'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: 30-50 tahun). Apakah ini benar?';
-    } else if (predictedAge > 50) {
-      ageRange = 4;
+    } else {
       message =
           'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: di atas 50 tahun). Apakah ini benar?';
     }
@@ -175,67 +186,69 @@ class _FaceScanState extends State<FaceScan> {
           title: const Text('Konfirmasi Usia'),
           content: Text(message),
           actions: <Widget>[
-            // Options for users under 18 years
             if (predictedAge < 18) ...[
-              CustomButton(
+              // Tombol untuk usia di bawah 18
+              TextButton(
+                onPressed: () async {
+                  // Hapus akun pengguna
+                  final uri = Uri.parse(
+                      'http://192.168.1.6:8000/api/user/${widget.userId}');
+                  try {
+                    final response = await http.delete(uri);
+                    if (response.statusCode == 200) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Akun Anda telah dihapus')),
+                        );
+                      }
+                    } else {
+                      print('Gagal menghapus akun: ${response.body}');
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Gagal menghapus akun Anda')),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    print('Error: $e');
+                  } finally {
+                    // Navigasi ke halaman login
+                    Navigator.pop(context); // Tutup dialog
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  }
+                },
+                child: const Text('Kembali ke Login'),
+              ),
+              TextButton(
                 onPressed: () {
-                  // Navigate back to login
+                  Navigator.pop(context); // Tutup popup
+                  _showManualAgeInputDialog(); // Masukkan usia manual
+                },
+                child: const Text('Masukkan Usia Manual'),
+              ),
+            ] else ...[
+              // Tombol untuk usia di atas 18
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => LoginScreen()),
                   );
                 },
-                text: 'Kembali ke Login',
-                textStyle: TextStyle(fontSize: 14),
-                horizontalPadding: 25.0,
-                verticalPadding: 8.0,
+                child: const Text('Benar'),
               ),
-              CustomButton(
+              TextButton(
                 onPressed: () {
-                  // Input age manually
                   Navigator.pop(context);
-                  _showManualAgeInputDialog();
+                  _showManualAgeInputDialog(); // Masukkan usia manual
                 },
-                text: 'Masukkan Usia Manual',
-                textStyle: TextStyle(fontSize: 14),
-                horizontalPadding: 25.0,
-                verticalPadding: 8.0,
-              ),
-            ],
-            // Options for users above 18 years
-            if (predictedAge >= 18) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  CustomButton(
-                    onPressed: () {
-                      // If age is correct, go to the next screen
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
-                        ),
-                      );
-                      print('Rentang usia pengguna: $ageRange');
-                    },
-                    text: 'Benar',
-                    textStyle: TextStyle(fontSize: 16),
-                    horizontalPadding: 30.0,
-                    verticalPadding: 8.0,
-                  ),
-                  SizedBox(width: 10), // Space between the buttons
-                  CustomButton(
-                    onPressed: () {
-                      // If age is incorrect, input age manually
-                      Navigator.pop(context);
-                      _showManualAgeInputDialog();
-                    },
-                    text: 'Salah',
-                    textStyle: TextStyle(fontSize: 16),
-                    horizontalPadding: 30.0,
-                    verticalPadding: 8.0,
-                  ),
-                ],
+                child: const Text('Salah'),
               ),
             ],
           ],
@@ -264,8 +277,18 @@ class _FaceScanState extends State<FaceScan> {
             TextButton(
               onPressed: () async {
                 int? manualAge = int.tryParse(ageController.text);
+
                 if (manualAge != null && manualAge > 0) {
-                  // Simpan usia manual ke database
+                  if (manualAge < 18) {
+                    // Tampilkan popup card untuk usia tidak valid
+                    if (mounted) {
+                      Navigator.pop(context); // Tutup dialog input usia manual
+                      _showInvalidAgePopup(); // Tampilkan popup card
+                    }
+                    return; // Hentikan proses jika usia kurang dari 18
+                  }
+
+                  // Simpan usia jika valid
                   final uri =
                       Uri.parse('http://192.168.1.6:8000/api/submit-age');
                   try {
@@ -281,28 +304,13 @@ class _FaceScanState extends State<FaceScan> {
                       }),
                     );
 
-                    // Debugging the response
-                    print('Response: ${response.body}');
                     if (response.statusCode == 200) {
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Usia berhasil disimpan')),
-                        );
-                      }
-
-                      // Menutup dialog sebelum navigasi
-                      if (mounted) {
-                        Navigator.pop(context); // Menutup dialog
-                      }
-
-                      // Navigasi ke halaman login
-                      if (mounted) {
+                        Navigator.pop(context); // Tutup dialog input
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
-                          ),
+                              builder: (context) => LoginScreen()),
                         );
                       }
                     } else {
@@ -310,7 +318,7 @@ class _FaceScanState extends State<FaceScan> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Gagal menyimpan usia: ${response.body} (Status: ${response.statusCode})',
+                              'Gagal menyimpan usia: ${response.body}',
                             ),
                           ),
                         );
@@ -342,6 +350,49 @@ class _FaceScanState extends State<FaceScan> {
                 Navigator.pop(context); // Tutup dialog jika batal
               },
               child: const Text('Batal'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showInvalidAgePopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Usia Tidak Memenuhi Syarat'),
+          content: const Text(
+            'Usia yang Anda masukkan tidak memenuhi syarat untuk menggunakan aplikasi ini. Silakan kembali ke halaman login atau ambil ulang gambar.',
+          ),
+          actions: <Widget>[
+            // Tombol kembali ke login
+            TextButton(
+              onPressed: () {
+                // Hapus akun pengguna jika perlu
+                final uri = Uri.parse(
+                    'http://192.168.1.6:8000/api/user/${widget.userId}');
+                http.delete(uri).then((response) {
+                  if (mounted) {
+                    Navigator.pop(context); // Tutup dialog popup
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  }
+                }).catchError((error) {
+                  print('Error: $error');
+                });
+              },
+              child: const Text('Kembali ke Login'),
+            ),
+            // Tombol ambil ulang gambar
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Tutup popup card
+              },
+              child: const Text('Ambil Ulang Gambar'),
             ),
           ],
         );
