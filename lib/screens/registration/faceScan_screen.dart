@@ -33,8 +33,11 @@ class _FaceScanState extends State<FaceScan> {
 
     if (pickedFile != null) {
       setState(() {
-        _isImageUploaded = false; // Reset status upload
-        _isUploading = false; // Pastikan spinner tidak aktif
+        // Reset status upload dan pastikan spinner tidak aktif
+        _isUploading = false;
+        _isImageUploaded = false;
+
+        // Reset image dan webImage
         _image = null;
         _webImage = null;
       });
@@ -58,15 +61,18 @@ class _FaceScanState extends State<FaceScan> {
     }
   }
 
-  // Method to pick image from gallery
+// Method to pick image from gallery
   Future<void> _pickImageFromGallery() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
-        _isImageUploaded = false; // Reset status upload
-        _isUploading = false; // Pastikan spinner tidak aktif
+        // Reset status upload dan pastikan spinner tidak aktif
+        _isUploading = false;
+        _isImageUploaded = false;
+
+        // Reset image dan webImage
         _image = null;
         _webImage = null;
       });
@@ -107,17 +113,16 @@ class _FaceScanState extends State<FaceScan> {
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString();
 
-      // For Web
       if (kIsWeb && _webImage != null) {
         final byteStream = http.ByteStream.fromBytes(_webImage!);
         final length = _webImage!.length;
         request.files.add(http.MultipartFile(
-          'image', byteStream, length,
-          filename: 'image.png', // Make sure to set the correct extension
+          'image',
+          byteStream,
+          length,
+          filename: 'image.png',
         ));
-      }
-      // For Mobile
-      else if (_image != null) {
+      } else if (_image != null) {
         request.files
             .add(await http.MultipartFile.fromPath('image', _image!.path));
       }
@@ -126,24 +131,18 @@ class _FaceScanState extends State<FaceScan> {
       final responseBody = await http.Response.fromStream(response);
 
       if (response.statusCode == 200) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gambar berhasil diunggah')),
-          );
-        }
+        // Handle success response
         setState(() {
           _isImageUploaded = true;
         });
-
-        // Parse the JSON response from Laravel
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gambar berhasil diunggah')),
+        );
         final responseData = json.decode(responseBody.body);
-        final predictedAge = responseData['predicted_age']; // Get predicted age
-
-        // After successful upload, show the dialog with predicted age
-        Future.delayed(Duration(seconds: 1), () {
-          _showAgeConfirmationDialog(predictedAge);
-        });
+        final predictedAge = responseData['predicted_age'];
+        _showAgeConfirmationDialog(predictedAge);
       } else {
+        // Handle error response
         print("Error: ${response.statusCode}, ${responseBody.body}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal mengunggah gambar')),
@@ -231,6 +230,12 @@ class _FaceScanState extends State<FaceScan> {
                 },
                 child: const Text('Masukkan Usia Manual'),
               ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Tutup popup card
+                },
+                child: const Text('Ambil Ulang Gambar'),
+              ),
             ] else ...[
               // Tombol untuk usia di atas 18
               TextButton(
@@ -248,7 +253,13 @@ class _FaceScanState extends State<FaceScan> {
                   Navigator.pop(context);
                   _showManualAgeInputDialog(); // Masukkan usia manual
                 },
-                child: const Text('Salah'),
+                child: const Text('Input usia manual'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Tutup popup card
+                },
+                child: const Text('Ambil Ulang Gambar'),
               ),
             ],
           ],
@@ -289,8 +300,8 @@ class _FaceScanState extends State<FaceScan> {
                   }
 
                   // Simpan usia jika valid
-                  final uri =
-                      Uri.parse('http://192.168.1.6:8000/api/submit-age');
+                  final uri = Uri.parse(
+                      'http://192.168.1.6:8000/api/submit-age-manual');
                   try {
                     final response = await http.post(
                       uri,
