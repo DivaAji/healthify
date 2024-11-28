@@ -44,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.1.6:8000/api/profile'), // Ensure this matches the endpoint in your routes
+          'http://192.168.1.6:8000/api/profile'), // Ensure this matches the endpoint
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -58,15 +58,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         weight = data['weight']?.toString() ?? 'Unknown';
         ageRange = data['age_range'] ?? 'Unknown';
         bmi = data['bmi'] != null ? data['bmi'].toString() : 'Unknown';
-
         profilePicture =
             data['profile_picture'] ?? 'assets/images/profile_picture.png';
         isLoading = false;
       });
     } else {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -88,12 +89,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt_token'); // Remove the token
+    Navigator.pushReplacementNamed(context, '/login'); // Redirect to login
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('PROFIL'),
-        automaticallyImplyLeading: false, // No back button in the app bar
+        automaticallyImplyLeading: false, // No back button
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: logout,
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -104,14 +117,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Profile Picture
                   GestureDetector(
                     onTap: () {
-                      // Optionally, you can add functionality to edit the profile picture here
+                      // You can add functionality for changing the picture
                     },
                     child: CircleAvatar(
                       radius: 50,
                       backgroundImage: profilePicture.startsWith('http')
-                          ? NetworkImage(profilePicture) // If URL image
+                          ? NetworkImage(profilePicture) // URL image
                           : AssetImage(profilePicture)
-                              as ImageProvider, // If local image
+                              as ImageProvider, // Local image
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -138,29 +151,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       final updatedData = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditProfilScreen(
-                            username: username,
-                            email: email,
-                            height: height,
-                            weight: weight,
-                            gender: gender,
-                            profileImagePath: profilePicture,
-                            ageRange: ageRange, // Sending the age range
-                          ),
+                          builder: (context) => EditProfilScreen(),
                         ),
                       );
 
-                      // Update the state with the new data
                       if (updatedData != null) {
                         setState(() {
-                          username = updatedData['username'];
-                          email = updatedData['email'];
-                          height = updatedData['height'];
-                          weight = updatedData['weight'];
-                          gender = updatedData['gender'];
-                          profilePicture = updatedData['profileImagePath'];
-                          ageRange =
-                              updatedData['ageRange']; // Updating age range
+                          username = updatedData['username'] ?? username;
+                          email = updatedData['email'] ?? email;
+                          height = updatedData['height'] ?? height;
+                          weight = updatedData['weight'] ?? weight;
+                          gender = updatedData['gender'] ?? gender;
+                          profilePicture =
+                              updatedData['profileImagePath'] ?? profilePicture;
+                          ageRange = updatedData['ageRange'] ?? ageRange;
                         });
                       }
                     },
@@ -185,8 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _buildInfoItem('Jenis Kelamin', gender),
                           _buildInfoItem('Tinggi Badan', height),
                           _buildInfoItem('Berat Badan', weight),
-                          _buildInfoItem(
-                              'Rentang Usia', ageRange), // Showing age range
+                          _buildInfoItem('Rentang Usia', ageRange),
                           _buildInfoItem('Indeks Masa Tubuh', bmi),
                         ],
                       ),

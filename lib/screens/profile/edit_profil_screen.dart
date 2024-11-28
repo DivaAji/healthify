@@ -1,92 +1,155 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:healthify/screens/login/login_screen.dart'; // Make sure to update this path if needed
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class EditProfilScreen extends StatefulWidget {
-  final String username;
-  final String email;
-  final String height;
-  final String weight;
-  final String gender;
-  final String profileImagePath;
-  final String ageRange;
-
-  const EditProfilScreen({
-    Key? key,
-    required this.username,
-    required this.email,
-    required this.height,
-    required this.weight,
-    required this.gender,
-    required this.profileImagePath,
-    required this.ageRange,
-  }) : super(key: key);
+  const EditProfilScreen({Key? key}) : super(key: key);
 
   @override
   _EditProfilScreenState createState() => _EditProfilScreenState();
 }
 
 class _EditProfilScreenState extends State<EditProfilScreen> {
-  // Controllers for each field to manage the form inputs
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _genderController = TextEditingController();
-  final TextEditingController _ageRangeController = TextEditingController();
+  String username = '';
+  String email = '';
+  String height = '';
+  String weight = '';
+  String profilePicture = 'assets/images/profile_picture.png';
+
+  bool isLoading = true;
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    // Set initial values from the widget's passed parameters
-    _usernameController.text = widget.username;
-    _emailController.text = widget.email;
-    _heightController.text = widget.height;
-    _weightController.text = widget.weight;
-    _genderController.text = widget.gender;
-    _ageRangeController.text = widget.ageRange;
+    fetchProfileData();
   }
 
-  @override
-  void dispose() {
-    // Clean up controllers when the widget is disposed
-    _usernameController.dispose();
-    _emailController.dispose();
-    _heightController.dispose();
-    _weightController.dispose();
-    _genderController.dispose();
-    _ageRangeController.dispose();
-    super.dispose();
-  }
-
-  // Function to save the updated profile data (you can modify this to save to API or SharedPreferences)
-  Future<void> _saveProfileData() async {
-    // You can implement saving here (e.g., update API, save to SharedPreferences)
+  Future<void> fetchProfileData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', _usernameController.text);
-    await prefs.setString('email', _emailController.text);
-    await prefs.setString('height', _heightController.text);
-    await prefs.setString('weight', _weightController.text);
-    await prefs.setString('gender', _genderController.text);
-    await prefs.setString('age_range', _ageRangeController.text);
+    String? token = prefs.getString('jwt_token'); // Retrieve token
 
-    // Show a confirmation message after saving
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile updated successfully')),
+    if (token == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse('http://192.168.1.6:8000/api/profile'),
+      headers: {'Authorization': 'Bearer $token'},
     );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        username = data['username'] ?? '';
+        email = data['email'] ?? '';
+        height = data['height']?.toString() ?? '';
+        weight = data['weight']?.toString() ?? '';
+        profilePicture =
+            data['profile_picture'] ?? 'assets/images/profile_picture.png';
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text(
+                'Failed to fetch profile data. Please try again later.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
-  // Function to logout
-  Future<void> logout(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token'); // Remove saved token
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        profilePicture = image.path; // Update the profile picture path
+      });
+    }
+  }
 
-    // Navigate to login screen
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (route) => false, // Remove all previous routes
+  Future<void> updateProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('jwt_token');
+
+    if (token == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
+
+    final response = await http.put(
+      Uri.parse('http://192.168.1.6:8000/api/profile'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'username': username,
+        'email': email,
+        'height': height,
+        'weight': weight,
+      }),
     );
+
+    if (response.statusCode == 200) {
+      final updatedData = json.decode(response.body);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Success'),
+            content: const Text('Profile updated successfully'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, updatedData); // Return updated data
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text('Failed to update profile: ${response.body}'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -94,60 +157,113 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profil'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              logout(context);
-            },
-          ),
-        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            // Profile Picture (Just showing the current one, with no option to change)
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: widget.profileImagePath.startsWith('http')
-                  ? NetworkImage(widget.profileImagePath)
-                  : AssetImage(widget.profileImagePath) as ImageProvider,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              // Wrap with SingleChildScrollView to avoid overflow
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      // Edit Profile Picture
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: profilePicture.isNotEmpty
+                              ? FileImage(File(profilePicture))
+                              : AssetImage('assets/images/default_profile.png')
+                                  as ImageProvider,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Username
+                      TextFormField(
+                        initialValue: username,
+                        decoration:
+                            const InputDecoration(labelText: 'Username'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your username';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          username = value;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Email
+                      TextFormField(
+                        initialValue: email,
+                        decoration: const InputDecoration(labelText: 'Email'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          email = value;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Height
+                      TextFormField(
+                        initialValue: height,
+                        decoration:
+                            const InputDecoration(labelText: 'Height (cm)'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your height';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          height = value;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Weight
+                      TextFormField(
+                        initialValue: weight,
+                        decoration:
+                            const InputDecoration(labelText: 'Weight (kg)'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your weight';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          weight = value;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Save Button
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            updateProfile();
+                          }
+                        },
+                        child: const Text('Save Changes'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 16),
-
-            // Editable fields for each piece of profile information
-            _buildTextField('Username', _usernameController),
-            _buildTextField('Email', _emailController),
-            _buildTextField('Height (cm)', _heightController),
-            _buildTextField('Weight (kg)', _weightController),
-            _buildTextField('Gender', _genderController),
-            _buildTextField('Age Range', _ageRangeController),
-
-            const SizedBox(height: 20),
-
-            // Save button
-            ElevatedButton(
-              onPressed: _saveProfileData,
-              child: const Text('Save Changes'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Helper function to build text fields
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-      ),
     );
   }
 }
