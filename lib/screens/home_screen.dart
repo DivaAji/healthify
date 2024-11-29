@@ -145,21 +145,35 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Column(
+                            child: Stack(
                               children: [
                                 Container(
                                   height: 150,
                                   width: screenWidth * 0.8,
-                                  color: Colors
-                                      .blue, // Just to represent category (adjust accordingly)
-                                  child: Center(
-                                    child: Text(
-                                      categoryName,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          'assets/images/kelenturan.jpg'), // Ganti dengan image yang sesuai
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  left: 10,
+                                  child: Text(
+                                    categoryName,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          blurRadius: 10,
+                                          color: Colors.black,
+                                          offset: Offset(2, 2),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
