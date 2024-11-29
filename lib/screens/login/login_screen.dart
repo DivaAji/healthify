@@ -48,12 +48,14 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         if (response.statusCode == 200) {
-          // Jika login berhasil, ambil token dari response
+          // Jika login berhasil, ambil token dan user_id dari response
           String token = response.data['token'];
+          String userId = response.data['user_id'].toString(); // Ambil user_id
 
-          // Simpan token di shared preferences untuk digunakan nanti
+          // Simpan token dan user_id di shared preferences untuk digunakan nanti
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('jwt_token', token);
+          prefs.setString('user_id', userId); // Simpan user_id
 
           // Arahkan ke halaman utama setelah login sukses
           Navigator.pushReplacement(

@@ -1,173 +1,166 @@
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/program/detail_program_screen.dart';
-import 'package:healthify/widgets/carousel_slider.dart';
-import 'package:healthify/widgets/program_indicator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:healthify/screens/program/detail_program_screen.dart'; // Sesuaikan dengan file yang sesuai
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<String> categories = []; // Daftar kategori
+  bool isLoading = true;
+  String errorMessage = "";
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProgramsByUserId(); // Ensure data is fetched on init
+  }
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('jwt_token');
+  }
+
+  Future<void> fetchProgramsByUserId() async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        setState(() {
+          isLoading = false;
+          errorMessage = "User is not logged in.";
+        });
+        return;
+      }
+
+      // Mengambil data pengguna
+      final userResponse = await http.get(
+        Uri.parse('http://192.168.1.6:8000/api/profile'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (userResponse.statusCode != 200) {
+        setState(() {
+          isLoading = false;
+          errorMessage =
+              "Failed to fetch user details (${userResponse.statusCode}).";
+        });
+        return;
+      }
+
+      final userData = json.decode(userResponse.body);
+      final userId = userData['user_id']; // Ambil ID user
+
+      if (userId == null) {
+        setState(() {
+          isLoading = false;
+          errorMessage = "User ID is null. Please check your profile data.";
+        });
+        return;
+      }
+
+      // Panggil API untuk mendapatkan kategori program berdasarkan ID pengguna
+      final workoutResponse = await http.get(
+        Uri.parse('http://192.168.1.6:8000/api/workouts/categories/$userId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (workoutResponse.statusCode == 200) {
+        final data = json.decode(workoutResponse.body);
+
+        // Check if the 'workouts' field exists and is not empty
+        if (data.containsKey('workouts') && data['workouts'] != null) {
+          Map<String, dynamic> workoutsData = data['workouts'];
+
+          List<String> categoryNames = [];
+
+          // Iterate over categories (Kelenturan, Kelincahan, etc.)
+          workoutsData.forEach((categoryName, _) {
+            categoryNames.add(categoryName); // Add category name to list
+          });
+
+          setState(() {
+            categories = categoryNames;
+            isLoading =
+                false; // Ensure loading is set to false when data is fetched
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+            errorMessage =
+                'Workouts data is not in the expected format or is empty.';
+          });
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage =
+              'Failed to load programs (${workoutResponse.statusCode}).';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Error fetching data: $e';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // List program yang sedang berlangsung (sesuaikan dg database)
-    final List<Map<String, String>> selectedPrograms = [
-      {
-        'name': 'KELENTURAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Latihan kelenturan adalah jenis latihan fisik yang bertujuan untuk meningkatkan kemampuan otot dan sendi tubuh agar dapat bergerak dengan leluasa, nyaman, dan tanpa rasa sakit dalam rentang gerak yang maksimal. Latihan ini penting untuk menjaga postur tubuh, mencegah cedera, dan meningkatkan performa dalam aktivitas sehari-hari.'
-      },
-      {
-        'name': 'KELINCAHAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Kelincahan merupakan salah satu komponen penting dalam kebugaran fisik yang mencerminkan kemampuan seseorang untuk bergerak cepat, tepat, dan seimbang dalam berbagai arah. Selain itu, kelincahan yang baik juga berperan dalam mengurangi risiko cedera serta meningkatkan kemampuan fungsional sehari-hari. Latihan ini penting bagi pengguna yang ingin mencapai tubuh yang lebih sehat dan tangkas.'
-      },
-    ];
-
-    // List semua program yang ditawarkan (sesuaikan dengan database)
-    final List<Map<String, String>> allPrograms = [
-      {
-        'name': 'KELINCAHAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Kelincahan merupakan salah satu komponen penting dalam kebugaran fisik yang mencerminkan kemampuan seseorang untuk bergerak cepat, tepat, dan seimbang dalam berbagai arah. Selain itu, kelincahan yang baik juga berperan dalam mengurangi risiko cedera serta meningkatkan kemampuan fungsional sehari-hari. Latihan ini penting bagi pengguna yang ingin mencapai tubuh yang lebih sehat dan tangkas.'
-      },
-      {
-        'name': 'KESEIMBANGAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Latihan keseimbangan adalah jenis aktivitas yang bertujuan untuk meningkatkan kemampuan tubuh dalam mempertahankan posisi stabil, baik dalam keadaan diam maupun bergerak. Keseimbangan merupakan komponen penting dalam kebugaran fisik, terutama untuk mendukung koordinasi tubuh, postur, dan mencegah cedera, terutama pada orang lanjut usia atau atlet.'
-      },
-      {
-        'name': 'KELENTURAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Latihan kelenturan adalah jenis latihan fisik yang bertujuan untuk meningkatkan kemampuan otot dan sendi tubuh agar dapat bergerak dengan leluasa, nyaman, dan tanpa rasa sakit dalam rentang gerak yang maksimal. Latihan ini penting untuk menjaga postur tubuh, mencegah cedera, dan meningkatkan performa dalam aktivitas sehari-hari.'
-      },
-    ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('PROGRAM'),
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Menampilkan greeting
-            // Padding(
-            //   padding: EdgeInsets.only(
-            //       left: screenWidth * 0.04, top: screenHeight * 0.002),
-            //   child: Text(
-            //     'Hi, username!',
-            //     style: TextStyle(
-            //       fontSize: 24,
-            //       fontFamily: 'Galatea',
-            //       fontWeight: FontWeight.bold,
-            //       color: Color.fromRGBO(33, 50, 75, 1),
-            //     ),
-            //   ),
-            // ),
-            // Menampilkan bagian "SEDANG BERLANGSUNG"
-            Padding(
-              padding: EdgeInsets.only(
-                  left: screenWidth * 0.04, top: screenHeight * 0.02),
-              child: Text(
-                'SEDANG BERLANGSUNG',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Galatea',
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(33, 50, 75, 1),
-                ),
-              ),
-            ),
-            // Menampilkan carousel untuk program yang sedang berlangsung
-            Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.01),
-              child: CustomCarouselSlider(
-                imageUrls: selectedPrograms
-                    .map((program) => program['image']!)
-                    .toList(),
-                chosenPrograms: selectedPrograms
-                    .map((program) => program['name']!)
-                    .toList(),
-                descriptions: selectedPrograms
-                    .map((program) => program['description']!)
-                    .toList(),
-              ),
-            ),
-            // Menampilkan bagian "PILIHAN PROGRAM"
-            Container(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: screenWidth * 0.04, top: screenHeight * 0.025),
-                child: Text(
-                  'PILIHAN PROGRAM',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Galatea',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(33, 50, 75, 1),
-                  ),
-                ),
-              ),
-            ),
-            // Menampilkan daftar semua program
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: allPrograms.length,
-              itemBuilder: (context, index) {
-                final program = allPrograms[index];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.04,
-                        vertical: 10.0, // Cek indeks pertama
-                      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage.isNotEmpty
+              ? Center(
+                  child: Text(errorMessage,
+                      style: const TextStyle(color: Colors.red)))
+              : ListView.builder(
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final categoryName = categories[index];
+
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
                       child: GestureDetector(
                         onTap: () {
-                          // Menavigasi ke halaman detail program
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MyDetailProgram(
-                                programName: program['name']!,
-                                programImage: program['image']!,
-                                programDescription: program['description']!,
-                              ),
-                            ),
-                          );
+                          // Navigasi ke halaman yang sesuai jika diperlukan
+                          // Bisa ditambahkan navigasi sesuai kebutuhan
                         },
                         child: Card(
-                          elevation: 5, // Memberikan efek shadow pada Card
+                          elevation: 5,
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10), // Sudut melengkung
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                10), // Pastikan gambar mengikuti sudut melengkung
-                            child: Stack(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Column(
                               children: [
-                                Image.asset(
-                                  'assets/images/${program['image']}',
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: screenHeight * 0.18,
-                                  alignment: Alignment.bottomCenter,
-                                ),
-                                Positioned(
-                                  bottom: 20,
-                                  child: ProgramIndicator(
-                                    name: program['name']!,
+                                Container(
+                                  height: 150,
+                                  width: screenWidth * 0.8,
+                                  color: Colors
+                                      .blue, // Just to represent category (adjust accordingly)
+                                  child: Center(
+                                    child: Text(
+                                      categoryName,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -175,14 +168,9 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+                    );
+                  },
+                ),
     );
   }
 }
