@@ -56,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         gender = data['gender'] ?? 'Unknown';
         height = data['height']?.toString() ?? 'Unknown';
         weight = data['weight']?.toString() ?? 'Unknown';
-        ageRange = data['age_range'] ?? 'Unknown';
+        ageRange = data['ageRange'] ?? 'Unknown';
         bmi = data['bmi'] != null ? data['bmi'].toString() : 'Unknown';
         profilePicture =
             data['profile_picture'] ?? 'assets/images/profile_picture.png';

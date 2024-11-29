@@ -25,6 +25,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
             'weight': event.weight,
             'height': event.height,
             'age': event.age,
+            'ageRange': event.ageRange,
           }),
         );
 
@@ -42,6 +43,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
           yield RegistrationFailure(
               message: 'Registration failed.'); // On failure
         }
+        print('Response status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
       } catch (e) {
         yield RegistrationFailure(
             message: 'An error occurred: $e'); // On exception
