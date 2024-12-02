@@ -7,6 +7,7 @@ import 'package:healthify/widgets/healthify_text.dart';
 import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/widgets/text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:healthify/screens/config/api_config.dart';
 
 bool isObscured = true; // Set default to true for password fields
 
@@ -16,9 +17,9 @@ final TextEditingController usernameController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
 
 // Ganti URL dengan URL backend Anda
-String urlDomain =
-    "http://192.168.1.6:8000/"; // Ganti dengan IP server lokal atau domain
-String urlLogin = urlDomain + "api/login"; // Endpoint API untuk login
+// String urlDomain =
+//     ApiConfig().baseUrl; // Ganti dengan IP server lokal atau domain
+String urlLogin = ApiConfig.baseUrl + "/login"; // Endpoint API untuk login
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -222,7 +223,7 @@ Future<void> getUserData() async {
     };
 
     try {
-      Response response = await dio.get('http://192.168.1.6:8000/api/user');
+      Response response = await dio.get(ApiConfig.userEndpoint);
       if (response.statusCode == 200) {
         // Mengolah data yang diterima
         print(response.data);

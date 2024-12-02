@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:healthify/screens/program/detail_program_screen.dart'; // Sesuaikan dengan file yang sesuai
+import 'package:healthify/screens/program/detail_program_screen.dart';
+import 'package:healthify/screens/config/api_config.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Mengambil data pengguna
       final userResponse = await http.get(
-        Uri.parse('http://192.168.1.6:8000/api/profile'),
+        Uri.parse(ApiConfig.profileEndpoint),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -66,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Panggil API untuk mendapatkan kategori program berdasarkan ID pengguna
       final workoutResponse = await http.get(
-        Uri.parse('http://192.168.1.6:8000/api/workouts/categories/$userId'),
+        Uri.parse(ApiConfig.workoutsCategoryEndpoint(userId)),
         headers: {'Authorization': 'Bearer $token'},
       );
 

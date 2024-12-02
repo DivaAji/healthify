@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:healthify/screens/profile/edit_profil_screen.dart';
 import 'package:healthify/widgets/button.dart';
+import 'package:healthify/screens/config/api_config.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -43,8 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final response = await http.get(
-      Uri.parse(
-          'http://192.168.1.6:8000/api/profile'), // Ensure this matches the endpoint
+      Uri.parse(ApiConfig.profileEndpoint), // Ensure this matches the endpoint
       headers: {'Authorization': 'Bearer $token'},
     );
 

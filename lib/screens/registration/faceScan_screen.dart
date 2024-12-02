@@ -7,7 +7,8 @@ import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/screens/login/login_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart'; // For checking if running on Web
+import 'package:flutter/foundation.dart';
+import 'package:healthify/screens/config/api_config.dart';
 
 class FaceScan extends StatefulWidget {
   final int userId;
@@ -109,7 +110,7 @@ class _FaceScanState extends State<FaceScan> {
     });
 
     try {
-      final uri = Uri.parse('http://192.168.1.6:8000/api/upload-image');
+      final uri = Uri.parse('${ApiConfig.baseUrl}/upload-image');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString();
 
@@ -190,8 +191,8 @@ class _FaceScanState extends State<FaceScan> {
               TextButton(
                 onPressed: () async {
                   // Hapus akun pengguna
-                  final uri = Uri.parse(
-                      'http://192.168.1.6:8000/api/user/${widget.userId}');
+                  final uri =
+                      Uri.parse('${ApiConfig.baseUrl}/user/${widget.userId}');
                   try {
                     final response = await http.delete(uri);
                     if (response.statusCode == 200) {
@@ -300,8 +301,7 @@ class _FaceScanState extends State<FaceScan> {
                   }
 
                   // Simpan usia jika valid
-                  final uri = Uri.parse(
-                      'http://192.168.1.6:8000/api/submit-age-manual');
+                  final uri = Uri.parse(ApiConfig.manualAgeEndpoint);
                   try {
                     final response = await http.post(
                       uri,
@@ -382,8 +382,8 @@ class _FaceScanState extends State<FaceScan> {
             TextButton(
               onPressed: () {
                 // Hapus akun pengguna jika perlu
-                final uri = Uri.parse(
-                    'http://192.168.1.6:8000/api/user/${widget.userId}');
+                final uri =
+                    Uri.parse('${ApiConfig.baseUrl}/user/${widget.userId}');
                 http.delete(uri).then((response) {
                   if (mounted) {
                     Navigator.pop(context); // Tutup dialog popup

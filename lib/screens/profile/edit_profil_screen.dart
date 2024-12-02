@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:healthify/screens/config/api_config.dart';
 import 'dart:io';
 
 class EditProfilScreen extends StatefulWidget {
@@ -39,7 +40,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://192.168.1.6:8000/api/profile'),
+      Uri.parse(ApiConfig.profileEndpoint),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -99,7 +100,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
     }
 
     final response = await http.put(
-      Uri.parse('http://192.168.1.6:8000/api/profile'),
+      Uri.parse(ApiConfig.profileEndpoint),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
