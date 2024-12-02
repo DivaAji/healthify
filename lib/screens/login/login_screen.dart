@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // Simpan token dan user_id di shared preferences untuk digunakan nanti
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('jwt_token', token);
-          prefs.setString('user_id', userId); // Simpan user_id
+          prefs.setString('user_id', userId.toString()); // Simpan user_id
 
           // Arahkan ke halaman utama setelah login sukses
           Navigator.pushReplacement(

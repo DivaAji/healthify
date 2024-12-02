@@ -1,10 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/login/login_screen.dart';
-import 'package:healthify/widgets/program_indicator.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:healthify/screens/config/api_config.dart';
 
 class DetailProgramScreen extends StatelessWidget {
   final String categoryName;
-  final List<dynamic> workouts;
+  final List<dynamic> workouts; // List of all workout details in the category
 
   const DetailProgramScreen({
     super.key,
@@ -12,9 +14,86 @@ class DetailProgramScreen extends StatelessWidget {
     required this.workouts,
   });
 
+  // Function to get user_id from SharedPreferences
+  Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userIdString = prefs.getString('user_id');
+    if (userIdString != null) {
+      print('User ID retrieved: $userIdString');
+      return int.tryParse(userIdString); // Convert string to int
+    }
+    print('User ID not found in SharedPreferences');
+    return null; // Return null if not found
+  }
+
+  // Function to get the access token from SharedPreferences
+  Future<String?> getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('access_token');
+  }
+
+  // Function to select a workout category and send request to the backend
+  Future<void> selectCategoryProgram(int workoutsId) async {
+    final userId = await getUserId(); // Get user_id from SharedPreferences
+    if (userId == null) {
+      print('User ID tidak ditemukan');
+      return;
+    }
+
+    final url = Uri.parse(ApiConfig.selectProgramEndpoint);
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'user_id': userId,
+        'workouts_id': workoutsId,
+        'completed': 0, // Status completed 0 for not completed
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      print('Program berhasil dipilih dan ditambahkan ke workouts_user!');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('category_selected_$workoutsId', true);
+    } else {
+      print('Terjadi kesalahan: ${response.body}');
+    }
+  }
+
+  // Dialog confirmation when selecting a category
+  void _showStartDialog(BuildContext context, int workoutsId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Mulai Program'),
+          content: Text('Apakah Anda siap untuk memulai program ini?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Tidak'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await selectCategoryProgram(workoutsId); // Select the category
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pop(context); // Go back to the previous screen
+              },
+              child: Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Menyesuaikan nama file gambar dengan kategori
     String bannerImage = 'assets/images/${categoryName.toLowerCase()}.jpg';
 
     return Scaffold(
@@ -22,18 +101,16 @@ class DetailProgramScreen extends StatelessWidget {
         children: [
           // Banner
           Container(
-            height: MediaQuery.of(context).size.height *
-                0.3, // Dynamic height based on screen size
+            height: MediaQuery.of(context).size.height * 0.3,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    bannerImage), // Gambar banner dinamis berdasarkan kategori
+                image: AssetImage(bannerImage),
                 fit: BoxFit.cover,
               ),
             ),
             child: Stack(
               children: [
-                // Gradasi hitam transparan
+                // Gradient overlay
                 Container(
                   height: double.infinity,
                   decoration: BoxDecoration(
@@ -41,8 +118,8 @@ class DetailProgramScreen extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.5), // Warna hitam transparan
-                        Colors.transparent, // Transparan di bagian bawah
+                        Colors.black.withOpacity(0.5),
+                        Colors.transparent,
                       ],
                     ),
                   ),
@@ -56,16 +133,10 @@ class DetailProgramScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () {
-                          Navigator.pop(
-                              context); // Kembali ke halaman sebelumnya
+                          Navigator.pop(context);
                         },
                       ),
-                      SizedBox(
-                          height: 80), // Adjusted for a smaller banner height
-                      ProgramIndicator(
-                        name: categoryName,
-                        margin: EdgeInsets.only(left: 3),
-                      ),
+                      SizedBox(height: 80),
                       Text(
                         'Latihan Program $categoryName',
                         style: const TextStyle(
@@ -81,16 +152,16 @@ class DetailProgramScreen extends StatelessWidget {
             ),
           ),
 
-          // Perbatasan antara banner dan konten
+          // Divider
           Container(
             width: double.infinity,
             height: 1,
-            color: Colors.grey.shade300, // Color for the border line
+            color: Colors.grey.shade300,
           ),
 
           const SizedBox(height: 16),
 
-          // Teks Center
+          // Guide Text
           const Center(
             child: Text(
               'Panduan',
@@ -113,8 +184,8 @@ class DetailProgramScreen extends StatelessWidget {
             ),
           ),
 
-          // ListView Latihan
-          Expanded(
+          // List of workouts
+          Flexible(
             child: workouts.isNotEmpty
                 ? ListView.builder(
                     itemCount: workouts.length,
@@ -184,32 +255,11 @@ class DetailProgramScreen extends StatelessWidget {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                        'Sub Kategori: ${detail['sub_category']}',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    33,
-                                                                    50,
-                                                                    75,
-                                                                    1))),
+                                                        'Sub Kategori: ${detail['sub_category']}'),
                                                     Text(
-                                                        'Deskripsi: ${detail['description']}',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    33,
-                                                                    50,
-                                                                    75,
-                                                                    1))),
+                                                        'Deskripsi: ${detail['description']}'),
                                                     Text(
-                                                        'Durasi: ${detail['duration']} menit',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    33,
-                                                                    50,
-                                                                    75,
-                                                                    1))),
+                                                        'Durasi: ${detail['duration']} detik'),
                                                   ],
                                                 ),
                                               ),
@@ -217,6 +267,47 @@ class DetailProgramScreen extends StatelessWidget {
                                           );
                                         },
                                       ),
+                                      Align(
+                                        alignment: Alignment
+                                            .bottomCenter, // Centers the button at the bottom
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(
+                                              16.0), // Adds padding around the button
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              _showStartDialog(context,
+                                                  workout['workouts_id']);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Color.fromRGBO(
+                                                  33,
+                                                  50,
+                                                  75,
+                                                  1), // Background color
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 20,
+                                                  horizontal:
+                                                      40), // Larger button size
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    30), // Larger radius for a more rounded button
+                                              ),
+                                              elevation:
+                                                  10, // Adds elevation for floating effect
+                                            ),
+                                            child: const Text(
+                                              'Pilih Program',
+                                              style: TextStyle(
+                                                fontSize:
+                                                    18, // Increase font size
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors
+                                                    .white, // White text for contrast
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -227,52 +318,8 @@ class DetailProgramScreen extends StatelessWidget {
                       );
                     },
                   )
-                : const Center(
-                    child: Text(
-                      'Tidak ada latihan untuk kategori ini',
-                      style: TextStyle(
-                          fontSize: 16, color: Color.fromRGBO(33, 50, 75, 1)),
-                    ),
-                  ),
+                : const Center(child: Text('Tidak ada latihan tersedia.')),
           ),
-
-          const SizedBox(height: 20), // Space between content and button
-
-          // Pilih Program Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const LoginScreen(), // Ganti dengan layar tujuan
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromRGBO(
-                    33, 50, 75, 1), // Tombol dengan warna yang sama
-                padding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30), // Rounded button
-                ),
-                minimumSize:
-                    const Size(double.infinity, 50), // Full-width button
-              ),
-              child: const Text(
-                'Pilih Program Ini',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20), // Optional space after the button
         ],
       ),
     );
