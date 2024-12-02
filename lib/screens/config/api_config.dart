@@ -4,6 +4,11 @@ class ApiConfig {
   static const String userEndpoint = "$baseUrl/user";
   static const String manualAgeEndpoint = "$baseUrl/submit-age-manual";
   static const String profileEndpoint = "$baseUrl/profile";
+
   static String workoutsCategoryEndpoint(int userId) =>
       "$baseUrl/workouts/categories/$userId";
+
+  static String getWorkoutsForCategory(String category) {
+    return '${baseUrl}getWorkoutsCategory/$category';
+  }
 }

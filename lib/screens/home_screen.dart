@@ -14,6 +14,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<String> categories = []; // Daftar kategori
+  Map<String, List<dynamic>> workoutsByCategory =
+      {}; // Menyimpan workouts berdasarkan kategori
   bool isLoading = true;
   String errorMessage = "";
 
@@ -32,10 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final token = await getToken();
       if (token == null) {
-        setState(() {
-          isLoading = false;
-          errorMessage = "User is not logged in.";
-        });
+        if (mounted) {
+          // Check if the widget is still mounted
+          setState(() {
+            isLoading = false;
+            errorMessage = "User is not logged in.";
+          });
+        }
         return;
       }
 
@@ -46,11 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       if (userResponse.statusCode != 200) {
-        setState(() {
-          isLoading = false;
-          errorMessage =
-              "Failed to fetch user details (${userResponse.statusCode}).";
-        });
+        if (mounted) {
+          // Check if the widget is still mounted
+          setState(() {
+            isLoading = false;
+            errorMessage =
+                "Failed to fetch user details (${userResponse.statusCode}).";
+          });
+        }
         return;
       }
 
@@ -58,10 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
       final userId = userData['user_id']; // Ambil ID user
 
       if (userId == null) {
-        setState(() {
-          isLoading = false;
-          errorMessage = "User ID is null. Please check your profile data.";
-        });
+        if (mounted) {
+          // Check if the widget is still mounted
+          setState(() {
+            isLoading = false;
+            errorMessage = "User ID is null. Please check your profile data.";
+          });
+        }
         return;
       }
 
@@ -80,35 +91,48 @@ class _HomeScreenState extends State<HomeScreen> {
 
           List<String> categoryNames = [];
 
-          // Iterate over categories (Kelenturan, Kelincahan, etc.)
-          workoutsData.forEach((categoryName, _) {
+          workoutsData.forEach((categoryName, workouts) {
             categoryNames.add(categoryName); // Add category name to list
+            workoutsByCategory[categoryName] =
+                List.from(workouts); // Store workouts by category
           });
 
-          setState(() {
-            categories = categoryNames;
-            isLoading =
-                false; // Ensure loading is set to false when data is fetched
-          });
+          if (mounted) {
+            // Check if the widget is still mounted
+            setState(() {
+              categories = categoryNames;
+              isLoading =
+                  false; // Ensure loading is set to false when data is fetched
+            });
+          }
         } else {
+          if (mounted) {
+            // Check if the widget is still mounted
+            setState(() {
+              isLoading = false;
+              errorMessage =
+                  'Workouts data is not in the expected format or is empty.';
+            });
+          }
+        }
+      } else {
+        if (mounted) {
+          // Check if the widget is still mounted
           setState(() {
             isLoading = false;
             errorMessage =
-                'Workouts data is not in the expected format or is empty.';
+                'Failed to load programs (${workoutResponse.statusCode}).';
           });
         }
-      } else {
-        setState(() {
-          isLoading = false;
-          errorMessage =
-              'Failed to load programs (${workoutResponse.statusCode}).';
-        });
       }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-        errorMessage = 'Error fetching data: $e';
-      });
+      if (mounted) {
+        // Check if the widget is still mounted
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Error fetching data: $e';
+        });
+      }
     }
   }
 
@@ -130,14 +154,27 @@ class _HomeScreenState extends State<HomeScreen> {
               : ListView.builder(
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
-                    final categoryName = categories[index];
+                    final categoryName = categories[
+                        index]; // Don't convert category name to lowercase here
 
                     return Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: GestureDetector(
                         onTap: () {
-                          // Navigasi ke halaman yang sesuai jika diperlukan
-                          // Bisa ditambahkan navigasi sesuai kebutuhan
+                          // Gunakan data workout yang sudah diambil untuk kategori ini
+                          final workoutsData = workoutsByCategory[categoryName];
+
+                          if (workoutsData != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailProgramScreen(
+                                  categoryName: categoryName,
+                                  workouts: workoutsData,
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: Card(
                           elevation: 5,
@@ -148,14 +185,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(10),
                             child: Stack(
                               children: [
-                                Container(
-                                  height: 150,
-                                  width: screenWidth * 0.8,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/kelenturan.jpg'), // Ganti dengan image yang sesuai
-                                      fit: BoxFit.cover,
+                                AspectRatio(
+                                  aspectRatio: 16 / 9, // Menjaga rasio gambar
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/${categoryName.toLowerCase()}.jpg'), // Apply lowercase only for image path
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
                                 ),

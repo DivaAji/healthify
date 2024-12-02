@@ -36,9 +36,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String? token = prefs.getString('jwt_token'); // Retrieve token
 
     if (token == null) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        // Check if the widget is still mounted
+        setState(() {
+          isLoading = false;
+        });
+      }
       Navigator.pushReplacementNamed(context, '/login');
       return;
     }
@@ -50,18 +53,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      setState(() {
-        username = data['username'] ?? 'Unknown';
-        email = data['email'] ?? 'Unknown';
-        gender = data['gender'] ?? 'Unknown';
-        height = data['height']?.toString() ?? 'Unknown';
-        weight = data['weight']?.toString() ?? 'Unknown';
-        ageRange = data['ageRange'] ?? 'Unknown';
-        bmi = data['bmi'] != null ? data['bmi'].toString() : 'Unknown';
-        profilePicture =
-            data['profile_picture'] ?? 'assets/images/profile_picture.png';
-        isLoading = false;
-      });
+
+      if (mounted) {
+        // Check if the widget is still mounted before calling setState
+        setState(() {
+          username = data['username'] ?? 'Unknown';
+          email = data['email'] ?? 'Unknown';
+          gender = data['gender'] ?? 'Unknown';
+          height = data['height']?.toString() ?? 'Unknown';
+          weight = data['weight']?.toString() ?? 'Unknown';
+          ageRange = data['ageRange'] ?? 'Unknown';
+          bmi = data['bmi'] != null ? data['bmi'].toString() : 'Unknown';
+          profilePicture =
+              data['profile_picture'] ?? 'assets/images/profile_picture.png';
+          isLoading = false;
+        });
+      }
     } else {
       if (mounted) {
         setState(() {
