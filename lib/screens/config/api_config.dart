@@ -9,7 +9,7 @@ class ApiConfig {
   static String workoutsCategoryEndpoint(int userId) =>
       "$baseUrl/workouts/categories/$userId";
 
-  static String getWorkoutsForCategory(String category) {
-    return '${baseUrl}getWorkoutsCategory/$category';
+  static String checkCategoryStatusEndpoint(int userId, int workoutsId) {
+    return '$baseUrl/categoryStatus/$userId/$workoutsId'; // Corrected URL with both userId and workoutsId
   }
 }
