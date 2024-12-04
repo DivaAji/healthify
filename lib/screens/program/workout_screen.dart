@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:healthify/screens/config/api_config.dart';
+import 'package:healthify/screens/program/program_steps.dart'; // Import the ProgramSteps screen
 
 class WorkoutScreen extends StatefulWidget {
   final int workoutsId;
@@ -112,6 +113,17 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
       if (response.statusCode == 200) {
         print('All workouts saved successfully!');
+        // Navigate to ProgramSteps when the workout is saved successfully
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProgramSteps(
+              userId: userId,
+              workoutsId: widget.workoutsId,
+              currentStep: 0, // Start from step 1 (0 index)
+            ),
+          ),
+        );
       } else {
         print('Failed to save workouts: ${response.body}');
       }
@@ -279,9 +291,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Sub Kategori: ${detail['sub_category']}'),
-                    Text('Deskripsi: ${detail['description']}'),
-                    Text('Durasi: ${detail['duration']} detik'),
+                    Text(detail['description']),
                   ],
                 ),
               ),

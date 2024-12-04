@@ -45,6 +45,8 @@ dependencies:
   shared_preferences: ^2.3.3
   flutter_bloc: ^7.0.0
   flutter_secure_storage: ^9.2.2
+  youtube_player_flutter: ^9.1.1
+  video_player: ^2.5.0
 
 dev_dependencies:
   flutter_test:
