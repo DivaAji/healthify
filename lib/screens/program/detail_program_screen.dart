@@ -50,12 +50,11 @@ class DetailProgramScreen extends StatelessWidget {
       body: json.encode({
         'user_id': userId,
         'workouts_id': workoutsId,
-        'completed': 0, // Status completed 0 for not completed
       }),
     );
 
     if (response.statusCode == 201) {
-      print('Program berhasil dipilih dan ditambahkan ke workouts_user!');
+      print('Workout category successfully selected!');
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('category_selected_$workoutsId', true);
     } else {

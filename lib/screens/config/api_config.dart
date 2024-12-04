@@ -10,6 +10,16 @@ class ApiConfig {
       "$baseUrl/workouts/categories/$userId";
 
   static String checkCategoryStatusEndpoint(int userId, int workoutsId) {
-    return '$baseUrl/categoryStatus/$userId/$workoutsId'; // Corrected URL with both userId and workoutsId
+    return '$baseUrl/categoryStatus/$userId/$workoutsId';
   }
+
+  // static String workoutsDetailsEndpoint(String category) {
+  //   return '$baseUrl/workouts/details?category=$category';
+  // }
+
+  static String workoutsDetailsEndpoint(int workoutsId) {
+    return '$baseUrl/workout-details/$workoutsId';
+  }
+
+  static String startProgramEndpoint = '$baseUrl/start-program';
 }

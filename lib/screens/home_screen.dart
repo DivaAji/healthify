@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:healthify/screens/program/detail_program_screen.dart';
 import 'package:healthify/screens/config/api_config.dart';
+import 'package:healthify/screens/program/workout_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -226,16 +227,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             if (workoutsData != null) {
                               final status = workoutsData.first['status'];
+                              final workoutsId = workoutsData.first[
+                                  'workouts_id']; // Ambil workoutsId dari data
 
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DetailProgramScreen(
-                                    categoryName: categoryName,
-                                    workouts: workoutsData,
+                              if (status == 'ongoing') {
+                                // Navigasi ke WorkoutScreen dengan workoutsId dan categoryName
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => WorkoutScreen(
+                                      workoutsId:
+                                          workoutsId, // Kirim workoutsId
+                                      categoryName:
+                                          categoryName, // Kirim categoryName
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
+                              } else {
+                                // Navigasi ke DetailProgramScreen untuk status lain
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DetailProgramScreen(
+                                      categoryName: categoryName,
+                                      workouts: workoutsData,
+                                    ),
+                                  ),
+                                );
+                              }
                             }
                           },
                           child: Card(
