@@ -33,18 +33,17 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     if (response.statusCode == 200) {
       setState(() {
         var workoutDetails = json.decode(response.body)['workout_details'];
-        print('Workout details fetched: $workoutDetails');
         warmups = workoutDetails
             .where((detail) => detail['sub_category'] == 'Pemanasan')
-            .take(2) // Ambil hanya 2 warmups
+            .take(2)
             .toList();
         coreExercises = workoutDetails
             .where((detail) => detail['sub_category'] == 'Latihan Inti')
-            .take(5) // Ambil hanya 5 latihan inti
+            .take(5)
             .toList();
         cooldowns = workoutDetails
             .where((detail) => detail['sub_category'] == 'Pendinginan')
-            .take(2) // Ambil hanya 2 cooldowns
+            .take(2)
             .toList();
       });
     } else {
@@ -69,14 +68,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
     final userId = await getUserId();
     if (userId == null) {
-      print('User ID not found');
       setState(() {
         isSaving = false; // Reset flag
       });
       return;
     }
 
-    // Gabungkan semua latihan ke dalam satu array JSON
     final allWorkouts = [
       ...warmups,
       ...coreExercises,
@@ -84,13 +81,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     ].map((workout) {
       return {
         'workouts_details_id': workout['workouts_details_id'],
-        'day_number': 1, // Awal day_number adalah 1
-        'completed': 0, // Nilai default untuk `completed`
+        'day_number': 1,
+        'completed': 0,
       };
     }).toList();
 
     if (allWorkouts.isEmpty) {
-      print('No workouts to save');
       setState(() {
         isSaving = false; // Reset flag
       });
@@ -112,15 +108,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       );
 
       if (response.statusCode == 200) {
-        print('All workouts saved successfully!');
-        // Navigate to ProgramSteps when the workout is saved successfully
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ProgramSteps(
               userId: userId,
               workoutsId: widget.workoutsId,
-              currentStep: 0, // Start from step 1 (0 index)
+              currentStep: 0,
             ),
           ),
         );
@@ -143,120 +137,80 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text('${widget.categoryName} Program')),
-      body: Column(
-        children: [
-          // Banner Image
-          Container(
-            height: MediaQuery.of(context).size.height * 0.3,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(bannerImage),
-                fit: BoxFit.cover,
+      body: Container(
+        color: Colors.white, // Mengatur background menjadi putih
+        child: Column(
+          children: [
+            // Banner Image Section (Header)
+            Container(
+              height: MediaQuery.of(context).size.height * 0.3,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(bannerImage),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            child: Stack(
-              children: [
-                Container(
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.5),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 20,
-                  left: 16,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 80),
-                      Text(
-                        'Latihan Program ${widget.categoryName}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
 
-          const SizedBox(height: 16),
-
-          const Center(
-            child: Text(
-              'Panduan',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color.fromRGBO(33, 50, 75, 1),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 4),
-
-          const Padding(
-            padding: EdgeInsets.only(bottom: 10.0),
-            child: Text(
-              'Daftar latihan',
-              style:
-                  TextStyle(fontSize: 16, color: Color.fromRGBO(33, 50, 75, 1)),
-            ),
-          ),
-
-          // List of workouts
-          Expanded(
-            child: warmups.isNotEmpty ||
-                    coreExercises.isNotEmpty ||
-                    cooldowns.isNotEmpty
-                ? ListView(
-                    children: [
-                      if (warmups.isNotEmpty)
-                        _buildWorkoutCategory('Pemanasan', warmups),
-                      if (coreExercises.isNotEmpty)
-                        _buildWorkoutCategory('Latihan Inti', coreExercises),
-                      if (cooldowns.isNotEmpty)
-                        _buildWorkoutCategory('Pendinginan', cooldowns),
-                    ],
-                  )
-                : const Center(child: Text('Tidak ada latihan tersedia.')),
-          ),
-
-          // Mulai Program Button
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: saveWorkoutsToDatabase,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromRGBO(33, 50, 75, 1),
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 10,
-              ),
-              child: const Text(
-                'Mulai Program',
-                style: TextStyle(
-                  fontSize: 18,
+            // Teks kategori program diletakkan di bawah gambar
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Latihan Program ${widget.categoryName}',
+                style: const TextStyle(
+                  color: Colors.black, // Mengubah warna font menjadi hitam
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
                 ),
               ),
             ),
-          ),
-        ],
+
+            const SizedBox(height: 16),
+
+            // List of workouts
+            Expanded(
+              child: warmups.isNotEmpty ||
+                      coreExercises.isNotEmpty ||
+                      cooldowns.isNotEmpty
+                  ? ListView(
+                      children: [
+                        if (warmups.isNotEmpty)
+                          _buildWorkoutCategory('Pemanasan', warmups),
+                        if (coreExercises.isNotEmpty)
+                          _buildWorkoutCategory('Latihan Inti', coreExercises),
+                        if (cooldowns.isNotEmpty)
+                          _buildWorkoutCategory('Pendinginan', cooldowns),
+                      ],
+                    )
+                  : const Center(child: Text('Tidak ada latihan tersedia.')),
+            ),
+
+            // Mulai Program Button dengan warna latar belakang yang diubah
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: saveWorkoutsToDatabase,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      (Color(0xFF008B90)), // Warna latar belakang tombol
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 10,
+                ),
+                child: const Text(
+                  'Mulai Program',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -269,30 +223,44 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             category,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
           ),
         ),
         Column(
           children: exercises.map((detail) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
-              child: ListTile(
-                leading: Icon(
-                  Icons.fitness_center,
-                  color: Color.fromRGBO(33, 50, 75, 1),
-                ),
-                title: Text(
-                  detail['name'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(33, 50, 75, 1),
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Color.fromRGBO(1, 1, 1, 1)),
+              ),
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListTile(
+                  leading: Icon(
+                    Icons.fitness_center,
+                    color: Colors.black87, // Warna ikon
+                    size: 30,
                   ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(detail['description']),
-                  ],
+                  title: Text(
+                    detail['name'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        detail['description'],
+                        style: TextStyle(color: Colors.black.withOpacity(0.7)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

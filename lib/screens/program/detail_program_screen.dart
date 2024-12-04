@@ -213,7 +213,7 @@ class DetailProgramScreen extends StatelessWidget {
                                       Text(
                                         workout['category'],
                                         style: const TextStyle(
-                                          fontSize: 22,
+                                          fontSize: 24,
                                           fontWeight: FontWeight.bold,
                                           color: Color.fromRGBO(33, 50, 75, 1),
                                         ),
@@ -253,12 +253,20 @@ class DetailProgramScreen extends StatelessWidget {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
+                                                    const SizedBox(height: 4),
                                                     Text(
-                                                        'Sub Kategori: ${detail['sub_category']}'),
+                                                        '${detail['sub_category']}',
+                                                        style: TextStyle(
+                                                            fontSize: 14)),
                                                     Text(
-                                                        'Deskripsi: ${detail['description']}'),
+                                                        '${detail['description']}',
+                                                        style: TextStyle(
+                                                            fontSize: 14)),
                                                     Text(
-                                                        'Durasi: ${detail['duration']} detik'),
+                                                        '${detail['duration']} detik',
+                                                        style: TextStyle(
+                                                            fontSize: 14)),
+                                                    const SizedBox(height: 4),
                                                   ],
                                                 ),
                                               ),
@@ -278,11 +286,8 @@ class DetailProgramScreen extends StatelessWidget {
                                                   workout['workouts_id']);
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Color.fromRGBO(
-                                                  33,
-                                                  50,
-                                                  75,
-                                                  1), // Background color
+                                              backgroundColor: (Color(
+                                                  0xFF008B90)), // Background color
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 20,
                                                   horizontal:
@@ -300,8 +305,7 @@ class DetailProgramScreen extends StatelessWidget {
                                                 fontSize:
                                                     18, // Increase font size
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors
-                                                    .white, // White text for contrast
+                                                color: Colors.white,
                                               ),
                                             ),
                                           ),

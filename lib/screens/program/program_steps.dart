@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:healthify/screens/config/api_config.dart';
+import 'package:healthify/screens/program/steps_finish.dart'; // Pastikan file ini sudah ada.
 
 class ProgramSteps extends StatefulWidget {
   final int userId;
@@ -28,7 +29,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
   late Timer _initialTimer;
   bool _isCountdownFinished = false;
   int _timerDuration = 45;
-  late Timer _timer;
+  Timer? _timer;
   bool _isPaused = false;
   YoutubePlayerController? _youtubeController;
 
@@ -43,9 +44,9 @@ class _ProgramStepsState extends State<ProgramSteps> {
   Future<void> _loadWorkoutSteps() async {
     final response = await http.get(
       Uri.parse(ApiConfig.workoutsStepsEndpoint(
-        widget.userId, // userId
-        widget.workoutsId, // workoutsId
-        1, // dayNumber (misalnya, untuk hari pertama)
+        widget.userId,
+        widget.workoutsId,
+        1,
       )),
     );
 
@@ -55,8 +56,6 @@ class _ProgramStepsState extends State<ProgramSteps> {
         steps = List<Map<String, dynamic>>.from(data);
         _timerDuration = steps[_currentStep]['duration'] ?? 45;
       });
-
-      // Initialize video player for the current step's video
       _initializeVideoPlayer();
     } else {
       print("Failed to load workout steps: ${response.body}");
@@ -67,7 +66,6 @@ class _ProgramStepsState extends State<ProgramSteps> {
     if (steps.isNotEmpty && steps[_currentStep]['video_link'] != null) {
       final videoLink = steps[_currentStep]['video_link'];
       final videoId = YoutubePlayer.convertUrlToId(videoLink);
-
       if (videoId != null) {
         _youtubeController = YoutubePlayerController(
           initialVideoId: videoId,
@@ -80,13 +78,17 @@ class _ProgramStepsState extends State<ProgramSteps> {
   void _startInitialTimer() {
     _initialTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_start > 0) {
-        setState(() {
-          _start--;
-        });
+        if (mounted) {
+          setState(() {
+            _start--;
+          });
+        }
       } else {
-        setState(() {
-          _isCountdownFinished = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isCountdownFinished = true;
+          });
+        }
         _initialTimer.cancel();
         _startTimer();
       }
@@ -94,13 +96,16 @@ class _ProgramStepsState extends State<ProgramSteps> {
   }
 
   void _startTimer() {
+    _timer?.cancel(); // Pastikan timer sebelumnya dihentikan
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_timerDuration > 0 && !_isPaused) {
-        setState(() {
-          _timerDuration--;
-        });
+        if (mounted) {
+          setState(() {
+            _timerDuration--;
+          });
+        }
       } else if (_timerDuration == 0) {
-        _timer.cancel();
+        _timer?.cancel();
         _nextStep();
       }
     });
@@ -111,25 +116,21 @@ class _ProgramStepsState extends State<ProgramSteps> {
       setState(() {
         _currentStep++;
         _isCountdownFinished = false;
-        _start = 10;
+        _start = 7;
         _timerDuration = steps[_currentStep]['duration'] ?? 45;
       });
 
-      // Delay untuk memulai countdown baru setelah update
       await Future.delayed(const Duration(milliseconds: 200));
       _startInitialTimer();
 
-      // Hentikan video lama dan bersihkan controller sebelumnya
       if (_youtubeController != null) {
         _youtubeController?.pause();
-        _youtubeController?.dispose(); // Properly dispose of the old controller
-        _youtubeController = null; // Reset the controller
+        _youtubeController?.dispose();
+        _youtubeController = null;
       }
 
-      // Inisialisasi video baru untuk langkah selanjutnya
       _initializeVideoPlayer();
 
-      // Update progress setelah langkah saat ini selesai
       if (_currentStep > 0) {
         final response = await http.post(
           Uri.parse(ApiConfig.updateWorkoutUserDayNumberEndpoint()),
@@ -150,7 +151,6 @@ class _ProgramStepsState extends State<ProgramSteps> {
         }
       }
     } else {
-      // Handle completion of the entire workout program
       final response = await http.post(
         Uri.parse(ApiConfig.updateWorkoutUserDayNumberEndpoint()),
         headers: {
@@ -165,16 +165,39 @@ class _ProgramStepsState extends State<ProgramSteps> {
       );
 
       if (response.statusCode == 200) {
-        print("Workout program completed");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StepsFinish(),
+          ),
+        );
       } else {
         print("Failed to update workout completion");
       }
     }
   }
 
+  void _togglePause() {
+    setState(() {
+      _isPaused = !_isPaused;
+    });
+  }
+
+  void _skipStep() {
+    if (!_isCountdownFinished) {
+      setState(() {
+        _isCountdownFinished = true;
+        _timerDuration = steps[_currentStep]['duration'] ?? 45;
+      });
+    } else {
+      _nextStep();
+    }
+  }
+
   @override
   void dispose() {
     _initialTimer.cancel();
+    _timer?.cancel();
     _youtubeController?.dispose();
     super.dispose();
   }
@@ -182,12 +205,18 @@ class _ProgramStepsState extends State<ProgramSteps> {
   @override
   Widget build(BuildContext context) {
     if (steps.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Step ${_currentStep + 1}'),
+        backgroundColor: const Color(0xFF008B90),
+        title: Text(
+          'Langkah ${_currentStep + 1}',
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
       body: Column(
         children: [
@@ -196,54 +225,80 @@ class _ProgramStepsState extends State<ProgramSteps> {
               controller: _youtubeController!,
               showVideoProgressIndicator: true,
             ),
-          const SizedBox(height: 35),
+          const SizedBox(height: 20),
           Text(
-            'Ambil posisi untuk gerakan: ${steps[_currentStep]['name']}',
-            style: const TextStyle(fontSize: 20),
+            'Gerakan: ${steps[_currentStep]['name']}',
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 10),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
               steps[_currentStep]['description'],
-              style: const TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 40),
+          const Spacer(),
           if (!_isCountdownFinished)
-            Center(
-              child: Container(
-                width: 125,
-                height: 125,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.red,
-                ),
-                alignment: Alignment.center,
-                child: Text(
+            Column(
+              children: [
+                Text(
                   '$_start',
-                  style: const TextStyle(fontSize: 50, color: Colors.white),
+                  style:
+                      const TextStyle(fontSize: 50, color: Color(0xFF008B90)),
                 ),
-              ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _skipStep,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF008B90),
+                  ),
+                  child: const Text(
+                    'Skip',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+              ],
             )
           else
             Column(
               children: [
                 Text(
                   '00:${_timerDuration.toString().padLeft(2, '0')}',
-                  style: const TextStyle(fontSize: 50, color: Colors.red),
+                  style:
+                      const TextStyle(fontSize: 50, color: Color(0xFF008B90)),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _nextStep,
-                  child: Text(
-                    _currentStep == steps.length - 1 ? 'Selesai' : 'Lanjutkan',
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _togglePause,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF78B9BA),
+                      ),
+                      child: Text(
+                        _isPaused ? 'Lanjutkan' : 'Pause',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _skipStep,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF008B90),
+                      ),
+                      child: const Text(
+                        'Skip',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+          const Spacer(),
         ],
       ),
     );
