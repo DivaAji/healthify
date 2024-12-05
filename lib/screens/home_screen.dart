@@ -1,188 +1,319 @@
 import 'package:flutter/material.dart';
+import 'package:healthify/screens/login/login_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:healthify/screens/program/detail_program_screen.dart';
-import 'package:healthify/widgets/carousel_slider.dart';
-import 'package:healthify/widgets/program_indicator.dart';
+import 'package:healthify/screens/config/api_config.dart';
+import 'package:healthify/screens/program/workout_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
-    // List program yang sedang berlangsung (sesuaikan dg database)
-    final List<Map<String, String>> selectedPrograms = [
-      {
-        'name': 'KELENTURAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Latihan kelenturan adalah jenis latihan fisik yang bertujuan untuk meningkatkan kemampuan otot dan sendi tubuh agar dapat bergerak dengan leluasa, nyaman, dan tanpa rasa sakit dalam rentang gerak yang maksimal. Latihan ini penting untuk menjaga postur tubuh, mencegah cedera, dan meningkatkan performa dalam aktivitas sehari-hari.'
-      },
-      {
-        'name': 'KELINCAHAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Kelincahan merupakan salah satu komponen penting dalam kebugaran fisik yang mencerminkan kemampuan seseorang untuk bergerak cepat, tepat, dan seimbang dalam berbagai arah. Selain itu, kelincahan yang baik juga berperan dalam mengurangi risiko cedera serta meningkatkan kemampuan fungsional sehari-hari. Latihan ini penting bagi pengguna yang ingin mencapai tubuh yang lebih sehat dan tangkas.'
-      },
-    ];
+class _HomeScreenState extends State<HomeScreen> {
+  List<String> categories = [];
+  Map<String, List<dynamic>> workoutsByCategory = {};
+  bool isLoading = true;
+  String errorMessage = "";
 
-    // List semua program yang ditawarkan (sesuaikan dengan database)
-    final List<Map<String, String>> allPrograms = [
-      {
-        'name': 'KELINCAHAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Kelincahan merupakan salah satu komponen penting dalam kebugaran fisik yang mencerminkan kemampuan seseorang untuk bergerak cepat, tepat, dan seimbang dalam berbagai arah. Selain itu, kelincahan yang baik juga berperan dalam mengurangi risiko cedera serta meningkatkan kemampuan fungsional sehari-hari. Latihan ini penting bagi pengguna yang ingin mencapai tubuh yang lebih sehat dan tangkas.'
-      },
-      {
-        'name': 'KESEIMBANGAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Latihan keseimbangan adalah jenis aktivitas yang bertujuan untuk meningkatkan kemampuan tubuh dalam mempertahankan posisi stabil, baik dalam keadaan diam maupun bergerak. Keseimbangan merupakan komponen penting dalam kebugaran fisik, terutama untuk mendukung koordinasi tubuh, postur, dan mencegah cedera, terutama pada orang lanjut usia atau atlet.'
-      },
-      {
-        'name': 'KELENTURAN',
-        'image': 'kelenturan.jpg',
-        'description':
-            'Latihan kelenturan adalah jenis latihan fisik yang bertujuan untuk meningkatkan kemampuan otot dan sendi tubuh agar dapat bergerak dengan leluasa, nyaman, dan tanpa rasa sakit dalam rentang gerak yang maksimal. Latihan ini penting untuk menjaga postur tubuh, mencegah cedera, dan meningkatkan performa dalam aktivitas sehari-hari.'
-      },
-    ];
+  @override
+  void initState() {
+    super.initState();
+    fetchProgramsByUserId();
+  }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('PROGRAM'),
-        automaticallyImplyLeading: false,
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('jwt_token');
+  }
+
+  Future<void> fetchProgramsByUserId() async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            errorMessage = "User is not logged in.";
+          });
+        }
+        return;
+      }
+
+      final userResponse = await http.get(
+        Uri.parse(ApiConfig.profileEndpoint),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (userResponse.statusCode != 200) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            errorMessage =
+                "Failed to fetch user details (${userResponse.statusCode}).";
+          });
+        }
+        return;
+      }
+
+      final userData = json.decode(userResponse.body);
+      final userId = userData['user_id'];
+
+      if (userId == null) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            errorMessage = "User ID is null. Please check your profile data.";
+          });
+        }
+        return;
+      }
+
+      final workoutResponse = await http.get(
+        Uri.parse(ApiConfig.workoutsCategoryEndpoint(userId)),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (workoutResponse.statusCode == 200) {
+        final data = json.decode(workoutResponse.body);
+
+        if (data.containsKey('workouts') && data['workouts'] != null) {
+          Map<String, dynamic> workoutsData = data['workouts'];
+
+          List<String> categoryNames = [];
+          workoutsData.forEach((categoryName, workouts) {
+            categoryNames.add(categoryName);
+            workoutsByCategory[categoryName] = List.from(workouts);
+          });
+
+          for (var category in categoryNames) {
+            final workoutsInCategory = workoutsByCategory[category];
+
+            if (workoutsInCategory != null) {
+              for (var workout in workoutsInCategory) {
+                final workoutsId = workout['workouts_id'];
+
+                if (workoutsId == null) {
+                  continue;
+                }
+
+                final statusUrl =
+                    ApiConfig.checkCategoryStatusEndpoint(userId, workoutsId);
+                final statusResponse = await http.get(
+                  Uri.parse(statusUrl),
+                  headers: {'Authorization': 'Bearer $token'},
+                );
+
+                if (statusResponse.statusCode == 200) {
+                  final statusData = json.decode(statusResponse.body);
+
+                  if (statusData['status'] == 'ongoing') {
+                    workout['status'] = 'ongoing';
+                  } else if (statusData['status'] == 'completed') {
+                    workout['status'] = 'completed';
+                  } else {
+                    workout['status'] = 'not_started';
+                  }
+                } else {
+                  workout['status'] = 'not_started';
+                }
+              }
+            }
+          }
+
+          if (mounted) {
+            setState(() {
+              categories = categoryNames;
+              isLoading = false;
+            });
+          }
+        } else {
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+              errorMessage =
+                  'Workouts data is not in the expected format or is empty.';
+            });
+          }
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            errorMessage =
+                'Failed to load programs (${workoutResponse.statusCode}).';
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Error fetching data: $e';
+        });
+      }
+    }
+  }
+
+  Widget _buildStatusBadge(String status) {
+    Color badgeColor;
+    IconData icon;
+
+    switch (status) {
+      case 'ongoing':
+        badgeColor = Colors.green;
+        icon = Icons.play_arrow;
+        break;
+      case 'completed':
+        badgeColor = Colors.blue;
+        icon = Icons.check_circle;
+        break;
+      case 'not_started':
+      default:
+        badgeColor = Colors.grey;
+        icon = Icons.access_time;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: badgeColor,
+        borderRadius: BorderRadius.circular(12),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Menampilkan greeting
-            // Padding(
-            //   padding: EdgeInsets.only(
-            //       left: screenWidth * 0.04, top: screenHeight * 0.002),
-            //   child: Text(
-            //     'Hi, username!',
-            //     style: TextStyle(
-            //       fontSize: 24,
-            //       fontFamily: 'Galatea',
-            //       fontWeight: FontWeight.bold,
-            //       color: Color.fromRGBO(33, 50, 75, 1),
-            //     ),
-            //   ),
-            // ),
-            // Menampilkan bagian "SEDANG BERLANGSUNG"
-            Padding(
-              padding: EdgeInsets.only(
-                  left: screenWidth * 0.04, top: screenHeight * 0.02),
-              child: Text(
-                'SEDANG BERLANGSUNG',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Galatea',
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(33, 50, 75, 1),
-                ),
-              ),
-            ),
-            // Menampilkan carousel untuk program yang sedang berlangsung
-            Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.01),
-              child: CustomCarouselSlider(
-                imageUrls: selectedPrograms
-                    .map((program) => program['image']!)
-                    .toList(),
-                chosenPrograms: selectedPrograms
-                    .map((program) => program['name']!)
-                    .toList(),
-                descriptions: selectedPrograms
-                    .map((program) => program['description']!)
-                    .toList(),
-              ),
-            ),
-            // Menampilkan bagian "PILIHAN PROGRAM"
-            Container(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: screenWidth * 0.04, top: screenHeight * 0.025),
-                child: Text(
-                  'PILIHAN PROGRAM',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Galatea',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(33, 50, 75, 1),
-                  ),
-                ),
-              ),
-            ),
-            // Menampilkan daftar semua program
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: allPrograms.length,
-              itemBuilder: (context, index) {
-                final program = allPrograms[index];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.04,
-                        vertical: 10.0, // Cek indeks pertama
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          // Menavigasi ke halaman detail program
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MyDetailProgram(
-                                programName: program['name']!,
-                                programImage: program['image']!,
-                                programDescription: program['description']!,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Card(
-                          elevation: 5, // Memberikan efek shadow pada Card
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10), // Sudut melengkung
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                10), // Pastikan gambar mengikuti sudut melengkung
-                            child: Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/${program['image']}',
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: screenHeight * 0.18,
-                                  alignment: Alignment.bottomCenter,
-                                ),
-                                Positioned(
-                                  bottom: 20,
-                                  child: ProgramIndicator(
-                                    name: program['name']!,
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white, size: 16),
+          const SizedBox(width: 5),
+          Text(
+            status[0].toUpperCase() +
+                status.substring(1), // Capitalize the first letter
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('PROGRAM'),
+          automaticallyImplyLeading: false,
+        ),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : errorMessage.isNotEmpty
+                ? Center(
+                    child: Text(errorMessage,
+                        style: const TextStyle(color: Colors.red)))
+                : ListView.builder(
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final categoryName = categories[index];
+
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            final workoutsData =
+                                workoutsByCategory[categoryName];
+
+                            if (workoutsData != null) {
+                              final status = workoutsData.first['status'];
+                              final workoutsId = workoutsData.first[
+                                  'workouts_id']; // Ambil workoutsId dari data
+
+                              if (status == 'ongoing') {
+                                // Navigasi ke WorkoutScreen dengan workoutsId dan categoryName
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => WorkoutScreen(
+                                      workoutsId:
+                                          workoutsId, // Kirim workoutsId
+                                      categoryName:
+                                          categoryName, // Kirim categoryName
+                                    ),
                                   ),
-                                ),
-                              ],
+                                );
+                              } else {
+                                // Navigasi ke DetailProgramScreen untuk status lain
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DetailProgramScreen(
+                                      categoryName: categoryName,
+                                      workouts: workoutsData,
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: Card(
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Stack(
+                                children: [
+                                  AspectRatio(
+                                    aspectRatio: 16 / 9,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                              'assets/images/${categoryName.toLowerCase()}.jpg'),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 10,
+                                    left: 10,
+                                    child: Text(
+                                      categoryName,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        shadows: [
+                                          Shadow(
+                                            blurRadius: 10,
+                                            color: Colors.black,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Display status on the card using the new styled widget
+                                  Positioned(
+                                    top: 10,
+                                    right: 10,
+                                    child: _buildStatusBadge(
+                                      workoutsByCategory[categoryName]
+                                              ?.first['status'] ??
+                                          'not_started',
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+                      );
+                    },
+                  ));
   }
 }

@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
+  final TextEditingController ageRangeController = TextEditingController();
 
   String selectedGender = '';
   String ageInputOption = 'Manual';
@@ -39,6 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     weightController.text = "70";
     heightController.text = "175";
     ageController.text = "";
+    ageRangeController.text = "";
   }
 
   @override
@@ -170,6 +172,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           weight: weightController.text,
                                           height: heightController.text,
                                           age: ageController.text,
+                                          ageRange: ageRangeController.text,
                                         ),
                                       );
                                 },

@@ -7,7 +7,9 @@ import 'package:healthify/widgets/navigation_bar.dart';
 import 'package:healthify/screens/login/login_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart'; // For checking if running on Web
+import 'package:flutter/foundation.dart';
+import 'package:healthify/screens/config/api_config.dart';
+import 'package:healthify/widgets/dropdown_button.dart';
 
 class FaceScan extends StatefulWidget {
   final int userId;
@@ -25,6 +27,7 @@ class _FaceScanState extends State<FaceScan> {
   bool _isUploading = false; // Track the uploading state
   bool _isImageUploaded = false; // Track if image is uploaded
   final TextEditingController _ageController = TextEditingController();
+  String selectedAgeRange = '';
 
   // Method to pick image from camera
   Future<void> _pickImageFromCamera() async {
@@ -109,7 +112,7 @@ class _FaceScanState extends State<FaceScan> {
     });
 
     try {
-      final uri = Uri.parse('http://192.168.1.6:8000/api/upload-image');
+      final uri = Uri.parse('${ApiConfig.baseUrl}/upload-image');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString();
 
@@ -139,8 +142,8 @@ class _FaceScanState extends State<FaceScan> {
           SnackBar(content: Text('Gambar berhasil diunggah')),
         );
         final responseData = json.decode(responseBody.body);
-        final predictedAge = responseData['predicted_age'];
-        _showAgeConfirmationDialog(predictedAge);
+        final ageRange = responseData['ageRange'];
+        _showAgeConfirmationDialog(ageRange);
       } else {
         // Handle error response
         print("Error: ${response.statusCode}, ${responseBody.body}");
@@ -160,22 +163,21 @@ class _FaceScanState extends State<FaceScan> {
     }
   }
 
-  void _showAgeConfirmationDialog(int predictedAge) {
+  void _showAgeConfirmationDialog(String ageRange) {
     String message;
 
-    // Pesan untuk setiap rentang usia
-    if (predictedAge < 18) {
+    // Message for each age range
+    if (ageRange == 'Belum Remaja') {
       message =
-          'Prediksi usia Anda adalah $predictedAge tahun. Maaf, Anda belum memenuhi syarat usia minimal untuk menggunakan aplikasi ini.';
-    } else if (predictedAge >= 18 && predictedAge <= 30) {
-      message =
-          'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: 18-30 tahun). Apakah ini benar?';
-    } else if (predictedAge >= 30 && predictedAge <= 50) {
-      message =
-          'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: 30-50 tahun). Apakah ini benar?';
+          'Prediksi usia Anda adalah Belum Remaja (Dibawah 18 tahun).\n Maaf anda belum mencukupi usia minimal untuk menggunakan aplikasi.';
+    } else if (ageRange == 'Remaja') {
+      message = 'Prediksi usia Anda adalah Remaja (18-30 tahun).';
+    } else if (ageRange == 'Dewasa') {
+      message = 'Prediksi usia Anda adalah Dewasa (31-50 tahun).';
+    } else if (ageRange == 'Lansia') {
+      message = 'Prediksi usia Anda adalah Lansia (di atas 50 tahun).';
     } else {
-      message =
-          'Prediksi usia Anda adalah $predictedAge tahun (Rentang usia: di atas 50 tahun). Apakah ini benar?';
+      message = 'Rentang usia tidak dikenali.';
     }
 
     showDialog(
@@ -185,13 +187,40 @@ class _FaceScanState extends State<FaceScan> {
           title: const Text('Konfirmasi Usia'),
           content: Text(message),
           actions: <Widget>[
-            if (predictedAge < 18) ...[
-              // Tombol untuk usia di bawah 18
+            if (ageRange == 'Remaja' ||
+                ageRange == 'Dewasa' ||
+                ageRange == 'Lansia') ...[
+              // Button for ages 18+
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
+                child: const Text('Benar'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showManualAgeInputDialog(); // Allow manual age input
+                },
+                child: const Text('Input usia manual'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                },
+                child: const Text('Ambil Ulang Gambar'),
+              ),
+            ] else ...[
+              // Button for under 18 age group
               TextButton(
                 onPressed: () async {
-                  // Hapus akun pengguna
-                  final uri = Uri.parse(
-                      'http://192.168.1.6:8000/api/user/${widget.userId}');
+                  // Delete the user's account if under 18
+                  final uri =
+                      Uri.parse('${ApiConfig.baseUrl}/user/${widget.userId}');
                   try {
                     final response = await http.delete(uri);
                     if (response.statusCode == 200) {
@@ -213,8 +242,8 @@ class _FaceScanState extends State<FaceScan> {
                   } catch (e) {
                     print('Error: $e');
                   } finally {
-                    // Navigasi ke halaman login
-                    Navigator.pop(context); // Tutup dialog
+                    // Navigate to login page
+                    Navigator.pop(context); // Close the dialog
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -225,39 +254,14 @@ class _FaceScanState extends State<FaceScan> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Tutup popup
-                  _showManualAgeInputDialog(); // Masukkan usia manual
+                  Navigator.pop(context); // Close the dialog
+                  _showManualAgeInputDialog(); // Allow manual age input
                 },
                 child: const Text('Masukkan Usia Manual'),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Tutup popup card
-                },
-                child: const Text('Ambil Ulang Gambar'),
-              ),
-            ] else ...[
-              // Tombol untuk usia di atas 18
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
-                },
-                child: const Text('Benar'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showManualAgeInputDialog(); // Masukkan usia manual
-                },
-                child: const Text('Input usia manual'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Tutup popup card
+                  Navigator.pop(context); // Close the dialog
                 },
                 child: const Text('Ambil Ulang Gambar'),
               ),
@@ -269,143 +273,105 @@ class _FaceScanState extends State<FaceScan> {
   }
 
   void _showManualAgeInputDialog() {
-    final TextEditingController ageController = TextEditingController();
+    String? selectedAgeRangeTemp = selectedAgeRange; // Variabel sementara
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Masukkan Usia Anda'),
-          content: TextField(
-            controller: ageController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Usia',
-              hintText: 'Masukkan usia Anda',
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setDialogState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text('Pilih Rentang Usia Anda'),
+                    Column(
+                      children: [
+                        RadioListTile<String>(
+                          title: const Text('Belum Remaja'),
+                          value: 'Belum Remaja',
+                          groupValue: selectedAgeRangeTemp,
+                          onChanged: (String? value) {
+                            setDialogState(() {
+                              selectedAgeRangeTemp = value!;
+                            });
+                          },
+                        ),
+                        RadioListTile<String>(
+                          title: const Text('Remaja'),
+                          value: 'Remaja',
+                          groupValue: selectedAgeRangeTemp,
+                          onChanged: (String? value) {
+                            setDialogState(() {
+                              selectedAgeRangeTemp = value!;
+                            });
+                          },
+                        ),
+                        RadioListTile<String>(
+                          title: const Text('Dewasa'),
+                          value: 'Dewasa',
+                          groupValue: selectedAgeRangeTemp,
+                          onChanged: (String? value) {
+                            setDialogState(() {
+                              selectedAgeRangeTemp = value!;
+                            });
+                          },
+                        ),
+                        RadioListTile<String>(
+                          title: const Text('Lansia'),
+                          value: 'Lansia',
+                          groupValue: selectedAgeRangeTemp,
+                          onChanged: (String? value) {
+                            setDialogState(() {
+                              selectedAgeRangeTemp = value!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            if (selectedAgeRangeTemp != null) {
+                              final uri =
+                                  Uri.parse(ApiConfig.manualAgeEndpoint);
+                              http.post(uri, body: {
+                                'user_id': widget.userId.toString(),
+                                'ageRange': selectedAgeRangeTemp,
+                              }).then((response) {
+                                if (response.statusCode == 200) {
+                                  setState(() {
+                                    selectedAgeRange = selectedAgeRangeTemp!;
+                                  });
+                                  Navigator.pop(context);
+                                  _showAgeConfirmationDialog(
+                                      selectedAgeRangeTemp!);
+                                } else {
+                                  // Handle failure
+                                }
+                              });
+                            }
+                          },
+                          child: const Text('Submit'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Batal'),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () async {
-                int? manualAge = int.tryParse(ageController.text);
-
-                if (manualAge != null && manualAge > 0) {
-                  if (manualAge < 18) {
-                    // Tampilkan popup card untuk usia tidak valid
-                    if (mounted) {
-                      Navigator.pop(context); // Tutup dialog input usia manual
-                      _showInvalidAgePopup(); // Tampilkan popup card
-                    }
-                    return; // Hentikan proses jika usia kurang dari 18
-                  }
-
-                  // Simpan usia jika valid
-                  final uri = Uri.parse(
-                      'http://192.168.1.6:8000/api/submit-age-manual');
-                  try {
-                    final response = await http.post(
-                      uri,
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                      },
-                      body: json.encode({
-                        'user_id': widget.userId,
-                        'age': manualAge,
-                      }),
-                    );
-
-                    if (response.statusCode == 200) {
-                      if (mounted) {
-                        Navigator.pop(context); // Tutup dialog input
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()),
-                        );
-                      }
-                    } else {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Gagal menyimpan usia: ${response.body}',
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    print('Error: $e');
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Terjadi kesalahan')),
-                      );
-                    }
-                  }
-                } else {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Harap masukkan usia yang valid dan lebih besar dari 0.'),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: const Text('Submit'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Tutup dialog jika batal
-              },
-              child: const Text('Batal'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showInvalidAgePopup() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Usia Tidak Memenuhi Syarat'),
-          content: const Text(
-            'Usia yang Anda masukkan tidak memenuhi syarat untuk menggunakan aplikasi ini. Silakan kembali ke halaman login atau ambil ulang gambar.',
-          ),
-          actions: <Widget>[
-            // Tombol kembali ke login
-            TextButton(
-              onPressed: () {
-                // Hapus akun pengguna jika perlu
-                final uri = Uri.parse(
-                    'http://192.168.1.6:8000/api/user/${widget.userId}');
-                http.delete(uri).then((response) {
-                  if (mounted) {
-                    Navigator.pop(context); // Tutup dialog popup
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                  }
-                }).catchError((error) {
-                  print('Error: $error');
-                });
-              },
-              child: const Text('Kembali ke Login'),
-            ),
-            // Tombol ambil ulang gambar
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Tutup popup card
-              },
-              child: const Text('Ambil Ulang Gambar'),
-            ),
-          ],
         );
       },
     );

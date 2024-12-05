@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healthify/blocs/registration_bloc/registration_event.dart';
 import 'package:healthify/blocs/registration_bloc/registration_state.dart';
+import 'package:healthify/screens/config/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -15,7 +16,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       try {
         // Simulate API call to register user
         final response = await http.post(
-          Uri.parse('http://192.168.1.6:8000/api/user'),
+          Uri.parse(ApiConfig.userEndpoint),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'username': event.username,
@@ -25,6 +26,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
             'weight': event.weight,
             'height': event.height,
             'age': event.age,
+            'ageRange': event.ageRange,
           }),
         );
 
@@ -42,6 +44,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
           yield RegistrationFailure(
               message: 'Registration failed.'); // On failure
         }
+        print('Response status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
       } catch (e) {
         yield RegistrationFailure(
             message: 'An error occurred: $e'); // On exception

@@ -44,6 +44,9 @@ dependencies:
   path_provider: ^2.0.11
   shared_preferences: ^2.3.3
   flutter_bloc: ^7.0.0
+  flutter_secure_storage: ^9.2.2
+  youtube_player_flutter: ^9.1.1
+  video_player: ^2.5.0
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +79,8 @@ flutter:
     - assets/images/detect_rectangle.png
     - assets/images/rectangle.png
     - assets/images/kelenturan.jpg
+    - assets/images/kelincahan.jpg
+    - assets/images/keseimbangan.jpg
     - assets/images/check.png
     - assets/images/vector.png
     - assets/images/profile_picture.png

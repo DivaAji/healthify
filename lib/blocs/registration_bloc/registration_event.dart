@@ -10,6 +10,7 @@ class RegisterUserEvent extends RegistrationEvent {
   final String weight;
   final String height;
   final String age;
+  final String ageRange;
 
   RegisterUserEvent({
     required this.username,
@@ -19,5 +20,6 @@ class RegisterUserEvent extends RegistrationEvent {
     required this.weight,
     required this.height,
     required this.age,
+    required this.ageRange,
   });
 }
