@@ -6,6 +6,7 @@ class ApiConfig {
   static const String profileEndpoint = "$baseUrl/profile";
   static const String selectProgramEndpoint = "$baseUrl/workouts/select";
   static String startProgramEndpoint = '$baseUrl/start-program';
+  static String checkWorkoutStatusEndpoint = '$baseUrl/statusWorkouts';
 
   static String workoutsCategoryEndpoint(int userId) =>
       "$baseUrl/workouts/categories/$userId";

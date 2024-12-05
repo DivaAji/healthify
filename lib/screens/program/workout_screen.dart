@@ -130,6 +130,69 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     }
   }
 
+  Future<bool> checkWorkoutStatus() async {
+    final userId = await getUserId();
+    if (userId == null) return false;
+
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.checkWorkoutStatusEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'user_id': userId,
+          'workouts_id': widget.workoutsId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        return result['exists'];
+      }
+    } catch (error) {
+      print('Error checking workout status: $error');
+    }
+    return false;
+  }
+
+  Future<void> onStartProgram() async {
+    final alreadySaved = await checkWorkoutStatus();
+
+    if (alreadySaved) {
+      // Tampilkan dialog jika program sudah ada
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Program Hari Ini Selesai!',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.green,
+            ),
+          ),
+          content: Text(
+            'Selamat! Anda telah menyelesaikan latihan hari ini dengan luar biasa. '
+            'Segera kembali dan lanjutkan perjalanan Anda besok untuk hasil yang lebih baik.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return; // Hentikan eksekusi
+    }
+
+    // Jika belum, lanjutkan menyimpan
+    await saveWorkoutsToDatabase();
+  }
+
   @override
   Widget build(BuildContext context) {
     String bannerImage =
@@ -189,7 +252,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: saveWorkoutsToDatabase,
+                onPressed: onStartProgram,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
                       (Color(0xFF008B90)), // Warna latar belakang tombol
