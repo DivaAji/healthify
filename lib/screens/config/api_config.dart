@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String baseUrl = 'http://192.168.69.120:8000/api';
+  static const String baseUrl = 'http://192.168.1.6:8000/api';
 
   static const String userEndpoint = "$baseUrl/user";
   static const String manualAgeEndpoint = "$baseUrl/submit-age-manual";
@@ -27,5 +27,14 @@ class ApiConfig {
   // Endpoint untuk mengupdate status latihan
   static String updateWorkoutUserDayNumberEndpoint() {
     return '$baseUrl/workouts/update-progress';
+  }
+
+  // Endpoint untuk mengupdate status latihan
+  static String getCurrentDayNumber(int userId, int workoutsId) {
+    return '$baseUrl/workouts/update-progress';
+  }
+
+  static String getMaxDayNumberEndpoint(int userId, int workoutsId) {
+    return '$baseUrl/getMaxDayNumber/$userId/$workoutsId';
   }
 }

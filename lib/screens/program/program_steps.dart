@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:healthify/screens/config/api_config.dart';
-import 'package:healthify/screens/program/steps_finish.dart'; // Pastikan file ini sudah ada.
+import 'package:healthify/screens/program/steps_finish.dart';
 
 class ProgramSteps extends StatefulWidget {
   final int userId;
@@ -25,10 +25,10 @@ class ProgramSteps extends StatefulWidget {
 class _ProgramStepsState extends State<ProgramSteps> {
   late int _currentStep;
   late List<Map<String, dynamic>> steps = [];
-  int _start = 7;
-  late Timer _initialTimer;
+  int _start = 7; // Initial countdown timer
+  Timer? _initialTimer;
   bool _isCountdownFinished = false;
-  int _timerDuration = 45;
+  int _timerDuration = 45; // Workout duration timer
   Timer? _timer;
   bool _isPaused = false;
   YoutubePlayerController? _youtubeController;
@@ -41,16 +41,32 @@ class _ProgramStepsState extends State<ProgramSteps> {
     _startInitialTimer();
   }
 
+  Future<int> _getMaxDayNumber(int userId, int workoutsId) async {
+    final response = await http.get(
+      Uri.parse(ApiConfig.getMaxDayNumberEndpoint(userId, workoutsId)),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['max_day_number'] ?? 1; // Default to 1 if no value found
+    } else {
+      print("Failed to get max day_number");
+      return 1; // Default value
+    }
+  }
+
   Future<void> _loadWorkoutSteps() async {
+    int maxDayNumber = await _getMaxDayNumber(widget.userId, widget.workoutsId);
     final response = await http.get(
       Uri.parse(ApiConfig.workoutsStepsEndpoint(
         widget.userId,
         widget.workoutsId,
-        1,
+        maxDayNumber,
       )),
     );
 
     if (response.statusCode == 200) {
+      print(maxDayNumber);
       List<dynamic> data = json.decode(response.body);
       setState(() {
         steps = List<Map<String, dynamic>>.from(data);
@@ -76,6 +92,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
   }
 
   void _startInitialTimer() {
+    _initialTimer?.cancel();
     _initialTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_start > 0) {
         if (mounted) {
@@ -89,7 +106,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
             _isCountdownFinished = true;
           });
         }
-        _initialTimer.cancel();
+        _initialTimer?.cancel();
         _startTimer();
       }
     });
@@ -112,16 +129,18 @@ class _ProgramStepsState extends State<ProgramSteps> {
   }
 
   void _nextStep() async {
+    int maxDayNumber = await _getMaxDayNumber(widget.userId, widget.workoutsId);
     if (_currentStep < steps.length - 1) {
       setState(() {
         _currentStep++;
         _isCountdownFinished = false;
-        _start = 7;
-        _timerDuration = steps[_currentStep]['duration'] ?? 45;
+        _start = 7; // Reset the initial countdown to 7
+        _timerDuration = steps[_currentStep]['duration'] ??
+            45; // Set the new workout duration
       });
 
       await Future.delayed(const Duration(milliseconds: 200));
-      _startInitialTimer();
+      _startInitialTimer(); // Start the countdown timer
 
       if (_youtubeController != null) {
         _youtubeController?.pause();
@@ -131,6 +150,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
 
       _initializeVideoPlayer();
 
+      // Update workout progress after completing the previous step
       if (_currentStep > 0) {
         final response = await http.post(
           Uri.parse(ApiConfig.updateWorkoutUserDayNumberEndpoint()),
@@ -140,9 +160,11 @@ class _ProgramStepsState extends State<ProgramSteps> {
           body: json.encode({
             'user_id': widget.userId,
             'workouts_id': widget.workoutsId,
-            'completed': 1,
+            'completed': 1, // Set completed to true
             'workouts_details_id': steps[_currentStep - 1]
                 ['workouts_details_id'],
+            'day_number':
+                maxDayNumber, // Kirimkan day_number yang sesuai dengan step
           }),
         );
 
@@ -159,18 +181,22 @@ class _ProgramStepsState extends State<ProgramSteps> {
         body: json.encode({
           'user_id': widget.userId,
           'workouts_id': widget.workoutsId,
-          'completed': 1,
+          'completed': 1, // Status selesai
           'workouts_details_id': steps[_currentStep]['workouts_details_id'],
+          'day_number': maxDayNumber, // Menambah 1 untuk hari berikutnya
         }),
       );
 
       if (response.statusCode == 200) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => StepsFinish(),
-          ),
-        );
+        // Cek apakah widget masih terpasang sebelum melakukan navigasi
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => StepsFinish(),
+            ),
+          );
+        }
       } else {
         print("Failed to update workout completion");
       }
@@ -185,18 +211,22 @@ class _ProgramStepsState extends State<ProgramSteps> {
 
   void _skipStep() {
     if (!_isCountdownFinished) {
+      // Skip during countdown phase (cancel initial timer and start workout immediately)
+      _initialTimer?.cancel();
       setState(() {
         _isCountdownFinished = true;
         _timerDuration = steps[_currentStep]['duration'] ?? 45;
       });
+      _startTimer(); // Start the workout timer immediately without delay
     } else {
+      // Skip during workout phase, go to the next step
       _nextStep();
     }
   }
 
   @override
   void dispose() {
-    _initialTimer.cancel();
+    _initialTimer?.cancel();
     _timer?.cancel();
     _youtubeController?.dispose();
     super.dispose();
