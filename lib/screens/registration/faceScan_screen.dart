@@ -113,6 +113,7 @@ class _FaceScanState extends State<FaceScan> {
 
     try {
       final uri = Uri.parse('${ApiConfig.baseUrl}/upload-image');
+      print('Debug: Sending request to: $uri');
       final request = http.MultipartRequest('POST', uri)
         ..fields['user_id'] = widget.userId.toString();
 
