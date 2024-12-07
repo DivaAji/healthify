@@ -33,14 +33,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    usernameController.text = "JohnDoe";
-    passwordController.text = "password123";
-    confirmPasswordController.text = "password123";
-    emailController.text = "johndoe@example.com";
-    weightController.text = "70";
-    heightController.text = "175";
-    ageController.text = "";
-    ageRangeController.text = "";
   }
 
   @override
