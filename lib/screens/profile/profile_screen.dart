@@ -21,7 +21,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String weight = 'Unknown';
   String ageRange = 'Unknown';
   String bmi = 'Unknown';
-  String profilePicture = 'assets/images/profile_picture.png'; // Default image
 
   bool isLoading = true;
 
@@ -37,7 +36,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (token == null) {
       if (mounted) {
-        // Check if the widget is still mounted
         setState(() {
           isLoading = false;
         });
@@ -47,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final response = await http.get(
-      Uri.parse(ApiConfig.profileEndpoint), // Ensure this matches the endpoint
+      Uri.parse(ApiConfig.profileEndpoint),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -55,7 +53,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final data = json.decode(response.body);
 
       if (mounted) {
-        // Check if the widget is still mounted before calling setState
         setState(() {
           username = data['username'] ?? 'Unknown';
           email = data['email'] ?? 'Unknown';
@@ -64,8 +61,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           weight = data['weight']?.toString() ?? 'Unknown';
           ageRange = data['ageRange'] ?? 'Unknown';
           bmi = data['bmi'] != null ? data['bmi'].toString() : 'Unknown';
-          profilePicture =
-              data['profile_picture'] ?? 'assets/images/profile_picture.png';
           isLoading = false;
         });
       }
@@ -102,13 +97,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.pushReplacementNamed(context, '/login'); // Redirect to login
   }
 
+  String getBmiCategory(String bmi) {
+    double bmiValue = double.tryParse(bmi) ?? 0.0;
+
+    if (bmiValue < 18.5) {
+      return 'Underweight';
+    } else if (bmiValue >= 18.5 && bmiValue <= 22.9) {
+      return 'Normal';
+    } else if (bmiValue >= 23 && bmiValue <= 24.9) {
+      return 'Overweight';
+    } else if (bmiValue >= 25) {
+      return 'Obesitas';
+    } else {
+      return 'Invalid BMI';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PROFIL'),
-        automaticallyImplyLeading: false, // No back button
+        title: const Text(
+          'Profil',
+          style: TextStyle(color: Color(0xFF21324B)),
+        ),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         actions: [
+          const Text(
+            'Logout',
+            style: TextStyle(
+              color: Color(0xFF21324B), // Adjust the color as needed
+              fontSize: 16,
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.exit_to_app),
             onPressed: logout,
@@ -117,92 +139,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  // Profile Picture
-                  GestureDetector(
-                    onTap: () {
-                      // You can add functionality for changing the picture
-                    },
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: profilePicture.startsWith('http')
-                          ? NetworkImage(profilePicture) // URL image
-                          : AssetImage(profilePicture)
-                              as ImageProvider, // Local image
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Username
-                  Text(
-                    username,
-                    style: const TextStyle(
-                        fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Email
-                  Text(
-                    email,
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Edit Profile Button
-                  CustomButton(
-                    text: 'Edit Profil',
-                    onPressed: () async {
-                      final updatedData = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditProfilScreen(),
-                        ),
-                      );
-
-                      if (updatedData != null) {
-                        setState(() {
-                          username = updatedData['username'] ?? username;
-                          email = updatedData['email'] ?? email;
-                          height = updatedData['height'] ?? height;
-                          weight = updatedData['weight'] ?? weight;
-                          gender = updatedData['gender'] ?? gender;
-                          profilePicture =
-                              updatedData['profileImagePath'] ?? profilePicture;
-                          ageRange = updatedData['ageRange'] ?? ageRange;
-                        });
-                      }
-                    },
-                    verticalPadding: 10.0,
-                    textStyle: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Additional Information
-                  Text(
-                    'Informasi Tambahan',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Info List
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListView(
-                        children: [
-                          _buildInfoItem('Jenis Kelamin', gender),
-                          _buildInfoItem('Tinggi Badan', height),
-                          _buildInfoItem('Berat Badan', weight),
-                          _buildInfoItem('Rentang Usia', ageRange),
-                          _buildInfoItem('Indeks Masa Tubuh', bmi),
-                        ],
+          : Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'assets/images/login_background.jpg'), // Your image asset path
+                  fit: BoxFit.cover, // Cover the whole screen
+                ),
+              ),
+              child: Center(
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Card(
+                      elevation: 8.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                    ),
-                  ),
-                ],
+                      color: Colors
+                          .white, // Set the card background color to white
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Username
+                            Text(
+                              username,
+                              style: const TextStyle(
+                                  fontSize: 28, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Email
+                            Text(
+                              email,
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.grey[600]),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Additional Information Section
+                            Text(
+                              'Informasi Tambahan',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Info List
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListView(
+                                  children: [
+                                    _buildInfoItem('Jenis Kelamin', gender),
+                                    _buildInfoItem('Tinggi Badan', height),
+                                    _buildInfoItem('Berat Badan', weight),
+                                    _buildInfoItem('Rentang Usia', ageRange),
+                                    _buildInfoItem('Indeks Masa Tubuh', bmi),
+                                    _buildInfoItem(
+                                        'Kategori IMB',
+                                        getBmiCategory(
+                                            bmi)), // Added BMI category
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Edit Profile Button - Positioned at the bottom of the card
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: Center(
+                                child: CustomButton(
+                                  text: 'Edit Profil',
+                                  onPressed: () async {
+                                    final updatedData = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditProfilScreen(),
+                                      ),
+                                    );
+
+                                    if (updatedData != null) {
+                                      setState(() {
+                                        username =
+                                            updatedData['username'] ?? username;
+                                        email = updatedData['email'] ?? email;
+                                        height =
+                                            updatedData['height'] ?? height;
+                                        weight =
+                                            updatedData['weight'] ?? weight;
+                                        gender =
+                                            updatedData['gender'] ?? gender;
+                                        ageRange =
+                                            updatedData['ageRange'] ?? ageRange;
+                                      });
+                                    }
+                                  },
+                                  verticalPadding: 10.0,
+                                  textStyle: const TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
               ),
             ),
     );

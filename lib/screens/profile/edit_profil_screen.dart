@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:healthify/screens/config/api_config.dart';
-import 'dart:io';
+import 'package:healthify/widgets/button.dart';
 
 class EditProfilScreen extends StatefulWidget {
   const EditProfilScreen({Key? key}) : super(key: key);
@@ -18,7 +17,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   String email = '';
   String height = '';
   String weight = '';
-  String profilePicture = 'assets/images/profile_picture.png';
 
   bool isLoading = true;
 
@@ -51,8 +49,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         email = data['email'] ?? '';
         height = data['height']?.toString() ?? '';
         weight = data['weight']?.toString() ?? '';
-        profilePicture =
-            data['profile_picture'] ?? 'assets/images/profile_picture.png';
         isLoading = false;
       });
     } else {
@@ -77,16 +73,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
           );
         },
       );
-    }
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        profilePicture = image.path; // Update the profile picture path
-      });
     }
   }
 
@@ -156,115 +142,125 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profil'),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              // Wrap with SingleChildScrollView to avoid overflow
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      // Edit Profile Picture
-                      GestureDetector(
-                        onTap: _pickImage,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: profilePicture.isNotEmpty
-                              ? FileImage(File(profilePicture))
-                              : AssetImage('assets/images/default_profile.png')
-                                  as ImageProvider,
+      body: Stack(
+        children: [
+          // Background image
+          Image.asset(
+            'assets/images/login_background.jpg',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+          // Content on top of background image
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Center(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Card(
+                        elevation: 8.0, // Optional shadow for the card
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Username
+                                TextFormField(
+                                  initialValue: username,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Username'),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your username';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    username = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Email
+                                TextFormField(
+                                  initialValue: email,
+                                  decoration:
+                                      const InputDecoration(labelText: 'Email'),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your email';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    email = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Height
+                                TextFormField(
+                                  initialValue: height,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Height (cm)'),
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your height';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    height = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Weight
+                                TextFormField(
+                                  initialValue: weight,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Weight (kg)'),
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your weight';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    weight = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Save Button
+                                CustomButton(
+                                  text: 'Save Changes',
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      updateProfile();
+                                    }
+                                  },
+                                  verticalPadding: 10.0,
+                                  textStyle: const TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-
-                      // Username
-                      TextFormField(
-                        initialValue: username,
-                        decoration:
-                            const InputDecoration(labelText: 'Username'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your username';
-                          }
-                          return null;
-                        },
-                        onChanged: (value) {
-                          username = value;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Email
-                      TextFormField(
-                        initialValue: email,
-                        decoration: const InputDecoration(labelText: 'Email'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          return null;
-                        },
-                        onChanged: (value) {
-                          email = value;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Height
-                      TextFormField(
-                        initialValue: height,
-                        decoration:
-                            const InputDecoration(labelText: 'Height (cm)'),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your height';
-                          }
-                          return null;
-                        },
-                        onChanged: (value) {
-                          height = value;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Weight
-                      TextFormField(
-                        initialValue: weight,
-                        decoration:
-                            const InputDecoration(labelText: 'Weight (kg)'),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your weight';
-                          }
-                          return null;
-                        },
-                        onChanged: (value) {
-                          weight = value;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Save Button
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            updateProfile();
-                          }
-                        },
-                        child: const Text('Save Changes'),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
+        ],
+      ),
     );
   }
 }

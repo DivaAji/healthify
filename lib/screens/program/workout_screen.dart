@@ -199,7 +199,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         'assets/images/${widget.categoryName.toLowerCase()}.jpg';
 
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.categoryName} Program')),
+      appBar: AppBar(
+        title: Text(
+          '${widget.categoryName} Program',
+          style: TextStyle(color: Color(0xFF21324B)), // Apply TextStyle here
+        ),
+        backgroundColor: Colors.white,
+      ),
       body: Container(
         color: Colors.white, // Mengatur background menjadi putih
         child: Column(
