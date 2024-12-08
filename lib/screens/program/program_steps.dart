@@ -94,7 +94,14 @@ class _ProgramStepsState extends State<ProgramSteps> {
         _youtubeController = YoutubePlayerController(
           initialVideoId: videoId,
           flags: YoutubePlayerFlags(autoPlay: true, mute: false),
-        );
+        )..addListener(() {
+            // Start the timer when the video is ready
+            if (_youtubeController!.value.isReady && !_isCountdownFinished) {
+              if (_initialTimer == null || !_initialTimer!.isActive) {
+                _startInitialTimer();
+              }
+            }
+          });
       }
     }
   }
