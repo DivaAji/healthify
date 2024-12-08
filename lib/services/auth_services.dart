@@ -12,7 +12,8 @@ class AuthService {
     required String height,
     required String age,
   }) async {
-    final url = Uri.parse('http://192.168.69.94:8000/api/register'); // Ganti dengan URL API backend Anda
+    final url = Uri.parse(
+        'http://192.168.1.10:8000/api/register'); // Ganti dengan URL API backend Anda
 
     try {
       final response = await http.post(

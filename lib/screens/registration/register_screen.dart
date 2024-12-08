@@ -1,12 +1,13 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:healthify/screens/registration/faceScan_screen.dart';
-import 'package:image_picker/image_picker.dart'; // Import image_picker
-import 'package:http/http.dart' as http;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:healthify/blocs/registration_bloc/registration_bloc.dart';
+import 'package:healthify/blocs/registration_bloc/registration_event.dart';
+import 'package:healthify/blocs/registration_bloc/registration_state.dart';
 import 'package:healthify/widgets/button.dart';
 import 'package:healthify/widgets/card.dart';
 import 'package:healthify/widgets/text_field.dart';
-import 'package:healthify/widgets/dropdown_button.dart'; // Import CustomDropdownButton
+import 'package:healthify/widgets/dropdown_button.dart';
+import 'package:healthify/screens/registration/faceScan_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -16,7 +17,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // text editing controller
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
+  final TextEditingController ageRangeController = TextEditingController();
 
   String selectedGender = '';
   String ageInputOption = 'Manual';
@@ -47,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       };
 
       final response = await http.post(
-        Uri.parse('http://192.168.69.94:8000/api/user'),
+        Uri.parse('http://192.168.1.10:8000/api/user'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
@@ -98,122 +99,148 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SizedBox.expand(
-            child: Image.asset(
-              'assets/images/login_background.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * 0.2,
-                left: 20.0,
-                right: 20.0,
+      body: BlocProvider(
+        create: (context) => RegistrationBloc(), // Ensure the bloc is created
+        child: Stack(
+          children: [
+            SizedBox.expand(
+              child: Image.asset(
+                'assets/images/login_background.jpg',
+                fit: BoxFit.cover,
               ),
-              child: MyCard(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Daftar Akun',
-                          style: TextStyle(
-                            fontFamily: 'Galatea',
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: Color.fromRGBO(33, 50, 75, 1),
+            ),
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.2,
+                  left: 20.0,
+                  right: 20.0,
+                ),
+                child: MyCard(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Daftar Akun',
+                            style: TextStyle(
+                              fontFamily: 'Galatea',
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: Color.fromRGBO(33, 50, 75, 1),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Bantu kami menyesuaikan program kebugaran yang paling sesuai untuk Anda.',
-                          style: TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.normal,
-                            color: Color.fromRGBO(33, 50, 75, 1),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Bantu kami menyesuaikan program kebugaran yang paling sesuai untuk Anda.',
+                            style: TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.normal,
+                              color: Color.fromRGBO(33, 50, 75, 1),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 13),
-                        CustomTextField(
-                          controller: usernameController,
-                          labelText: 'Username',
-                          keyboardType: TextInputType.name,
-                        ),
-                        const SizedBox(height: 15),
-                        CustomTextField(
-                          controller: passwordController,
-                          labelText: 'Password',
-                          obscureText: true,
-                          keyboardType: TextInputType.text,
-                        ),
-                        const SizedBox(height: 15),
-                        CustomTextField(
-                          controller: confirmPasswordController,
-                          labelText: 'Konfirmasi Password',
-                          obscureText: true,
-                          keyboardType: TextInputType.text,
-                        ),
-                        const SizedBox(height: 15),
-                        CustomTextField(
-                          controller: emailController,
-                          labelText: 'Email',
-                          keyboardType: TextInputType.text,
-                        ),
-                        const SizedBox(height: 15),
-                        CustomDropdownButton(
-                          labelText: 'Jenis Kelamin',
-                          selectedValue: selectedGender,
-                          items: ['Laki-laki', 'Perempuan'],
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedGender = newValue!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 15),
-                        CustomTextField(
-                          labelText: 'Berat Badan',
-                          controller: weightController,
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 15),
-                        CustomTextField(
-                          labelText: 'Tinggi Badan',
-                          controller: heightController,
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 20),
-                        // if (_imageFile != null)
-                        //   CustomButton(
-                        //     text: 'Next',
-                        //     onPressed: registerUser,
-                        //     horizontalPadding: 50.0,
-                        //     verticalPadding: 10.0,
-                        //   ),
-
-                        const SizedBox(height: 20),
-                        CustomButton(
-                          text: 'Next',
-                          onPressed:
-                              registerUser, // Calls registerUser and navigates upon success
-                          horizontalPadding: 50.0,
-                          verticalPadding: 10.0,
-                        ),
-                      ],
+                          const SizedBox(height: 13),
+                          CustomTextField(
+                            controller: usernameController,
+                            labelText: 'Username',
+                            keyboardType: TextInputType.name,
+                          ),
+                          const SizedBox(height: 15),
+                          CustomTextField(
+                            controller: passwordController,
+                            labelText: 'Password',
+                            obscureText: true,
+                            keyboardType: TextInputType.text,
+                          ),
+                          const SizedBox(height: 15),
+                          CustomTextField(
+                            controller: confirmPasswordController,
+                            labelText: 'Konfirmasi Password',
+                            obscureText: true,
+                            keyboardType: TextInputType.text,
+                          ),
+                          const SizedBox(height: 15),
+                          CustomTextField(
+                            controller: emailController,
+                            labelText: 'Email',
+                            keyboardType: TextInputType.text,
+                          ),
+                          const SizedBox(height: 15),
+                          CustomDropdownButton(
+                            labelText: 'Jenis Kelamin',
+                            selectedValue: selectedGender,
+                            items: ['Laki-laki', 'Perempuan'],
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedGender = newValue!;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 15),
+                          CustomTextField(
+                            labelText: 'Berat Badan',
+                            controller: weightController,
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 15),
+                          CustomTextField(
+                            labelText: 'Tinggi Badan',
+                            controller: heightController,
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 20),
+                          BlocConsumer<RegistrationBloc, RegistrationState>(
+                            listener: (context, state) {
+                              if (state is RegistrationSuccess) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        FaceScan(userId: state.userId),
+                                  ),
+                                );
+                              } else if (state is RegistrationFailure) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(state.message)),
+                                );
+                              }
+                            },
+                            builder: (context, state) {
+                              if (state is RegistrationInProgress) {
+                                return CircularProgressIndicator();
+                              }
+                              return CustomButton(
+                                text: 'Next',
+                                onPressed: () {
+                                  context.read<RegistrationBloc>().add(
+                                        RegisterUserEvent(
+                                          username: usernameController.text,
+                                          password: passwordController.text,
+                                          email: emailController.text,
+                                          gender: selectedGender,
+                                          weight: weightController.text,
+                                          height: heightController.text,
+                                          age: ageController.text,
+                                          ageRange: ageRangeController.text,
+                                        ),
+                                      );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

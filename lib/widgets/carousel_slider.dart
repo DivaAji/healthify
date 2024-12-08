@@ -1,37 +1,37 @@
-import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:healthify/screens/program/detail_program_screen.dart';
-import 'package:healthify/widgets/program_indicator.dart';
+// import 'package:flutter/material.dart';
+// import 'package:carousel_slider/carousel_slider.dart';
+// import 'package:healthify/screens/program/detail_program_screen.dart';
+// import 'package:healthify/widgets/program_indicator.dart';
 
-class CustomCarouselSlider extends StatefulWidget {
-  final List<String> imageUrls;
-  final List<String> chosenPrograms;
-  final List<String> descriptions;
+// class CustomCarouselSlider extends StatefulWidget {
+//   final List<String> imageUrls;
+//   final List<String> chosenPrograms;
+//   final List<String> descriptions;
 
-  CustomCarouselSlider({
-    required this.imageUrls,
-    required this.chosenPrograms,
-    required this.descriptions,
-  });
+//   CustomCarouselSlider({
+//     required this.imageUrls,
+//     required this.chosenPrograms,
+//     required this.descriptions,
+//   });
 
-  @override
-  _CustomCarouselSliderState createState() => _CustomCarouselSliderState();
-}
+//   @override
+//   _CustomCarouselSliderState createState() => _CustomCarouselSliderState();
+// }
 
-class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
-  late CarouselController _carouselController;
-  int _currentIndex = 0;
+// class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
+//   late CarouselController _carouselController;
+//   int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _carouselController = CarouselController();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     _carouselController = CarouselController();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+//   @override
+//   Widget build(BuildContext context) {
+//     final screenWidth = MediaQuery.of(context).size.width;
+//     final screenHeight = MediaQuery.of(context).size.height;
 
     return CarouselSlider(
       options: CarouselOptions(
@@ -48,7 +48,7 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
       ),
       items: widget.imageUrls.map((url) {
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
             onTap: () {
               // Navigasi ke halaman DetailProgram

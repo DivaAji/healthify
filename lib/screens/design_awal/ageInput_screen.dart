@@ -27,7 +27,7 @@ class _AgeinputScreenState extends State<AgeinputScreen> {
       };
 
       final response = await http.post(
-        Uri.parse('http://192.168.1.6:8000/api/update-age'),
+        Uri.parse('http://192.168.56.239:8000/api/update-age'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );

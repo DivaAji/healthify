@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/screens/home_screen.dart';
 import 'package:healthify/widgets/button.dart';
+import 'package:healthify/widgets/navigation_bar.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class StepsFinish extends StatefulWidget {
   const StepsFinish({super.key});
@@ -10,6 +12,12 @@ class StepsFinish extends StatefulWidget {
 }
 
 class _StepsFinishState extends State<StepsFinish> {
+  @override
+  void initState() {
+    super.initState();
+    WakelockPlus.disable(); // Menonaktifkan wakelock saat layar dimuat
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +88,7 @@ class _StepsFinishState extends State<StepsFinish> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
+                          builder: (context) => MyNavigationBar(),
                         ),
                       );
                     },

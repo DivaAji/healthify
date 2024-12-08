@@ -21,6 +21,13 @@ version: 1.0.0+1
 environment:
   sdk: ^3.5.1
 
+flutter_icons:
+  android: "launcher_icon"  
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_foreground: "assets/icons/adaptive_icon_foreground.png"
+  adaptive_icon_background: "assets/icons/adaptive_icon_background.png"
+
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -42,6 +49,14 @@ dependencies:
   http: ^1.2.2
   file_picker: ^5.0.1
   path_provider: ^2.0.11
+  shared_preferences: ^2.3.3
+  flutter_bloc: ^7.0.0
+  flutter_secure_storage: ^9.2.2
+  youtube_player_flutter: ^9.1.1
+  video_player: ^2.5.0
+  wakelock_plus: ^1.2.8
+  flutter_launcher_icons: ^0.9.2
+
 
 dev_dependencies:
   flutter_test:
@@ -74,14 +89,20 @@ flutter:
     - assets/images/detect_rectangle.png
     - assets/images/rectangle.png
     - assets/images/kelenturan.jpg
+    - assets/images/kelincahan.jpg
+    - assets/images/keseimbangan.jpg
     - assets/images/check.png
     - assets/images/vector.png
     - assets/images/profile_picture.png
     - assets/icons/upload.png
     - assets/icons/home.png
     - assets/icons/latihan.png
+    - assets/icons/app_icon.png
     - assets/icons/user.png
     - assets/icons/history.png
+    - assets/images/home_background.png
+    - assets/icons/adaptive_icon_foreground.png
+    - assets/icons/adaptive_icon_background.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
