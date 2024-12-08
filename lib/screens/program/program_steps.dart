@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:healthify/screens/config/api_config.dart';
 import 'package:healthify/screens/program/steps_finish.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class ProgramSteps extends StatefulWidget {
   final int userId;
@@ -25,7 +26,7 @@ class ProgramSteps extends StatefulWidget {
 class _ProgramStepsState extends State<ProgramSteps> {
   late int _currentStep;
   late List<Map<String, dynamic>> steps = [];
-  int _start = 7; // Initial countdown timer
+  int _start = 20; // Initial countdown timer
   Timer? _initialTimer;
   bool _isCountdownFinished = false;
   int _timerDuration = 45; // Workout duration timer
@@ -39,6 +40,7 @@ class _ProgramStepsState extends State<ProgramSteps> {
     _currentStep = widget.currentStep;
     _loadWorkoutSteps();
     _startInitialTimer();
+    WakelockPlus.enable();
   }
 
   Future<int> _getMaxDayNumber(int userId, int workoutsId) async {
@@ -79,7 +81,13 @@ class _ProgramStepsState extends State<ProgramSteps> {
   }
 
   void _initializeVideoPlayer() {
-    if (steps.isNotEmpty && steps[_currentStep]['video_link'] != null) {
+    if (_youtubeController != null) {
+      _youtubeController!.dispose();
+      _youtubeController = null;
+    }
+    if (steps.isNotEmpty &&
+        steps[_currentStep]['video_link'] != null &&
+        steps[_currentStep]['video_link']!.isNotEmpty) {
       final videoLink = steps[_currentStep]['video_link'];
       final videoId = YoutubePlayer.convertUrlToId(videoLink);
       if (videoId != null) {
@@ -129,12 +137,17 @@ class _ProgramStepsState extends State<ProgramSteps> {
   }
 
   void _nextStep() async {
+    if (_youtubeController != null) {
+      _youtubeController!.pause();
+      _youtubeController!.dispose();
+      _youtubeController = null;
+    }
     int maxDayNumber = await _getMaxDayNumber(widget.userId, widget.workoutsId);
     if (_currentStep < steps.length - 1) {
       setState(() {
         _currentStep++;
         _isCountdownFinished = false;
-        _start = 7; // Reset the initial countdown to 7
+        _start = 20; // Reset the initial countdown to 20
         _timerDuration = steps[_currentStep]['duration'] ??
             45; // Set the new workout duration
       });
