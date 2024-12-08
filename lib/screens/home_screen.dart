@@ -203,17 +203,23 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('PROGRAM'),
-          automaticallyImplyLeading: false,
+      appBar: AppBar(
+        title: const Text(
+          'Program',
+          style: TextStyle(color: Color(0xFF21324B)),
         ),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : errorMessage.isNotEmpty
-                ? Center(
-                    child: Text(errorMessage,
-                        style: const TextStyle(color: Colors.red)))
-                : ListView.builder(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage.isNotEmpty
+              ? Center(
+                  child: Text(errorMessage,
+                      style: const TextStyle(color: Colors.red)))
+              : Container(
+                  decoration: BoxDecoration(color: Colors.white),
+                  child: ListView.builder(
                     itemCount: categories.length,
                     itemBuilder: (context, index) {
                       final categoryName = categories[index];
@@ -314,6 +320,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                     },
-                  ));
+                  ),
+                ),
+    );
   }
 }

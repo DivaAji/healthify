@@ -38,4 +38,8 @@ class ApiConfig {
   static String getMaxDayNumberEndpoint(int userId, int workoutsId) {
     return '$baseUrl/getMaxDayNumber/$userId/$workoutsId';
   }
+
+  static String workoutHistoryEndpoint(String userId, String date) {
+    return '$baseUrl/workouts/history/$userId/$date';
+  }
 }
