@@ -30,70 +30,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String selectedGender = '';
   String ageInputOption = 'Manual';
 
-  XFile? _imageFile; // Variable untuk menyimpan gambar yang diambil
-
-  final ImagePicker _picker = ImagePicker(); // Inisialisasi image picker
-
-  //proses registrasi
-  Future<void> registerUser() async {
-    try {
-      final data = {
-        'username': usernameController.text,
-        'email': emailController.text,
-        'password': passwordController.text,
-        'gender': selectedGender,
-        'weight': weightController.text,
-        'height': heightController.text,
-        'age': ageController.text,
-      };
-
-      final response = await http.post(
-        Uri.parse('http://192.168.1.10:8000/api/user'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
-        print("Response body: ${response.body}");
-        if (responseData.containsKey('data') &&
-            responseData['data'].containsKey('user_id')) {
-          int userId = responseData['data']
-              ['user_id']; // Use 'user_id' from the response
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FaceScan(userId: userId),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('ID pengguna tidak ditemukan.')),
-          );
-        }
-      } else {
-        print("Unexpected status code: ${response.statusCode}");
-        print("Response body: ${response.body}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registrasi gagal! Silakan coba lagi.')),
-        );
-      }
-    } catch (e) {
-      print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan. Silakan coba lagi.')),
-      );
-    }
-  }
-
-  // Fungsi untuk mengambil gambar dari kamera
-  Future<void> _takePicture() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      setState(() {
-        _imageFile = image;
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override

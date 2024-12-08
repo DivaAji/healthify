@@ -24,6 +24,7 @@ String urlGetData = urlDomain + "api/user/1"; // Endpoint API yang sesuai
 //     ApiConfig().baseUrl; // Ganti dengan IP server lokal atau domain
 String urlLogin = ApiConfig.baseUrl + "/login"; // Endpoint API untuk login
 
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
