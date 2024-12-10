@@ -219,7 +219,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         builder: (context) =>
                                             EditProfilScreen(),
                                       ),
-                                    );
+                                    ).then((updatedData) {
+                                      if (updatedData != null) {
+                                        setState(() {
+                                          username =
+                                              updatedData['username'] ?? '';
+                                          email = updatedData['email'] ?? '';
+                                          height = updatedData['height']
+                                                  ?.toString() ??
+                                              '';
+                                          weight = updatedData['weight']
+                                                  ?.toString() ??
+                                              '';
+                                        });
+                                      }
+                                    });
 
                                     if (updatedData != null) {
                                       setState(() {
