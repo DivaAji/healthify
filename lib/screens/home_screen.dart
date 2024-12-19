@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(color: Color(0xFF21324B)),
         ),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey.shade200,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -259,7 +259,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                       workouts: workoutsData,
                                     ),
                                   ),
-                                );
+                                ).then((shouldRefresh) {
+                                  // Hanya panggil setState() jika harus merefresh halaman
+                                  if (shouldRefresh == true) {
+                                    setState(() {
+                                      fetchProgramsByUserId();
+                                    });
+                                  }
+                                });
                               }
                             }
                           },

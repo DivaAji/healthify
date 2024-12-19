@@ -18,7 +18,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   String height = '';
   String weight = '';
   String oldPassword = '';
-
+  bool isPasswordVisible = false;
   bool isLoading = true;
 
   final _formKey = GlobalKey<FormState>();
@@ -61,8 +61,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text(
-                'Failed to fetch profile data. Please try again later.'),
+            content: const Text('Gagal mengambil data.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -76,14 +75,14 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   }
 
   Future<void> updateProfile() async {
-    // Jika password lama kosong, beri pesan error
+    // If oldPassword is empty, show error
     if (oldPassword.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text('Please enter your old password.'),
+            content: const Text('Masukkan password anda.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -104,20 +103,51 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       return;
     }
 
-    // Buat Map untuk body request, hanya kirim data yang berubah
-    final Map<String, dynamic> bodyData = {};
+    // Fetch stored values from SharedPreferences
+    String? storedUsername = prefs.getString('username');
+    String? storedEmail = prefs.getString('email');
 
-    bodyData['oldPassword'] = oldPassword;
+    // Create Map for request body, only send changed data
+    final Map<String, dynamic> bodyData = {
+      'oldPassword': oldPassword, // Always send oldPassword
+    };
 
-    // Hanya kirim data username dan email jika mereka berubah
-    if (username != '') {
+    // Only include fields in the request if they have changed
+    if (username != storedUsername && username.isNotEmpty) {
       bodyData['username'] = username;
     }
-    if (email != '') {
+    if (email != storedEmail && email.isNotEmpty) {
       bodyData['email'] = email;
     }
+    if (height.isNotEmpty) {
+      bodyData['height'] = height;
+    }
+    if (weight.isNotEmpty) {
+      bodyData['weight'] = weight;
+    }
 
-    // Kirim request ke API
+    // Proceed with API call only if there's any data to update
+    if (bodyData.length == 1) {
+      // Only oldPassword is present, no other data changed
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Tidak ada perubahan'),
+            content: const Text('Tidak ada data yang diubah.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // Send request to API
     final response = await http.put(
       Uri.parse(ApiConfig.profileEndpoint),
       headers: {
@@ -127,20 +157,21 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       body: json.encode(bodyData),
     );
 
+    // Handle API response
     if (response.statusCode == 200) {
       final updatedData = json.decode(response.body);
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Profile updated successfully'),
+            title: const Text('Berhasil'),
+            content: const Text('Data profil telah diperbarui'),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Tutup dialog
+                  Navigator.pop(context); // Close the dialog
                   Navigator.pop(
-                      context, updatedData); // Kembalikan data ke ProfileScreen
+                      context, true); // Return updated data to ProfileScreen
                 },
                 child: const Text('OK'),
               ),
@@ -150,13 +181,12 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       );
     } else if (response.statusCode == 302) {
       final errorMessage =
-          "Username atau email sudah digunakan. Silahkan gunakan yang lain.";
-
+          "Username atau Email telah digunakan. Silahkan coba yang lain.";
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Validasi error'),
+            title: const Text('Kesalahan'),
             content: Text(errorMessage),
             actions: [
               TextButton(
@@ -203,8 +233,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: Text(
-                'Failed to update profile. Server responded with status code: ${response.statusCode}.'),
+            content: Text('Gagal mengupdate profil'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -220,14 +249,19 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // White background
+      appBar: AppBar(
+        backgroundColor: Colors.grey.shade200, // You can customize the color
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back when pressed
+          },
+        ),
+        title: const Text('Edit Profil'),
+      ),
       body: Stack(
         children: [
-          Image.asset(
-            'assets/images/login_background.jpg',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : Center(
@@ -236,6 +270,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                       padding: const EdgeInsets.all(16.0),
                       child: Card(
                         elevation: 8.0,
+                        color: Colors.grey.shade200, // Light gray card
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
@@ -301,9 +336,24 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 TextFormField(
-                                  decoration: const InputDecoration(
-                                      labelText: 'Masukkan password anda'),
-                                  obscureText: true,
+                                  decoration: InputDecoration(
+                                    labelText: 'Masukkan password anda',
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        isPasswordVisible
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          isPasswordVisible =
+                                              !isPasswordVisible;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  obscureText:
+                                      !isPasswordVisible, // Toggle visibility
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Masukkan password lama anda';

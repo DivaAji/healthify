@@ -66,7 +66,7 @@ class _StepsFinishState extends State<StepsFinish> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 10),
                     child: Text(
-                      'Selamat atas pencapaiannya',
+                      'Hebat! Anda telah menyelesaikan latihan hari ini.',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w400,

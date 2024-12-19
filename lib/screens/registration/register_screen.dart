@@ -27,19 +27,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController ageController = TextEditingController();
   final TextEditingController ageRangeController = TextEditingController();
 
+  final FocusNode passwordFocusNode = FocusNode();
+
+  bool isPasswordMatched = true;
+  bool isPasswordLengthValid = true;
+  bool isPasswordFocused = false;
+
   String selectedGender = '';
   String ageInputOption = 'Manual';
 
   @override
   void initState() {
     super.initState();
+
+    // Add listener to FocusNode
+    passwordFocusNode.addListener(() {
+      setState(() {
+        isPasswordFocused = passwordFocusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    passwordFocusNode.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocProvider(
-        create: (context) => RegistrationBloc(), // Ensure the bloc is created
+        create: (context) => RegistrationBloc(),
         child: Stack(
           children: [
             SizedBox.expand(
@@ -89,11 +109,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             keyboardType: TextInputType.name,
                           ),
                           const SizedBox(height: 15),
-                          CustomTextField(
-                            controller: passwordController,
-                            labelText: 'Password',
-                            obscureText: true,
-                            keyboardType: TextInputType.text,
+                          Stack(
+                            children: [
+                              CustomTextField(
+                                controller: passwordController,
+                                labelText: 'Password',
+                                obscureText: true,
+                                keyboardType: TextInputType.text,
+                                validationText: 'Password minimal 8 karakter.',
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 15),
                           CustomTextField(
@@ -101,6 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             labelText: 'Konfirmasi Password',
                             obscureText: true,
                             keyboardType: TextInputType.text,
+                            isError: !isPasswordMatched,
                           ),
                           const SizedBox(height: 15),
                           CustomTextField(
@@ -155,6 +181,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               return CustomButton(
                                 text: 'Next',
                                 onPressed: () {
+                                  if (passwordController.text !=
+                                      confirmPasswordController.text) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Password dan Konfirmasi Password tidak cocok.'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  setState(() {
+                                    isPasswordMatched =
+                                        passwordController.text ==
+                                            confirmPasswordController.text;
+                                  });
+
+                                  if (!isPasswordMatched) {
+                                    return;
+                                  }
                                   context.read<RegistrationBloc>().add(
                                         RegisterUserEvent(
                                           username: usernameController.text,
