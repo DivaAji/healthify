@@ -36,7 +36,7 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
     final prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('user_id');
     String date =
-        DateTime.now().toString().split(' ')[0]; // Current date (YYYY-MM-DD)
+        "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}"; // Date yang dipilih
 
     if (userId != null) {
       final url = ApiConfig.workoutHistoryEndpoint(userId, date);
@@ -79,10 +79,10 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
             });
           }
         } else {
-          throw Exception('Failed to load workout history');
+          throw Exception('Gagal memuat histori latihan');
         }
       } else {
-        throw Exception('Failed to load workout history');
+        throw Exception('Gagal memuat histori latihan');
       }
     }
   }
@@ -95,14 +95,23 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
     });
 
     try {
+      // Memanggil API untuk mendapatkan data berdasarkan tanggal yang dipilih
       final data = await fetchWorkoutHistory(
         _userId!,
         "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}",
       );
 
+      // Pastikan data yang diterima sesuai dengan tanggal yang dipilih
+      final filteredData = data.where((workout) {
+        final workoutDate = DateTime.parse(workout['date']);
+        return workoutDate.year == _selectedDate.year &&
+            workoutDate.month == _selectedDate.month &&
+            workoutDate.day == _selectedDate.day;
+      }).toList();
+
       if (mounted) {
         setState(() {
-          _historyData = data;
+          _historyData = filteredData;
         });
       }
     } catch (e) {
@@ -146,8 +155,10 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
         _selectedDate = pickedDate;
+        _categories.clear();
       });
       _fetchData();
+      _fetchCategories();
     }
   }
 
@@ -160,9 +171,19 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
           style: TextStyle(color: Color(0xFF21324B)),
         ),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey.shade200, // Set to grey shade 200
         foregroundColor: Color(0xFF21324B),
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0), // Left padding
+            child: Text(
+              'Pilih Tanggal', // Add "Pilih Tanggal" text
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF21324B),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.calendar_today),
             onPressed: () => _selectDate(context),
@@ -174,20 +195,14 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/login_background.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                color: Colors.white,
                 child: Column(
                   children: [
                     // Display workout history grouped by category
                     Expanded(
                       child: _categories.isEmpty
                           ? const Center(
-                              child: Text(
-                                  'No workout history found for this date.'))
+                              child: Text('Tidak ada histori latihan.'))
                           : ListView(
                               children: _categories.map((categoryData) {
                                 return Column(
@@ -196,7 +211,8 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
                                     Card(
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
-                                      color: Colors.white,
+                                      color: Colors
+                                          .grey.shade50, // Set to grey shade 50
                                       elevation: 2,
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -218,10 +234,6 @@ class _WorkoutHistoryState extends State<WorkoutHistory> {
                                         elevation: 2,
                                         color: Colors.white,
                                         child: ListTile(
-                                          leading: CircleAvatar(
-                                            backgroundImage: AssetImage(
-                                                'assets/images/kelenturan.jpg'),
-                                          ),
                                           title: Text(program['name']),
                                           subtitle: Column(
                                             crossAxisAlignment:

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:healthify/screens/config/api_config.dart';
+import 'package:healthify/widgets/button.dart';
 
 class DetailProgramScreen extends StatelessWidget {
   final String categoryName;
@@ -71,19 +72,21 @@ class DetailProgramScreen extends StatelessWidget {
           title: Text('Mulai Program'),
           content: Text('Apakah Anda siap untuk memulai program ini?'),
           actions: [
-            TextButton(
+            // Custom button for "Tidak"
+            CustomButton(
+              text: 'Tidak',
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Tidak'),
             ),
-            TextButton(
+            // Custom button for "Ya"
+            CustomButton(
+              text: 'Ya',
               onPressed: () async {
                 await selectCategoryProgram(workoutsId); // Select the category
                 Navigator.of(context).pop(); // Close the dialog
-                Navigator.pop(context); // Go back to the previous screen
+                Navigator.pop(context, true); // Go back to the previous screen
               },
-              child: Text('Ya'),
             ),
           ],
         );
@@ -91,11 +94,17 @@ class DetailProgramScreen extends StatelessWidget {
     );
   }
 
+  // Remove dynamic border color and make it always black
+  Color _getBorderColor() {
+    return Colors.black; // Set all borders to black
+  }
+
   @override
   Widget build(BuildContext context) {
     String bannerImage = 'assets/images/${categoryName.toLowerCase()}.jpg';
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade200,
       body: Column(
         children: [
           // Banner
@@ -197,6 +206,7 @@ class DetailProgramScreen extends StatelessWidget {
                             vertical: 8.0, horizontal: 16.0),
                         child: Card(
                           elevation: 8,
+                          color: Colors.grey.shade50,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -235,6 +245,17 @@ class DetailProgramScreen extends StatelessWidget {
                                               margin:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 5),
+                                              color: Colors
+                                                  .white, // Inside the card is white
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                side: BorderSide(
+                                                  color:
+                                                      _getBorderColor(), // Set all borders to black
+                                                  width: 1,
+                                                ),
+                                              ),
                                               child: ListTile(
                                                 leading: Icon(
                                                   Icons.fitness_center,

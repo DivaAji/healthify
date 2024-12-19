@@ -178,7 +178,7 @@ class _FaceScanState extends State<FaceScan> {
     } else if (ageRange == 'Lansia') {
       message = 'Prediksi usia Anda adalah Lansia (di atas 50 tahun).';
     } else {
-      message = 'Rentang usia tidak dikenali.';
+      message = 'Rentang usia tidak dikenali.\nCoba gunakan gambar lain';
     }
 
     showDialog(
@@ -191,80 +191,133 @@ class _FaceScanState extends State<FaceScan> {
             if (ageRange == 'Remaja' ||
                 ageRange == 'Dewasa' ||
                 ageRange == 'Lansia') ...[
-              // Button for ages 18+
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
-                },
-                child: const Text('Benar'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showManualAgeInputDialog(); // Allow manual age input
-                },
-                child: const Text('Input usia manual'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                },
-                child: const Text('Ambil Ulang Gambar'),
+              // Column to place buttons
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Row to place "Salah" and "Benar" buttons side by side
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Tombol "Salah"
+                      CustomButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                  'Silahkan upload gambar ulang untuk verifikasi usia.'),
+                              duration: Duration(seconds: 3), // Durasi tampil
+                            ),
+                          );
+                        },
+                        text: 'Salah',
+                        horizontalPadding: 16.0,
+                        verticalPadding: 8.0,
+                      ),
+                      SizedBox(width: 16), // Jarak antar tombol
+
+                      // Tombol "Benar"
+                      CustomButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close dialog
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
+                          );
+                        },
+                        text: 'Benar',
+                        horizontalPadding: 16.0,
+                        verticalPadding: 8.0,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16), // Jarak antar baris tombol
+
+                  // Tombol "Masukkan Usia Manual"
+                  CustomButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close dialog
+                      _showManualAgeInputDialog(); // Allow manual age input
+                    },
+                    text: 'Masukkan Usia Manual',
+                    horizontalPadding: 16.0,
+                    verticalPadding: 8.0,
+                  ),
+                ],
               ),
             ] else ...[
               // Button for under 18 age group
-              TextButton(
-                onPressed: () async {
-                  // Delete the user's account if under 18
-                  final uri =
-                      Uri.parse('${ApiConfig.baseUrl}/user/${widget.userId}');
-                  try {
-                    final response = await http.delete(uri);
-                    if (response.statusCode == 200) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Akun Anda telah dihapus')),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Tombol Registrasi Ulang
+                  CustomButton(
+                    onPressed: () async {
+                      // Hapus akun pengguna jika usia di bawah 18 tahun
+                      final uri = Uri.parse(
+                          '${ApiConfig.baseUrl}/user/${widget.userId}');
+                      try {
+                        final response = await http.delete(uri);
+                        if (response.statusCode == 200) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Akun Anda telah dihapus')),
+                            );
+                          }
+                        } else {
+                          print('Gagal menghapus akun: ${response.body}');
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Gagal menghapus akun Anda')),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        print('Error: $e');
+                      } finally {
+                        // Arahkan ke halaman login
+                        Navigator.pop(context); // Tutup dialog
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()),
                         );
                       }
-                    } else {
-                      print('Gagal menghapus akun: ${response.body}');
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Gagal menghapus akun Anda')),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    print('Error: $e');
-                  } finally {
-                    // Navigate to login page
-                    Navigator.pop(context); // Close the dialog
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                  }
-                },
-                child: const Text('Kembali ke Login'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                  _showManualAgeInputDialog(); // Allow manual age input
-                },
-                child: const Text('Masukkan Usia Manual'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                },
-                child: const Text('Ambil Ulang Gambar'),
+                    },
+                    text: 'Kembali ke login',
+                    horizontalPadding: 16.0,
+                    verticalPadding: 8.0,
+                  ),
+                  SizedBox(height: 16), // Jarak antar tombol
+
+                  // Tombol Masukkan Usia Manual
+                  CustomButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Tutup dialog
+                      _showManualAgeInputDialog(); // Izinkan input usia manual
+                    },
+                    text: 'Masukkan Usia Manual',
+                    horizontalPadding: 16.0,
+                    verticalPadding: 8.0,
+                  ),
+                  SizedBox(height: 30),
+                  // Tombol Kembali untuk kembali ke halaman sebelumnya
+                  CustomButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Kembali ke halaman sebelumnya
+                    },
+                    text: 'Kembali',
+                    horizontalPadding: 16.0,
+                    verticalPadding: 8.0,
+                  ),
+                  SizedBox(height: 16), // Jarak antar tombol
+                ],
               ),
             ],
           ],
@@ -292,7 +345,8 @@ class _FaceScanState extends State<FaceScan> {
                     Column(
                       children: [
                         RadioListTile<String>(
-                          title: const Text('Belum Remaja'),
+                          title:
+                              const Text('Belum Remaja \n(Dibawah 18 tahun)'),
                           value: 'Belum Remaja',
                           groupValue: selectedAgeRangeTemp,
                           onChanged: (String? value) {
@@ -302,7 +356,7 @@ class _FaceScanState extends State<FaceScan> {
                           },
                         ),
                         RadioListTile<String>(
-                          title: const Text('Remaja'),
+                          title: const Text('Remaja \n(18-30 tahun)'),
                           value: 'Remaja',
                           groupValue: selectedAgeRangeTemp,
                           onChanged: (String? value) {
@@ -312,7 +366,7 @@ class _FaceScanState extends State<FaceScan> {
                           },
                         ),
                         RadioListTile<String>(
-                          title: const Text('Dewasa'),
+                          title: const Text('Dewasa \n(31-50 tahun)'),
                           value: 'Dewasa',
                           groupValue: selectedAgeRangeTemp,
                           onChanged: (String? value) {
@@ -322,7 +376,7 @@ class _FaceScanState extends State<FaceScan> {
                           },
                         ),
                         RadioListTile<String>(
-                          title: const Text('Lansia'),
+                          title: const Text('Lansia \n(50+ tahun)'),
                           value: 'Lansia',
                           groupValue: selectedAgeRangeTemp,
                           onChanged: (String? value) {

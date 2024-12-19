@@ -17,10 +17,11 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   String email = '';
   String height = '';
   String weight = '';
+  String oldPassword = '';
 
   bool isLoading = true;
-
   final _formKey = GlobalKey<FormState>();
+  final _oldPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
 
   Future<void> fetchProfileData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('jwt_token'); // Retrieve token
+    String? token = prefs.getString('jwt_token');
 
     if (token == null) {
       Navigator.pushReplacementNamed(context, '/login');
@@ -60,8 +61,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text(
-                'Failed to fetch profile data. Please try again later.'),
+            content: const Text('Failed to fetch profile data. Please try again later.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -77,11 +77,77 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   }
 
   Future<void> updateProfile() async {
+    oldPassword = _oldPasswordController.text;
+    if (oldPassword.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Please enter your old password.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true; // Show loading indicator while updating
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwt_token');
 
     if (token == null) {
       Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
+
+    String? storedUsername = prefs.getString('username');
+    String? storedEmail = prefs.getString('email');
+
+    final Map<String, dynamic> bodyData = {
+      'oldPassword': oldPassword,
+    };
+
+    if (username != storedUsername && username.isNotEmpty) {
+      bodyData['username'] = username;
+    }
+    if (email != storedEmail && email.isNotEmpty) {
+      bodyData['email'] = email;
+    }
+    if (height.isNotEmpty) {
+      bodyData['height'] = height;
+    }
+    if (weight.isNotEmpty) {
+      bodyData['weight'] = weight;
+    }
+
+    if (bodyData.length == 1) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('No Changes'),
+            content: const Text('No data has been updated.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      setState(() {
+        isLoading = false; // Hide loading indicator
+      });
       return;
     }
 
@@ -91,13 +157,12 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: json.encode({
-        'username': username,
-        'email': email,
-        'height': height,
-        'weight': weight,
-      }),
+      body: json.encode(bodyData),
     );
+
+    setState(() {
+      isLoading = false; // Hide loading indicator after request is done
+    });
 
     if (response.statusCode == 200) {
       final updatedData = json.decode(response.body);
@@ -106,12 +171,59 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Success'),
-            content: const Text('Profile updated successfully'),
+            content: const Text('Profile data has been updated'),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context, updatedData); // Return updated data
+                  Navigator.pop(context, updatedData);
                 },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (response.statusCode == 302) {
+      final errorMessage = "Username or Email is already in use. Please try again.";
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text(errorMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (response.statusCode == 422) {
+      final errorData = json.decode(response.body);
+      String errorMessage = "Validation error:\n";
+      if (errorData['errors'] != null) {
+        errorData['errors'].forEach((key, value) {
+          if (key == 'username') {
+            errorMessage += "Username is already taken\n";
+          } else if (key == 'email') {
+            errorMessage += "Email is already taken\n";
+          } else {
+            errorMessage += "${value[0]}\n";
+          }
+        });
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Validation Error'),
+            content: Text(errorMessage.trim()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('OK'),
               ),
             ],
@@ -142,6 +254,17 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.grey.shade200,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text('Edit Profile'),
+      ),
       body: Stack(
         children: [
           // Background image
@@ -151,7 +274,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
             width: double.infinity,
             height: double.infinity,
           ),
-          // Content on top of background image
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : Center(
@@ -159,7 +281,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Card(
-                        elevation: 8.0, // Optional shadow for the card
+                        elevation: 8.0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
@@ -170,14 +292,34 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                // Username
+                                TextFormField(
+                                  controller: _oldPasswordController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Masukkan Password',
+                                    prefixIcon: Icon(Icons.lock),
+                                  ),
+                                  obscureText: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Masukkan password lama';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    oldPassword = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
                                 TextFormField(
                                   initialValue: username,
                                   decoration: const InputDecoration(
-                                      labelText: 'Username'),
+                                    labelText: 'Username',
+                                    prefixIcon: Icon(Icons.person),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your username';
+                                      return 'Masukkan username';
                                     }
                                     return null;
                                   },
@@ -187,14 +329,15 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Email
                                 TextFormField(
                                   initialValue: email,
-                                  decoration:
-                                      const InputDecoration(labelText: 'Email'),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Email',
+                                    prefixIcon: Icon(Icons.email),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your email';
+                                      return 'Masukkan email';
                                     }
                                     return null;
                                   },
@@ -204,15 +347,16 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Height
                                 TextFormField(
                                   initialValue: height,
                                   decoration: const InputDecoration(
-                                      labelText: 'Height (cm)'),
+                                    labelText: 'Tinggi Badan (cm)',
+                                    prefixIcon: Icon(Icons.height),
+                                  ),
                                   keyboardType: TextInputType.number,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your height';
+                                      return 'Masukkan Tinggi Badan';
                                     }
                                     return null;
                                   },
@@ -222,15 +366,16 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Weight
                                 TextFormField(
                                   initialValue: weight,
                                   decoration: const InputDecoration(
-                                      labelText: 'Weight (kg)'),
+                                    labelText: 'Berat Badan (kg)',
+                                    prefixIcon: Icon(Icons.fitness_center),
+                                  ),
                                   keyboardType: TextInputType.number,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your weight';
+                                      return 'Masukkan Berat Badan';
                                     }
                                     return null;
                                   },
@@ -240,16 +385,13 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Save Button
                                 CustomButton(
-                                  text: 'Save Changes',
                                   onPressed: () {
-                                    if (_formKey.currentState!.validate()) {
+                                    if (_formKey.currentState?.validate() ?? false) {
                                       updateProfile();
                                     }
                                   },
-                                  verticalPadding: 10.0,
-                                  textStyle: const TextStyle(fontSize: 18),
+                                  text: 'Simpan',
                                 ),
                               ],
                             ),
