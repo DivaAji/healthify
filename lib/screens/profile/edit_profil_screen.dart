@@ -17,9 +17,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   String email = '';
   String height = '';
   String weight = '';
-
   bool isLoading = true;
-
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -30,7 +28,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
 
   Future<void> fetchProfileData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('jwt_token'); // Retrieve token
+    String? token = prefs.getString('jwt_token');
 
     if (token == null) {
       Navigator.pushReplacementNamed(context, '/login');
@@ -55,25 +53,28 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       setState(() {
         isLoading = false;
       });
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text(
-                'Failed to fetch profile data. Please try again later.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      showErrorDialog('Failed to fetch profile data.');
     }
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> updateProfile() async {
@@ -110,7 +111,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context, updatedData); // Return updated data
+                  Navigator.pop(context, updatedData);
                 },
                 child: const Text('OK'),
               ),
@@ -119,23 +120,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         },
       );
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: Text('Failed to update profile: ${response.body}'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      showErrorDialog('Failed to update profile: ${response.body}');
     }
   }
 
@@ -151,7 +136,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
             width: double.infinity,
             height: double.infinity,
           ),
-          // Content on top of background image
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : Center(
@@ -159,7 +143,8 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Card(
-                        elevation: 8.0, // Optional shadow for the card
+                        color: Colors.white.withOpacity(0.8),
+                        elevation: 8.0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
@@ -170,73 +155,52 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
+                                const Text(
+                                  'Edit Profil',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF21324B),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+
                                 // Username
-                                TextFormField(
+                                _buildTextFormField(
+                                  label: 'Username',
+                                  icon: Icons.person,
                                   initialValue: username,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Username'),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your username';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    username = value;
-                                  },
+                                  onChanged: (value) => username = value,
                                 ),
                                 const SizedBox(height: 16),
 
                                 // Email
-                                TextFormField(
+                                _buildTextFormField(
+                                  label: 'Email',
+                                  icon: Icons.email,
                                   initialValue: email,
-                                  decoration:
-                                      const InputDecoration(labelText: 'Email'),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your email';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    email = value;
-                                  },
+                                  onChanged: (value) => email = value,
                                 ),
                                 const SizedBox(height: 16),
 
                                 // Height
-                                TextFormField(
+                                _buildTextFormField(
+                                  label: 'Height (cm)',
+                                  icon: Icons.height,
                                   initialValue: height,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Height (cm)'),
                                   keyboardType: TextInputType.number,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your height';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    height = value;
-                                  },
+                                  onChanged: (value) => height = value,
                                 ),
                                 const SizedBox(height: 16),
 
                                 // Weight
-                                TextFormField(
+                                _buildTextFormField(
+                                  label: 'Weight (kg)',
+                                  icon: Icons.monitor_weight,
                                   initialValue: weight,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Weight (kg)'),
                                   keyboardType: TextInputType.number,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your weight';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    weight = value;
-                                  },
+                                  onChanged: (value) => weight = value,
                                 ),
                                 const SizedBox(height: 16),
 
@@ -262,5 +226,55 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildTextFormField({
+  required String label,
+  required IconData icon,
+  required String initialValue,
+  required Function(String) onChanged,
+  TextInputType keyboardType = TextInputType.text,
+}) {
+  return TextFormField(
+    initialValue: initialValue,
+    keyboardType: keyboardType,
+    decoration: InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(
+        icon,
+        color: const Color(0xFF21324B), // Icon color
+      ),
+      labelStyle: TextStyle(
+        color: const Color(0xFF21324B), // Label text color
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: BorderSide(
+          color: const Color(0xFF21324B), // Default border color
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: BorderSide(
+          color: const Color(0xFF21324B), // Border color when not focused
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: BorderSide(
+          color: const Color(0xFF21324B), // Border color when focused
+        ),
+      ),
+      filled: true,
+      fillColor: Colors.white.withOpacity(0),
+    ),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'Please enter your $label';
+      }
+      return null;
+    },
+    onChanged: onChanged,
+  );
   }
 }

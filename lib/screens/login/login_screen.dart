@@ -17,9 +17,13 @@ final TextEditingController usernameController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
 
 // Ganti URL dengan URL backend Anda
+String urlDomain =
+    "http://192.168.69.94:8000/"; // Ganti dengan IP server lokal atau domain
+String urlGetData = urlDomain + "api/user/1"; // Endpoint API yang sesuai
 // String urlDomain =
 //     ApiConfig().baseUrl; // Ganti dengan IP server lokal atau domain
 String urlLogin = ApiConfig.baseUrl + "/login"; // Endpoint API untuk login
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
