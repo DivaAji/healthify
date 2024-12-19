@@ -162,13 +162,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withOpacity(0.25),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.white.withOpacity(1)),
                       boxShadow: [
                         BoxShadow(
                           color: const Color.fromARGB(255, 59, 56, 56)
-                              .withOpacity(0.33),
+                              .withOpacity(0.45),
                           blurRadius: 20,
                           spreadRadius: 5,
                         ),
