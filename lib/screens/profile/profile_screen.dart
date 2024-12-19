@@ -116,13 +116,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'Profil',
           style: TextStyle(color: Color(0xFF21324B)),
         ),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor:
+            Colors.grey.shade100, // Set the app bar color to grey[200]
         actions: [
           const Text(
             'Logout',
@@ -140,6 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Container(
+<<<<<<< HEAD
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/images/login_background.jpg'),
@@ -159,6 +162,109 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: const Color.fromARGB(255, 59, 56, 56).withOpacity(0.33),
                           blurRadius: 20,
                           spreadRadius: 5,
+=======
+              child: Center(
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Card(
+                      elevation: 8.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      color: Colors.grey
+                          .shade50, // Set the card background color to white
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Username
+                            Text(
+                              username,
+                              style: const TextStyle(
+                                  fontSize: 28, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Email
+                            Text(
+                              email,
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.grey[600]),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Additional Information Section
+                            Text(
+                              'Informasi Tambahan',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Info List
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListView(
+                                  children: [
+                                    _buildInfoItem('Jenis Kelamin', gender),
+                                    _buildInfoItem('Tinggi Badan', height),
+                                    _buildInfoItem('Berat Badan', weight),
+                                    _buildInfoItem('Rentang Usia', ageRange),
+                                    _buildInfoItem('Indeks Masa Tubuh', bmi),
+                                    _buildInfoItem(
+                                        'Kategori IMB',
+                                        getBmiCategory(
+                                            bmi)), // Added BMI category
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Edit Profile Button - Positioned at the bottom of the card
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: Center(
+                                child: CustomButton(
+                                  text: 'Edit Profil',
+                                  onPressed: () async {
+                                    final updatedData = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditProfilScreen(),
+                                      ),
+                                    ).then((shouldRefresh) {
+                                      if (shouldRefresh == true) {
+                                        // Trigger the profile data refresh here
+                                        fetchProfileData(); // Call the method to reload the profile data
+                                      }
+                                    });
+
+                                    if (updatedData != null) {
+                                      setState(() {
+                                        username =
+                                            updatedData['username'] ?? username;
+                                        email = updatedData['email'] ?? email;
+                                        height =
+                                            updatedData['height'] ?? height;
+                                        weight =
+                                            updatedData['weight'] ?? weight;
+                                        gender =
+                                            updatedData['gender'] ?? gender;
+                                        ageRange =
+                                            updatedData['ageRange'] ?? ageRange;
+                                      });
+                                    }
+                                  },
+                                  verticalPadding: 10.0,
+                                  textStyle: const TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+>>>>>>> 9af0eb5074b7c727a5275bc28240383cc3dde9ff
                         ),
                       ],
                     ),

@@ -305,6 +305,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 side: BorderSide(color: Color.fromRGBO(1, 1, 1, 1)),
               ),
               elevation: 4,
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListTile(
