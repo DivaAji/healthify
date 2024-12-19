@@ -17,9 +17,11 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   String email = '';
   String height = '';
   String weight = '';
+  String oldPassword = '';
 
   bool isLoading = true;
   final _formKey = GlobalKey<FormState>();
+  final _oldPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -59,8 +61,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text(
-                'Failed to fetch profile data. Please try again later.'),
+            content: const Text('Failed to fetch profile data. Please try again later.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -76,14 +77,14 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   }
 
   Future<void> updateProfile() async {
-    // If oldPassword is empty, show error
+    oldPassword = _oldPasswordController.text;
     if (oldPassword.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text('Masukkan password anda.'),
+            content: const Text('Please enter your old password.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -96,6 +97,10 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       return;
     }
 
+    setState(() {
+      isLoading = true; // Show loading indicator while updating
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwt_token');
 
@@ -104,16 +109,13 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       return;
     }
 
-    // Fetch stored values from SharedPreferences
     String? storedUsername = prefs.getString('username');
     String? storedEmail = prefs.getString('email');
 
-    // Create Map for request body, only send changed data
     final Map<String, dynamic> bodyData = {
-      'oldPassword': oldPassword, // Always send oldPassword
+      'oldPassword': oldPassword,
     };
 
-    // Only include fields in the request if they have changed
     if (username != storedUsername && username.isNotEmpty) {
       bodyData['username'] = username;
     }
@@ -127,15 +129,13 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       bodyData['weight'] = weight;
     }
 
-    // Proceed with API call only if there's any data to update
     if (bodyData.length == 1) {
-      // Only oldPassword is present, no other data changed
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Tidak ada perubahan'),
-            content: const Text('Tidak ada data yang diubah.'),
+            title: const Text('No Changes'),
+            content: const Text('No data has been updated.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -145,10 +145,12 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
           );
         },
       );
+      setState(() {
+        isLoading = false; // Hide loading indicator
+      });
       return;
     }
 
-    // Send request to API
     final response = await http.put(
       Uri.parse(ApiConfig.profileEndpoint),
       headers: {
@@ -158,19 +160,22 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       body: json.encode(bodyData),
     );
 
-    // Handle API response
+    setState(() {
+      isLoading = false; // Hide loading indicator after request is done
+    });
+
     if (response.statusCode == 200) {
       final updatedData = json.decode(response.body);
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Berhasil'),
-            content: const Text('Data profil telah diperbarui'),
+            title: const Text('Success'),
+            content: const Text('Profile data has been updated'),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context, updatedData); // Return updated data
+                  Navigator.pop(context, updatedData);
                 },
                 child: const Text('OK'),
               ),
@@ -179,13 +184,12 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         },
       );
     } else if (response.statusCode == 302) {
-      final errorMessage =
-          "Username atau Email telah digunakan. Silahkan coba yang lain.";
+      final errorMessage = "Username or Email is already in use. Please try again.";
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Kesalahan'),
+            title: const Text('Error'),
             content: Text(errorMessage),
             actions: [
               TextButton(
@@ -250,16 +254,16 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // White background
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade200, // You can customize the color
+        backgroundColor: Colors.grey.shade200,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Navigate back when pressed
+            Navigator.pop(context);
           },
         ),
-        title: const Text('Edit Profil'),
+        title: const Text('Edit Profile'),
       ),
       body: Stack(
         children: [
@@ -270,7 +274,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
             width: double.infinity,
             height: double.infinity,
           ),
-          // Content on top of background image
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : Center(
@@ -278,7 +281,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Card(
-                        elevation: 8.0, // Optional shadow for the card
+                        elevation: 8.0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
@@ -289,14 +292,34 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                // Username
+                                TextFormField(
+                                  controller: _oldPasswordController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Masukkan Password',
+                                    prefixIcon: Icon(Icons.lock),
+                                  ),
+                                  obscureText: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Masukkan password lama';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    oldPassword = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
                                 TextFormField(
                                   initialValue: username,
                                   decoration: const InputDecoration(
-                                      labelText: 'Username'),
+                                    labelText: 'Username',
+                                    prefixIcon: Icon(Icons.person),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your username';
+                                      return 'Masukkan username';
                                     }
                                     return null;
                                   },
@@ -306,14 +329,15 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Email
                                 TextFormField(
                                   initialValue: email,
-                                  decoration:
-                                      const InputDecoration(labelText: 'Email'),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Email',
+                                    prefixIcon: Icon(Icons.email),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your email';
+                                      return 'Masukkan email';
                                     }
                                     return null;
                                   },
@@ -323,15 +347,16 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Height
                                 TextFormField(
                                   initialValue: height,
                                   decoration: const InputDecoration(
-                                      labelText: 'Height (cm)'),
+                                    labelText: 'Tinggi Badan (cm)',
+                                    prefixIcon: Icon(Icons.height),
+                                  ),
                                   keyboardType: TextInputType.number,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your height';
+                                      return 'Masukkan Tinggi Badan';
                                     }
                                     return null;
                                   },
@@ -341,15 +366,16 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Weight
                                 TextFormField(
                                   initialValue: weight,
                                   decoration: const InputDecoration(
-                                      labelText: 'Weight (kg)'),
+                                    labelText: 'Berat Badan (kg)',
+                                    prefixIcon: Icon(Icons.fitness_center),
+                                  ),
                                   keyboardType: TextInputType.number,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your weight';
+                                      return 'Masukkan Berat Badan';
                                     }
                                     return null;
                                   },
@@ -358,14 +384,14 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
+
                                 CustomButton(
                                   onPressed: () {
-                                    if (_formKey.currentState?.validate() ??
-                                        false) {
+                                    if (_formKey.currentState?.validate() ?? false) {
                                       updateProfile();
                                     }
                                   },
-                                  text: 'Simpan Perubahan',
+                                  text: 'Simpan',
                                 ),
                               ],
                             ),
@@ -378,55 +404,5 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         ],
       ),
     );
-  }
-
-  Widget _buildTextFormField({
-  required String label,
-  required IconData icon,
-  required String initialValue,
-  required Function(String) onChanged,
-  TextInputType keyboardType = TextInputType.text,
-}) {
-  return TextFormField(
-    initialValue: initialValue,
-    keyboardType: keyboardType,
-    decoration: InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(
-        icon,
-        color: const Color(0xFF21324B), // Icon color
-      ),
-      labelStyle: TextStyle(
-        color: const Color(0xFF21324B), // Label text color
-      ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(
-          color: const Color(0xFF21324B), // Default border color
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(
-          color: const Color(0xFF21324B), // Border color when not focused
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(
-          color: const Color(0xFF21324B), // Border color when focused
-        ),
-      ),
-      filled: true,
-      fillColor: Colors.white.withOpacity(0),
-    ),
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter your $label';
-      }
-      return null;
-    },
-    onChanged: onChanged,
-  );
   }
 }
