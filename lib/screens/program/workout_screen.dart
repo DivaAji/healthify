@@ -310,8 +310,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: ListTile(
                   leading: Icon(
-                    Icons.fitness_center,
-                    color: Colors.black87, // Warna ikon
+                    Icons.sports_gymnastics_rounded,
+                    color: const Color(0xFF21324B), // Warna ikon
                     size: 30,
                   ),
                   title: Text(
@@ -319,7 +319,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: Colors.black87,
+                      color: Color(0xFF21324B),
                     ),
                   ),
                   subtitle: Column(
@@ -327,7 +327,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     children: [
                       Text(
                         detail['description'],
-                        style: TextStyle(color: Colors.black.withOpacity(0.7)),
+                        style: TextStyle(color: const Color(0xFF21324B).withOpacity(0.7)),
                       ),
                     ],
                   ),
