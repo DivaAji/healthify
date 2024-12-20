@@ -61,7 +61,8 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text('Failed to fetch profile data. Please try again later.'),
+            content: const Text(
+                'Failed to fetch profile data. Please try again later.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -77,14 +78,14 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   }
 
   Future<void> updateProfile() async {
-    oldPassword = _oldPasswordController.text;
+    // If oldPassword is empty, show error
     if (oldPassword.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text('Please enter your old password.'),
+            content: const Text('Masukkan password anda.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -97,10 +98,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       return;
     }
 
-    setState(() {
-      isLoading = true; // Show loading indicator while updating
-    });
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwt_token');
 
@@ -109,13 +106,16 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       return;
     }
 
+    // Fetch stored values from SharedPreferences
     String? storedUsername = prefs.getString('username');
     String? storedEmail = prefs.getString('email');
 
+    // Create Map for request body, only send changed data
     final Map<String, dynamic> bodyData = {
-      'oldPassword': oldPassword,
+      'oldPassword': oldPassword, // Always send oldPassword
     };
 
+    // Only include fields in the request if they have changed
     if (username != storedUsername && username.isNotEmpty) {
       bodyData['username'] = username;
     }
@@ -129,13 +129,15 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       bodyData['weight'] = weight;
     }
 
+    // Proceed with API call only if there's any data to update
     if (bodyData.length == 1) {
+      // Only oldPassword is present, no other data changed
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('No Changes'),
-            content: const Text('No data has been updated.'),
+            title: const Text('Tidak ada perubahan'),
+            content: const Text('Tidak ada data yang diubah.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -145,12 +147,10 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
           );
         },
       );
-      setState(() {
-        isLoading = false; // Hide loading indicator
-      });
       return;
     }
 
+    // Send request to API
     final response = await http.put(
       Uri.parse(ApiConfig.profileEndpoint),
       headers: {
@@ -160,22 +160,21 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       body: json.encode(bodyData),
     );
 
-    setState(() {
-      isLoading = false; // Hide loading indicator after request is done
-    });
-
+    // Handle API response
     if (response.statusCode == 200) {
       final updatedData = json.decode(response.body);
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Profile data has been updated'),
+            title: const Text('Berhasil'),
+            content: const Text('Data profil telah diperbarui'),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context, updatedData);
+                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(
+                      context, true); // Return updated data to ProfileScreen
                 },
                 child: const Text('OK'),
               ),
@@ -184,12 +183,13 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         },
       );
     } else if (response.statusCode == 302) {
-      final errorMessage = "Username or Email is already in use. Please try again.";
+      final errorMessage =
+          "Username atau Email telah digunakan. Silahkan coba yang lain.";
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Error'),
+            title: const Text('Kesalahan'),
             content: Text(errorMessage),
             actions: [
               TextButton(
@@ -236,12 +236,10 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: Text('Failed to update profile: ${response.body}'),
+            content: Text('Gagal mengupdate profil'),
             actions: [
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('OK'),
               ),
             ],
@@ -310,7 +308,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
                                 TextFormField(
                                   initialValue: username,
                                   decoration: const InputDecoration(
@@ -328,7 +325,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
                                 TextFormField(
                                   initialValue: email,
                                   decoration: const InputDecoration(
@@ -346,7 +342,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
                                 TextFormField(
                                   initialValue: height,
                                   decoration: const InputDecoration(
@@ -365,7 +360,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
                                 TextFormField(
                                   initialValue: weight,
                                   decoration: const InputDecoration(
@@ -384,10 +378,10 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
                                 CustomButton(
                                   onPressed: () {
-                                    if (_formKey.currentState?.validate() ?? false) {
+                                    if (_formKey.currentState?.validate() ??
+                                        false) {
                                       updateProfile();
                                     }
                                   },

@@ -133,7 +133,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(color: Color(0xFF21324B)),
         ),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.grey.shade100, // Set the app bar color to grey[200]
+        backgroundColor:
+            Colors.grey.shade100, // Set the app bar color to grey[200]
         actions: [
           const Text(
             'Logout',
@@ -239,12 +240,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               final updatedData = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditProfilScreen(),
+                                  builder: (context) => EditProfilScreen(),
                                 ),
                               ).then((shouldRefresh) {
                                 if (shouldRefresh == true) {
-                                  fetchProfileData();
+                                  // Trigger the profile data refresh here
+                                  fetchProfileData(); // Call the method to reload the profile data
                                 }
                               });
 
@@ -253,12 +254,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   username =
                                       updatedData['username'] ?? username;
                                   email = updatedData['email'] ?? email;
-                                  height =
-                                      updatedData['height'] ?? height;
-                                  weight =
-                                      updatedData['weight'] ?? weight;
-                                  gender =
-                                      updatedData['gender'] ?? gender;
+                                  height = updatedData['height'] ?? height;
+                                  weight = updatedData['weight'] ?? weight;
+                                  gender = updatedData['gender'] ?? gender;
                                   ageRange =
                                       updatedData['ageRange'] ?? ageRange;
                                 });
@@ -289,7 +287,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           Text(
             value,
-            style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
+            style:
+                TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
           ),
         ],
       ),
